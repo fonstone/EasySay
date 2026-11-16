@@ -1,0 +1,209 @@
+<view class="session" wx:if="{{ready}}" style="padding-top: {{statusBarHeight}}px;">
+  <!-- ================= 题目介绍 ================= -->
+  <view wx:if="{{phase === 'intro'}}" class="intro fade-up">
+    <view class="phase-bar">
+      <view class="back-btn" bindtap="goBack">←</view>
+      <view class="phase-source">{{sourceLabel}}<text wx:if="{{levelName}}"> · {{levelName}}</text></view>
+      <view wx:if="{{isToday}}" class="phase-quota">{{chancesLeft < 0 ? '已打卡' : '剩 ' + chancesLeft + ' 次'}}</view>
+      <view wx:else class="phase-quota phase-quota-ghost">练习</view>
+    </view>
+
+    <view class="intro-head">
+      <view class="eyebrow">{{question.categoryName}}</view>
+      <view class="intro-title serif">{{question.title}}</view>
+      <view class="intro-sub">{{question.subtitle}}</view>
+      <view class="intro-meta">
+        <view class="meta-chip">{{question.minSeconds}}–{{question.maxSeconds}} 秒</view>
+        <view class="meta-chip">构思 {{prepTotal}} 秒</view>
+        <view class="meta-chip" wx:if="{{isToday}}">{{chancesLeft < 0 ? '已打卡 · 自由重练' : chancesLeft + ' 次机会'}}</view>
+      </view>
+
+      <view wx:if="{{question.audio}}" class="demo-row">
+        <view class="demo-btn" bindtap="toggleDemo">
+          <view class="demo-icon {{demoPlaying ? 'pause' : ''}}"></view>
+          <text>{{demoPlaying ? '暂停示范' : '听教练示范'}}</text>
+        </view>
+        <view class="demo-note">{{demoError ? '示范音频不可用' : '合成语音 · 先听停顿与重音'}}</view>
+      </view>
+    </view>
+
+    <view class="prompt-card">
+      <view class="card-label">题目</view>
+      <view class="prompt-text">{{question.prompt}}</view>
+    </view>
+
+    <view wx:if="{{question.material}}" class="material-card">
+      <view class="between">
+        <view class="card-label">材料</view>
+        <view wx:if="{{materialLong}}" class="material-toggle" bindtap="toggleMaterial">
+          {{materialExpanded ? '收起' : '展开全文'}}
+        </view>
+      </view>
+      <view class="material-text {{materialExpanded ? '' : 'clamped'}}">{{question.material}}</view>
+      <view wx:if="{{materialLong && !materialExpanded}}" class="material-fade"></view>
+    </view>
+
+    <view class="section-mini">
+      <view class="card-label">这一题看这几点</view>
+      <view class="point-list">
+        <view wx:for="{{question.keyPoints}}" wx:key="label" class="point-row">
+          <view class="point-index">{{index + 1}}</view>
+          <view class="point-label">{{item.label}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{tips.length}}" class="section-mini">
+      <view class="card-label">教练提示</view>
+      <view class="tip-list">
+        <view wx:for="{{tips}}" wx:key="*this" class="tip-row">
+          <view class="tip-dot"></view>
+          <view class="tip-text">{{item}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="require-grid">
+      <view class="require-item">
+        <view class="require-num serif">{{prepTotal}}</view>
+        <view class="require-label">秒构思</view>
+      </view>
+      <view class="require-item">
+        <view class="require-num serif">{{question.minSeconds}}</view>
+        <view class="require-label">秒起步</view>
+      </view>
+      <view class="require-item">
+        <view class="require-num serif">{{question.maxSeconds}}</view>
+        <view class="require-label">秒上限</view>
+      </view>
+    </view>
+
+    <view class="privacy-line">录音只保存在本机 · 不上传 · 可随时删除</view>
+
+    <view class="intro-cta">
+      <view class="btn btn-primary btn-block" bindtap="startPrepare">
+        {{question.mode === 'read' ? '开始朗读' : '开始构思'}}
+      </view>
+      <view class="intro-cta-note">开口前先想三个关键词，不要写完整稿</view>
+    </view>
+  </view>
+
+  <!-- ================= 构思倒计时 ================= -->
+  <view wx:if="{{phase === 'prepare'}}" class="prepare-screen fade-up">
+    <view class="phase-bar phase-bar-light">
+      <view class="back-btn" bindtap="goBack">←</view>
+      <view class="phase-source">构思时间</view>
+      <view class="phase-quota phase-quota-ghost">别写稿</view>
+    </view>
+
+    <view class="prepare-body">
+      <view class="eyebrow">THINK FIRST</view>
+      <view class="prepare-title serif">先想三个关键词。</view>
+      <view class="prepare-sub">不写完整稿，只记骨架。时间一到自动开始录音。</view>
+
+      <view class="countdown-circle">
+        <view class="countdown-num serif">{{prepLeft}}</view>
+        <view class="countdown-unit">秒</view>
+      </view>
+
+      <view class="prepare-bar">
+        <view class="bar"><view class="bar-fill" style="width: {{prepLeft / prepTotal * 100}}%;"></view></view>
+      </view>
+
+      <view class="prepare-question">
+        <view class="prepare-q-label">你要说</view>
+        <view class="prepare-q-title">{{question.title}}</view>
+      </view>
+
+      <view class="prepare-points">
+        <view wx:for="{{question.keyPoints}}" wx:key="label" class="prepare-point">
+          <text class="prepare-point-index">{{index + 1}}</text>
+          <text>{{item.label}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="prepare-foot">
+      <view class="prepare-cancel" bindtap="cancelPrepare">返回题目</view>
+      <view class="btn btn-primary btn-block" bindtap="skipPrepare">跳过构思，直接开录</view>
+    </view>
+  </view>
+
+  <!-- ================= 录音 ================= -->
+  <view wx:if="{{phase === 'recording'}}" class="record-screen" style="padding-top: {{statusBarHeight + 12}}px;">
+    <view class="record-top">
+      <view class="record-source">{{sourceLabel}} · {{question.categoryName}}</view>
+      <view class="record-cancel" bindtap="goBack">取消</view>
+    </view>
+
+    <view class="record-center">
+      <view class="record-status">
+        <view class="record-dot {{recordActive ? 'active' : ''}}"></view>
+        <text>{{recordActive ? '正在录音' : '正在打开麦克风'}}</text>
+      </view>
+
+      <view class="record-clock serif">{{recordClock}}</view>
+      <view class="record-range">目标 {{minSeconds}}–{{maxSeconds}} 秒</view>
+
+      <view class="wave">
+        <view
+          wx:for="{{waveBars}}"
+          wx:key="id"
+          class="wave-bar"
+          style="height: {{item.h}}%; animation-delay: {{item.delay}}s; animation-duration: {{item.dur}}s;"
+        ></view>
+      </view>
+
+      <view class="record-progress">
+        <view class="record-progress-fill" style="width: {{recordPercent}}%;"></view>
+      </view>
+      <view class="record-remain">还剩 {{maxSeconds - recordSeconds}} 秒</view>
+
+      <view class="record-tip">
+        <view class="record-tip-label">提示</view>
+        <view class="record-tip-text">{{recordTip}}</view>
+      </view>
+    </view>
+
+    <view class="record-foot">
+      <view class="record-stop" bindtap="stopRecording">
+        <view class="stop-icon"></view>
+        <text>说完了</text>
+      </view>
+      <view class="record-hint">说完停 1 秒再点，句尾会更完整</view>
+    </view>
+  </view>
+
+  <!-- ================= 分析 ================= -->
+  <view wx:if="{{phase === 'analyzing'}}" class="analyzing-screen fade-up">
+    <view class="analyzing-orbit">
+      <view class="orbit orbit-1"></view>
+      <view class="orbit orbit-2"></view>
+      <view class="orbit-core serif">清</view>
+    </view>
+
+    <view class="analyzing-title serif">正在把这段声音<br />拆成可改的动作。</view>
+    <view class="analyzing-sub">本地确定性分析 · 不联网 · 不上传</view>
+
+    <view class="analyzing-bar">
+      <view class="bar"><view class="bar-fill" style="width: {{analyzingProgress}}%;"></view></view>
+    </view>
+
+    <view class="stage-list">
+      <view
+        wx:for="{{analyzingStages}}"
+        wx:key="*this"
+        class="stage-row {{index < analyzingStage ? 'stage-done' : ''}} {{index === analyzingStage ? 'stage-current' : ''}}"
+      >
+        <view class="stage-dot">
+          <text wx:if="{{index < analyzingStage}}">✓</text>
+          <text wx:else>{{index + 1}}</text>
+        </view>
+        <view class="stage-text">{{item}}</view>
+        <view wx:if="{{index === analyzingStage}}" class="stage-spinner"></view>
+      </view>
+    </view>
+
+    <view class="analyzing-note">通常只需要几秒。你会拿到分数、原话证据和一个下次能改的动作。</view>
+  </view>
+</view>

@@ -1,0 +1,79 @@
+<view class="page thinking" wx:if="{{ready}}">
+  <view class="head fade-up">
+    <text class="eyebrow">THINK CLEARLY</text>
+    <view class="thinking-title serif">先分清，<br />再说清。</view>
+    <view class="head-sub">说话没逻辑，往往不是嘴的问题，是判断混在了一起。</view>
+  </view>
+
+  <view class="stat-card fade-up">
+    <view class="stat-item">
+      <view class="stat-num serif">{{done}}<text class="stat-total">/{{total}}</text></view>
+      <view class="stat-label">已做题目</view>
+    </view>
+    <view class="stat-line"></view>
+    <view class="stat-item">
+      <view class="stat-num serif">{{accuracy}}<text class="stat-unit">%</text></view>
+      <view class="stat-label">总正确率</view>
+    </view>
+    <view class="stat-line"></view>
+    <view class="stat-item">
+      <view class="stat-num serif">{{stats.todayCount}}</view>
+      <view class="stat-label">今日已做</view>
+    </view>
+  </view>
+
+  <view class="section-head fade-up">
+    <view class="section-title">四种判断力</view>
+    <view class="section-more">点一类开始</view>
+  </view>
+
+  <view class="type-grid">
+    <view
+      wx:for="{{types}}"
+      wx:key="id"
+      class="type-card fade-up"
+      data-type="{{item.id}}"
+      bindtap="startType"
+    >
+      <view class="type-glyph serif" style="background: {{item.soft}}; color: {{item.color}};">{{item.glyph}}</view>
+      <view class="type-name">{{item.name}}</view>
+      <view class="type-desc">{{item.desc}}</view>
+      <view class="type-foot">
+        <text>{{item.done}}/{{item.total}}</text>
+        <text wx:if="{{item.attempts}}" class="type-acc">正确率 {{item.accuracy}}%</text>
+        <text wx:else class="type-acc type-new">未开始</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="section-head fade-up">
+    <view class="section-title">全部题目</view>
+    <view class="section-more">共 {{total}} 题</view>
+  </view>
+
+  <view class="q-list">
+    <view
+      wx:for="{{questions}}"
+      wx:key="id"
+      class="q-row fade-up"
+      data-id="{{item.id}}"
+      bindtap="startQuestion"
+    >
+      <view class="q-type" style="color: {{item.typeColor}}; background: {{item.typeSoft}};">{{item.typeShort}}</view>
+      <view class="grow">
+        <view class="q-stem ellipsis-2">{{item.stem}}</view>
+        <view class="q-meta">
+          <text>{{item.typeName}}</text>
+          <text wx:if="{{item.done}}" class="q-done {{item.lastCorrect ? 'q-right' : 'q-wrong'}}">
+            · {{item.lastCorrect ? '上次答对' : '上次答错'}}
+          </text>
+        </view>
+      </view>
+      <view class="q-arrow">→</view>
+    </view>
+  </view>
+
+  <view class="thinking-note">
+    思维题不录音、不评分，随时可做。它的作用是在你开口之前，先把事实、观点和判断分开。
+  </view>
+</view>

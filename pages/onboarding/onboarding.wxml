@@ -1,0 +1,133 @@
+<view class="onboard" style="padding-top: {{statusBarHeight + 16}}px;">
+  <view class="nav">
+    <view wx:if="{{step > 0}}" class="nav-back" bindtap="prev">←</view>
+    <view wx:else class="nav-back nav-ghost"></view>
+    <view class="nav-brand">
+      <image class="nav-logo" src="/assets/logo.png" mode="aspectFit" />
+      <text class="nav-name">清述</text>
+    </view>
+    <view class="nav-skip" bindtap="skip">跳过</view>
+  </view>
+
+  <view wx:if="{{step === 0}}" class="step step-welcome fade-up">
+    <view class="welcome-eyebrow">CLEARSAY · 口才陪练</view>
+    <view class="welcome-title serif">先说清楚，<br />再被听见。</view>
+    <view class="welcome-desc">
+      不教你背话术。每天用三到五分钟，开口说一次，拿到一次具体的反馈。
+    </view>
+    <view class="welcome-points">
+      <view class="point">
+        <view class="point-num serif">01</view>
+        <view class="point-body">
+          <view class="point-title">每次都有反馈</view>
+          <view class="point-desc">声音、节奏、结构，逐项拆开看</view>
+        </view>
+      </view>
+      <view class="point">
+        <view class="point-num serif">02</view>
+        <view class="point-body">
+          <view class="point-title">3 分钟一关</view>
+          <view class="point-desc">碎片时间也能完成一次完整表达</view>
+        </view>
+      </view>
+      <view class="point">
+        <view class="point-num serif">03</view>
+        <view class="point-body">
+          <view class="point-title">只改一件事</view>
+          <view class="point-desc">每次只给一个下一轮能执行的动作</view>
+        </view>
+      </view>
+    </view>
+    <view class="welcome-cta">
+      <view class="btn btn-primary btn-block" bindtap="next">开始设置我的练习</view>
+      <view class="welcome-hint">大约 30 秒 · 之后可随时修改</view>
+    </view>
+  </view>
+
+  <view wx:if="{{step === 1}}" class="step fade-up">
+    <view class="step-eyebrow">STEP 01 / 03</view>
+    <view class="step-title serif">你这次，<br />最想练什么？</view>
+    <view class="step-desc">选一个当下最需要的。私教会按这个目标排一周的训练。</view>
+    <view class="goal-grid">
+      <view
+        wx:for="{{goals}}"
+        wx:key="id"
+        class="goal-card {{goalId === item.id ? 'goal-active' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="pickGoal"
+      >
+        <view class="goal-glyph serif" style="background: {{item.soft}}; color: {{item.color}};">{{item.glyph}}</view>
+        <view class="goal-name">{{item.name}}</view>
+        <view class="goal-desc">{{item.desc}}</view>
+        <view wx:if="{{goalId === item.id}}" class="goal-check">✓</view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{step === 2}}" class="step fade-up">
+    <view class="step-eyebrow">STEP 02 / 03</view>
+    <view class="step-title serif">现在的你，<br />在哪一步？</view>
+    <view class="step-desc">没有对错，只决定我们给你出多难的题。</view>
+    <view class="level-list">
+      <view
+        wx:for="{{levels}}"
+        wx:key="id"
+        class="level-card {{level === item.id ? 'level-active' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="pickLevel"
+      >
+        <view class="level-glyph serif">{{item.glyph}}</view>
+        <view class="grow">
+          <view class="level-name">{{item.name}}</view>
+          <view class="level-desc">{{item.desc}}</view>
+        </view>
+        <view class="level-radio {{level === item.id ? 'on' : ''}}"></view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{step === 3}}" class="step fade-up">
+    <view class="step-eyebrow">STEP 03 / 03</view>
+    <view class="step-title serif">每天留多少时间？</view>
+    <view class="step-desc">短一点没关系，重要的是每天都开口。</view>
+    <view class="time-row">
+      <view
+        wx:for="{{times}}"
+        wx:key="minutes"
+        class="time-card {{minutes === item.minutes ? 'time-active' : ''}}"
+        data-minutes="{{item.minutes}}"
+        bindtap="pickTime"
+      >
+        <view class="time-num serif">{{item.minutes}}</view>
+        <view class="time-unit">分钟</view>
+        <view class="time-desc">{{item.desc}}</view>
+      </view>
+    </view>
+
+    <view class="nickname-box">
+      <view class="field-label">怎么称呼你</view>
+      <input
+        class="nickname-input"
+        value="{{nickname}}"
+        maxlength="12"
+        placeholder="练习者"
+        placeholder-class="placeholder"
+        bindinput="onNickname"
+      />
+    </view>
+
+    <view class="privacy-note">
+      录音只保存在本机，不会上传。你可以随时在设置里清空全部数据。
+    </view>
+  </view>
+
+  <view class="onboard-foot">
+    <view wx:if="{{step > 0}}" class="dots">
+      <view wx:for="{{dots}}" wx:key="*this" class="dot-item {{step === index ? 'on' : ''}}"></view>
+    </view>
+    <view wx:if="{{step > 0}}" class="btn btn-primary btn-block" bindtap="next">
+      {{step === 3 ? '进入清述' : '继续'}}
+    </view>
+    <view wx:if="{{step === 0}}" class="foot-hint">今天就可以完成第一次练习</view>
+  </view>
+</view>

@@ -1,0 +1,90 @@
+<view class="page drill-detail" wx:if="{{drill}}">
+  <view class="hero fade-up" style="background: {{section.soft}};">
+    <view class="between">
+      <view class="hero-tag">{{section.name}} · {{drill.focus}}</view>
+      <view wx:if="{{done}}" class="hero-done">✓ 已练过</view>
+    </view>
+    <view class="hero-title serif">{{drill.title}}</view>
+    <view class="hero-pinyin">{{drill.pinyin}}</view>
+    <view class="demo-row">
+      <view class="demo-btn" bindtap="toggleDemo">
+        <view class="demo-icon {{playing ? 'pause' : ''}}"></view>
+        <text>{{playing ? '暂停示范' : '听教练示范'}}</text>
+      </view>
+      <view class="demo-note">{{audioError ? '示范音频不可用' : '合成语音 · 听字音与节奏'}}</view>
+    </view>
+  </view>
+
+  <view wx:if="{{drill.words.length}}" class="word-grid fade-up">
+    <view wx:for="{{drill.words}}" wx:key="word" class="word-card">
+      <view class="word-text serif">{{item.word}}</view>
+      <view class="word-pinyin">{{item.pinyin}}</view>
+    </view>
+  </view>
+
+  <view class="tip-card fade-up">
+    <view class="tip-label">发音位置</view>
+    <view class="tip-text">{{drill.tip}}</view>
+  </view>
+
+  <view class="text-card fade-up">
+    <view class="between">
+      <view class="card-label">跟读文本</view>
+      <view class="text-hint">慢读比快读难</view>
+    </view>
+    <view class="text-body serif">{{drill.text}}</view>
+  </view>
+
+  <view class="ladder fade-up">
+    <view class="ladder-title">三遍法</view>
+    <view class="ladder-step">
+      <view class="ladder-num serif">01</view>
+      <view class="grow">
+        <view class="ladder-name">看清楚</view>
+        <view class="ladder-desc">先看每个字的声母韵母，不急着出声。</view>
+      </view>
+    </view>
+    <view class="ladder-step">
+      <view class="ladder-num serif">02</view>
+      <view class="grow">
+        <view class="ladder-name">慢一半</view>
+        <view class="ladder-desc">用正常语速的一半读，确认舌头和嘴唇的位置。</view>
+      </view>
+    </view>
+    <view class="ladder-step">
+      <view class="ladder-num serif">03</view>
+      <view class="grow">
+        <view class="ladder-name">录一遍</view>
+        <view class="ladder-desc">正常语速录下来，回听有没有吞字、拖音。</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="challenge-card fade-up">
+    <view class="challenge-label">这一练的目标</view>
+    <view class="challenge-text">{{drill.challenge}}</view>
+  </view>
+
+  <view class="detail-cta">
+    <view class="btn btn-primary btn-block" bindtap="startPractice">开始跟读并录音</view>
+    <view class="detail-note">录音只保存在本机 · 评声音表现</view>
+  </view>
+
+  <view wx:if="{{related.length}}" class="related">
+    <view class="related-title">同组练习</view>
+    <view
+      wx:for="{{related}}"
+      wx:key="id"
+      class="related-row"
+      data-id="{{item.id}}"
+      bindtap="openRelated"
+    >
+      <view class="related-focus">{{item.focus}}</view>
+      <view class="grow">
+        <view class="related-name">{{item.title}}</view>
+        <view class="related-pinyin">{{item.pinyin}}</view>
+      </view>
+      <view class="related-arrow">→</view>
+    </view>
+  </view>
+</view>

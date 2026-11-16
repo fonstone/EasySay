@@ -1,0 +1,8 @@
+<view class="radar-wrap" style="width: {{size}}rpx; height: {{size}}rpx;">
+  <canvas wx:if="{{!empty}}" type="2d" id="radar" class="radar-canvas"></canvas>
+  <view wx:else class="radar-empty">
+    <view class="radar-empty-mark serif">图</view>
+    <view class="radar-empty-title">能力图谱还在生长</view>
+    <view class="radar-empty-desc">完成 3 次练习后，这里会长出你的能力形状</view>
+  </view>
+</view>

@@ -1,0 +1,131 @@
+.quotes {
+  padding-top: 26rpx;
+  padding-bottom: calc(60rpx + env(safe-area-inset-bottom));
+}
+
+.head {
+  margin-bottom: 28rpx;
+}
+
+.title {
+  margin-top: 12rpx;
+  font-size: 56rpx;
+  line-height: 1.3;
+}
+
+.head-sub {
+  margin-top: 12rpx;
+  font-size: 23rpx;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.quote-count {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  background: linear-gradient(120deg, #f7f2e8, #fbf8f1);
+  border: 1rpx solid var(--brass-soft);
+  border-radius: var(--radius);
+  padding: 24rpx 26rpx;
+}
+
+.count-num {
+  font-size: 52rpx;
+  line-height: 1;
+  color: var(--brass);
+  font-weight: 600;
+}
+
+.count-title {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #6d5128;
+}
+
+.count-desc {
+  margin-top: 3rpx;
+  font-size: 19rpx;
+  color: #9c7c4b;
+}
+
+.count-mark {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: #ffffff;
+  color: var(--brass);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  margin-left: auto;
+}
+
+.quote-list {
+  margin-top: 24rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+}
+
+.quote-card {
+  position: relative;
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 30rpx 30rpx 24rpx;
+  box-shadow: var(--shadow-soft);
+  border: 1rpx solid var(--line);
+}
+
+.quote-index {
+  font-size: 20rpx;
+  color: var(--brass);
+  letter-spacing: 2rpx;
+}
+
+.quote-body {
+  margin-top: 14rpx;
+  font-size: 34rpx;
+  line-height: 1.7;
+  color: var(--ink);
+  letter-spacing: 0.5rpx;
+}
+
+.quote-meta {
+  margin-top: 16rpx;
+  font-size: 18rpx;
+  color: var(--muted-2);
+}
+
+.quote-dot {
+  margin: 0 6rpx;
+  opacity: 0.5;
+}
+
+.quote-actions {
+  display: flex;
+  gap: 24rpx;
+  margin-top: 18rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid var(--line);
+}
+
+.quote-action {
+  font-size: 20rpx;
+  color: var(--green-600);
+}
+
+.quote-remove {
+  color: var(--muted-2);
+}
+
+.quotes-note {
+  margin-top: 30rpx;
+  padding: 18rpx 22rpx;
+  background: var(--bg-deep);
+  border-radius: 14rpx;
+  font-size: 19rpx;
+  line-height: 1.7;
+  color: var(--muted-2);
+}

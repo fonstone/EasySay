@@ -1,0 +1,49 @@
+<view class="page review-history">
+  <view class="head fade-up">
+    <text class="eyebrow">REVIEW ARCHIVE</text>
+    <view class="title serif">复盘档案</view>
+    <view class="head-sub">共 {{reviews.length}} 次复盘。每一次，都是你给下一次写的说明书。</view>
+  </view>
+
+  <view wx:if="{{reviews.length}}" class="review-list">
+    <view wx:for="{{reviews}}" wx:key="id" class="review-card fade-up">
+      <view class="between">
+        <view class="review-date">{{item.dateText}}</view>
+        <view class="review-delete" data-id="{{item.id}}" bindtap="remove">删除</view>
+      </view>
+
+      <view wx:if="{{item.learned}}" class="review-block">
+        <view class="block-label">练了什么</view>
+        <view class="block-text">{{item.learned}}</view>
+      </view>
+
+      <view wx:if="{{item.stuck.length || item.stuckText}}" class="review-block">
+        <view class="block-label">卡在哪里</view>
+        <view class="stuck-row">
+          <text wx:for="{{item.stuck}}" wx:for-item="s" wx:key="*this" class="stuck-tag">{{s}}</text>
+        </view>
+        <view wx:if="{{item.stuckText}}" class="block-text">{{item.stuckText}}</view>
+      </view>
+
+      <view class="review-next">
+        <view class="next-label">下次只改</view>
+        <view class="next-text">{{item.next}}</view>
+      </view>
+
+      <view wx:if="{{item.message}}" class="review-message serif">“{{item.message}}”</view>
+    </view>
+  </view>
+
+  <empty-state
+    wx:else
+    mark="复"
+    title="还没有复盘"
+    desc="完成一次练习后，花两分钟写一次。只记一个失误，写一个预案。"
+    action="去写第一次复盘"
+    bind:action="goReview"
+  />
+
+  <view wx:if="{{reviews.length}}" class="history-foot">
+    <view class="btn btn-soft btn-block" bindtap="goReview">再写一次复盘</view>
+  </view>
+</view>

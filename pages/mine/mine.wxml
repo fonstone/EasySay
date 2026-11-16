@@ -1,0 +1,177 @@
+<view class="page has-tabbar mine" wx:if="{{ready}}">
+  <view class="profile-head fade-up">
+    <view class="profile-row">
+      <view class="avatar serif">{{avatarText}}</view>
+      <view class="grow">
+        <view class="profile-name-row">
+          <view class="profile-name serif">{{profile.nickname}}</view>
+          <view class="member-chip {{membership.type !== 'free' ? 'member-on' : ''}}">{{memberLabel}}</view>
+        </view>
+        <view class="profile-desc">{{profile.goalName}} · {{profile.level}}</view>
+        <view class="profile-meta">累计 {{stats.sessions}} 次开口 · 连续 {{streak.current}} 天</view>
+      </view>
+      <view class="edit-btn" bindtap="goSettings">编辑</view>
+    </view>
+  </view>
+
+  <view class="member-banner fade-up" bindtap="goMember">
+    <view class="member-mark serif">{{membership.type === 'free' ? '试' : '会'}}</view>
+    <view class="grow">
+      <view class="member-title">{{membership.type === 'free' ? '7 天体验会员，送 3 次点评' : memberLabel + ' 生效中'}}</view>
+      <view class="member-desc">{{membership.type === 'free' ? '解锁完整点评与全部课程，先试七天' : memberExpire + ' · 无限点评'}}</view>
+    </view>
+    <view class="member-arrow">→</view>
+  </view>
+
+  <view class="stats-grid fade-up">
+    <view class="stats-item">
+      <view class="stats-num serif">{{stats.sessions}}</view>
+      <view class="stats-label">累计开口</view>
+    </view>
+    <view class="stats-item">
+      <view class="stats-num serif">{{totalMinutes}}</view>
+      <view class="stats-label">累计分钟</view>
+    </view>
+    <view class="stats-item">
+      <view class="stats-num serif">{{streak.best}}</view>
+      <view class="stats-label">最佳连续</view>
+    </view>
+    <view class="stats-item">
+      <view class="stats-num serif">{{thinking.accuracy}}<text class="stats-unit">%</text></view>
+      <view class="stats-label">思维正确率</view>
+    </view>
+  </view>
+
+  <view class="radar-card fade-up">
+    <view class="between">
+      <view>
+        <view class="section-title">能力图谱</view>
+        <view class="radar-sub">{{radarSub}}</view>
+      </view>
+      <view class="radar-tag">{{hasRadar ? '持续生长' : '待生成'}}</view>
+    </view>
+    <view class="radar-wrap">
+      <radar-chart dimensions="{{radarDims}}" size="{{500}}" />
+    </view>
+    <view wx:if="{{hasRadar}}" class="dim-list">
+      <view wx:for="{{dims}}" wx:key="name" class="dim-item">
+        <view class="dim-item-head">
+          <text class="dim-item-name">{{item.name}}</text>
+          <text class="dim-item-value {{item.tone}} serif">{{item.value}}</text>
+        </view>
+        <view class="dim-item-bar"><view class="dim-item-fill {{item.tone}}" style="width: {{item.value}}%;"></view></view>
+      </view>
+    </view>
+  </view>
+
+  <view class="heat-card fade-up">
+    <view class="between">
+      <view>
+        <view class="section-title">打卡热力</view>
+        <view class="radar-sub">最近 8 周 · 颜色越深，开口越多</view>
+      </view>
+      <view class="heat-current">连续 {{streak.current}} 天</view>
+    </view>
+    <view class="heat-body">
+      <view class="heat-weekdays">
+        <text wx:for="{{weekdays}}" wx:key="*this">{{item}}</text>
+      </view>
+      <view class="heat-grid">
+        <view wx:for="{{heatColumns}}" wx:for-item="col" wx:key="id" class="heat-col">
+          <view
+            wx:for="{{col.cells}}"
+            wx:for-item="cell"
+            wx:key="key"
+            class="heat-cell level-{{cell.level}} {{cell.isToday ? 'heat-today' : ''}} {{cell.isFuture ? 'heat-future' : ''}}"
+          ></view>
+        </view>
+      </view>
+    </view>
+    <view class="heat-legend">
+      <text>少</text>
+      <view class="heat-cell level-0"></view>
+      <view class="heat-cell level-1"></view>
+      <view class="heat-cell level-2"></view>
+      <view class="heat-cell level-3"></view>
+      <view class="heat-cell level-4"></view>
+      <text>多</text>
+    </view>
+  </view>
+
+  <view class="section-head fade-up">
+    <view class="section-title">我的收藏与记录</view>
+    <view class="section-more">都在本机</view>
+  </view>
+
+  <view class="menu-card fade-up">
+    <view class="menu-item" bindtap="goArchive">
+      <view class="menu-icon serif">录</view>
+      <view class="grow">
+        <view class="menu-title">录音档案</view>
+        <view class="menu-desc">回听每一次开口 · {{archive}} 条</view>
+      </view>
+      <view class="menu-count">{{archive}}</view>
+      <view class="chev"></view>
+    </view>
+    <view class="menu-item" bindtap="goQuotes">
+      <view class="menu-icon serif">句</view>
+      <view class="grow">
+        <view class="menu-title">金句墙</view>
+        <view class="menu-desc">那些说得很好的瞬间 · {{quotes}} 句</view>
+      </view>
+      <view class="menu-count">{{quotes}}</view>
+      <view class="chev"></view>
+    </view>
+    <view class="menu-item" bindtap="goReview">
+      <view class="menu-icon serif">复</view>
+      <view class="grow">
+        <view class="menu-title">高效能复盘</view>
+        <view class="menu-desc">把失误变成下一次的预案 · {{reviews}} 次</view>
+      </view>
+      <view class="menu-count">{{reviews}}</view>
+      <view class="chev"></view>
+    </view>
+    <view class="menu-item" bindtap="goCoach">
+      <view class="menu-icon serif">师</view>
+      <view class="grow">
+        <view class="menu-title">私教计划</view>
+        <view class="menu-desc">按目标排一周，不用纠结练什么</view>
+      </view>
+      <view class="chev"></view>
+    </view>
+    <view class="menu-item" bindtap="goCourses">
+      <view class="menu-icon serif">课</view>
+      <view class="grow">
+        <view class="menu-title">已学课程</view>
+        <view class="menu-desc">三条学习线 · 已完成 {{courses}} 节</view>
+      </view>
+      <view class="menu-count">{{courses}}</view>
+      <view class="chev"></view>
+    </view>
+  </view>
+
+  <view class="menu-card menu-card-plain fade-up">
+    <view class="menu-item" bindtap="goSettings">
+      <view class="menu-icon serif">设</view>
+      <view class="grow">
+        <view class="menu-title">设置</view>
+        <view class="menu-desc">昵称、目标、构思时间、数据管理</view>
+      </view>
+      <view class="chev"></view>
+    </view>
+    <view class="menu-item" bindtap="goPrivacy">
+      <view class="menu-icon serif">私</view>
+      <view class="grow">
+        <view class="menu-title">隐私与录音说明</view>
+        <view class="menu-desc">录音只在本机 · 不上传</view>
+      </view>
+      <view class="chev"></view>
+    </view>
+  </view>
+
+  <view class="mine-foot">
+    <image class="mine-logo" src="/assets/logo.png" mode="aspectFit" />
+    <view class="mine-brand">清述 · 口才陪练</view>
+    <view class="mine-version">本地演示版 v1.0 · 无需联网</view>
+  </view>
+</view>

@@ -1,0 +1,212 @@
+.discover {
+  padding-top: 30rpx;
+}
+
+.head {
+  margin-bottom: 32rpx;
+}
+
+.discover-title {
+  margin-top: 12rpx;
+  font-size: 60rpx;
+  line-height: 1.26;
+}
+
+.head-sub {
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  color: var(--muted);
+  line-height: 1.7;
+  max-width: 570rpx;
+}
+
+.daily-card {
+  background: linear-gradient(135deg, #fffaf0, #f8f1e3);
+  border: 1rpx solid #eee0c6;
+  border-radius: var(--radius-lg);
+  padding: 30rpx 30rpx 26rpx;
+  box-shadow: 0 14rpx 40rpx rgba(182, 138, 78, 0.09);
+}
+
+.daily-badge {
+  font-size: 18rpx;
+  letter-spacing: 3rpx;
+  color: #8a6630;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1rpx solid #e6d3b0;
+  border-radius: 999rpx;
+  padding: 6rpx 16rpx;
+}
+
+.daily-type {
+  font-size: 19rpx;
+  color: #a08356;
+}
+
+.daily-stem {
+  margin-top: 22rpx;
+  font-size: 29rpx;
+  line-height: 1.7;
+  color: #4f3d25;
+  font-weight: 500;
+}
+
+.daily-foot {
+  margin-top: 24rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx dashed #e3d1b2;
+}
+
+.daily-meta {
+  font-size: 20rpx;
+  color: #a08356;
+}
+
+.daily-cta {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #7a5626;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18rpx;
+  margin-top: 24rpx;
+}
+
+.grid-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 26rpx 24rpx 24rpx;
+  box-shadow: var(--shadow-soft);
+  min-height: 250rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.grid-card-green {
+  background: linear-gradient(145deg, #1b5a47, #143d31);
+  color: #fff;
+}
+
+.grid-glyph {
+  width: 62rpx;
+  height: 62rpx;
+  border-radius: 18rpx;
+  background: var(--green-50);
+  color: var(--green-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 27rpx;
+  margin-bottom: 18rpx;
+}
+
+.grid-card-green .grid-glyph {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.grid-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.grid-card-green .grid-name {
+  color: #fff;
+}
+
+.grid-desc {
+  margin-top: 6rpx;
+  font-size: 20rpx;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.grid-card-green .grid-desc {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.grid-stat {
+  margin-top: auto;
+  padding-top: 16rpx;
+  font-size: 18rpx;
+  color: var(--green-600);
+}
+
+.grid-card-green .grid-stat {
+  color: #d8b36c;
+}
+
+.drill-scroll {
+  white-space: nowrap;
+  display: flex;
+  gap: 16rpx;
+}
+
+.drill-card {
+  display: inline-flex;
+  flex-direction: column;
+  width: 290rpx;
+  margin-right: 16rpx;
+  background: var(--card);
+  border-radius: 24rpx;
+  padding: 24rpx 24rpx 22rpx;
+  border: 1rpx solid var(--line);
+  vertical-align: top;
+}
+
+.drill-focus {
+  font-size: 18rpx;
+  color: var(--green-700);
+  background: var(--green-50);
+  border-radius: 6rpx;
+  padding: 2rpx 10rpx;
+  align-self: flex-start;
+}
+
+.drill-title {
+  margin-top: 14rpx;
+  font-size: 25rpx;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: normal;
+  line-height: 1.45;
+}
+
+.drill-pinyin {
+  margin-top: 6rpx;
+  font-size: 19rpx;
+  color: var(--muted-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drill-go {
+  margin-top: 16rpx;
+  font-size: 20rpx;
+  color: var(--green-600);
+}
+
+.micro-quote {
+  margin-top: 48rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18rpx;
+}
+
+.micro-line {
+  width: 40rpx;
+  height: 2rpx;
+  background: var(--line-strong);
+}
+
+.micro-text {
+  font-size: 28rpx;
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.7;
+}

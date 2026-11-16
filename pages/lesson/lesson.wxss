@@ -1,0 +1,185 @@
+.lesson {
+  padding-top: 24rpx;
+  padding-bottom: calc(60rpx + env(safe-area-inset-bottom));
+}
+
+.lesson-hero {
+  border-radius: var(--radius-lg);
+  padding: 36rpx 32rpx 30rpx;
+  position: relative;
+}
+
+.lesson-crumb {
+  font-size: 19rpx;
+  letter-spacing: 2rpx;
+  color: var(--muted);
+}
+
+.lesson-title {
+  margin-top: 16rpx;
+  font-size: 48rpx;
+  line-height: 1.36;
+  color: var(--ink);
+}
+
+.lesson-sub {
+  margin-top: 10rpx;
+  font-size: 23rpx;
+  color: var(--ink-2);
+}
+
+.lesson-meta {
+  margin-top: 14rpx;
+  font-size: 20rpx;
+  color: var(--muted);
+}
+
+.lesson-done-badge {
+  position: absolute;
+  right: 28rpx;
+  top: 28rpx;
+  font-size: 18rpx;
+  color: var(--green-700);
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 999rpx;
+  padding: 5rpx 14rpx;
+}
+
+.hook-card {
+  position: relative;
+  margin-top: 24rpx;
+  padding: 32rpx 32rpx 30rpx;
+  background: var(--green-800);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.hook-mark {
+  position: absolute;
+  left: 20rpx;
+  top: 2rpx;
+  font-size: 90rpx;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.12);
+}
+
+.hook-text {
+  position: relative;
+  font-size: 34rpx;
+  line-height: 1.6;
+  color: #f5faf7;
+}
+
+.lesson-sections {
+  margin-top: 42rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 40rpx;
+}
+
+.lesson-section {
+  position: relative;
+  padding-top: 10rpx;
+}
+
+.section-num {
+  font-size: 22rpx;
+  color: var(--brass);
+  letter-spacing: 2rpx;
+  margin-bottom: 8rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.45;
+}
+
+.section-p {
+  margin-top: 16rpx;
+  font-size: 27rpx;
+  line-height: 1.9;
+  color: var(--ink-2);
+}
+
+.takeaway-card {
+  margin-top: 40rpx;
+  background: linear-gradient(135deg, #f7f2e8, #fbf8f1);
+  border: 1rpx solid var(--brass-soft);
+  border-radius: var(--radius);
+  padding: 28rpx 30rpx;
+}
+
+.takeaway-label {
+  font-size: 18rpx;
+  letter-spacing: 3rpx;
+  color: var(--brass);
+  font-weight: 600;
+}
+
+.takeaway-text {
+  margin-top: 10rpx;
+  font-size: 33rpx;
+  line-height: 1.6;
+  color: #5c4727;
+}
+
+.practice-card {
+  margin-top: 30rpx;
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  padding: 30rpx;
+  box-shadow: var(--shadow);
+  border: 1rpx solid var(--line);
+}
+
+.practice-eyebrow {
+  font-size: 18rpx;
+  letter-spacing: 3rpx;
+  color: var(--green-600);
+  font-weight: 600;
+}
+
+.practice-title {
+  margin-top: 10rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.45;
+}
+
+.practice-sub {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: var(--muted);
+}
+
+.practice-tags {
+  margin-top: 10rpx;
+  font-size: 19rpx;
+  color: var(--muted-2);
+}
+
+.practice-skip {
+  margin-top: 18rpx;
+  text-align: center;
+  font-size: 20rpx;
+  color: var(--muted-2);
+}
+
+.lesson-quote {
+  margin-top: 38rpx;
+  padding: 0 24rpx;
+  text-align: center;
+}
+
+.lesson-quote .quote-text {
+  font-size: 26rpx;
+  line-height: 1.8;
+  color: var(--muted);
+}
+
+.lesson-actions {
+  margin-top: 36rpx;
+}

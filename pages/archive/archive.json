@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "录音档案",
+  "navigationBarBackgroundColor": "#F4F7F5",
+  "usingComponents": {
+    "empty-state": "/components/empty-state/index"
+  }
+}

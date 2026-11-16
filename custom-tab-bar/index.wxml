@@ -1,0 +1,23 @@
+<view class="tabbar">
+  <view class="tabbar-inner">
+    <view
+      wx:for="{{list}}"
+      wx:key="pagePath"
+      class="tab-item {{selected === index ? 'active' : ''}} {{item.center ? 'center' : ''}}"
+      data-index="{{index}}"
+      data-path="{{item.pagePath}}"
+      bindtap="switchTab"
+    >
+      <view wx:if="{{item.center}}" class="center-btn {{selected === index ? 'center-btn-active' : ''}}">
+        <image class="center-icon" src="/assets/tab/practice-white.png" mode="aspectFit" />
+      </view>
+      <image
+        wx:else
+        class="tab-icon"
+        src="{{selected === index ? item.activeIcon : item.icon}}"
+        mode="aspectFit"
+      />
+      <text class="tab-label">{{item.text}}</text>
+    </view>
+  </view>
+</view>

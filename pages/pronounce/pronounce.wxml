@@ -1,0 +1,62 @@
+<view class="page pronounce" wx:if="{{ready}}">
+  <view class="head fade-up">
+    <text class="eyebrow">PRONUNCIATION</text>
+    <view class="pronounce-title serif">先把每个字<br />咬准。</view>
+    <view class="head-sub">纠音不是要你变成播音员，是让别人不用猜你在说什么。</view>
+  </view>
+
+  <view class="stat-card fade-up">
+    <view class="stat-num serif">{{done}}<text class="stat-total">/{{total}}</text></view>
+    <view class="stat-body">
+      <view class="stat-title">已完成跟读</view>
+      <view class="stat-desc">每完成一个练习，会标记在这里</view>
+    </view>
+    <view class="stat-mark serif">音</view>
+  </view>
+
+  <view class="tabs fade-up">
+    <view
+      wx:for="{{sections}}"
+      wx:key="id"
+      class="tab {{active === item.id ? 'tab-on' : ''}}"
+      data-id="{{item.id}}"
+      bindtap="switchSection"
+    >
+      <text>{{item.name}}</text>
+      <text class="tab-count">{{item.done}}/{{item.total}}</text>
+    </view>
+  </view>
+
+  <view wx:if="{{sectionInfo}}" class="section-intro fade-up">
+    <view class="section-intro-title">{{sectionInfo.desc}}</view>
+    <view class="section-intro-en">{{sectionInfo.en}}</view>
+  </view>
+
+  <view class="drill-list">
+    <view
+      wx:for="{{drills}}"
+      wx:key="id"
+      class="drill-card fade-up"
+      data-id="{{item.id}}"
+      bindtap="openDrill"
+    >
+      <view class="drill-left">
+        <view class="drill-focus">{{item.focus}}</view>
+        <view class="drill-index serif">{{item.label}}</view>
+      </view>
+      <view class="grow">
+        <view class="drill-title">{{item.title}}</view>
+        <view class="drill-pinyin">{{item.pinyin}}</view>
+        <view class="drill-tip ellipsis">{{item.tip}}</view>
+      </view>
+      <view class="drill-right">
+        <view wx:if="{{item.done}}" class="drill-done">✓</view>
+        <view wx:else class="drill-arrow">→</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="pronounce-note">
+    建议顺序：先看清发音位置，再用一半速度读两遍，最后正常速度录一遍。慢比快难，也更有用。
+  </view>
+</view>

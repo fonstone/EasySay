@@ -1,0 +1,47 @@
+<view class="page quotes">
+  <view class="head fade-up">
+    <text class="eyebrow">GOLDEN LINES</text>
+    <view class="title serif">金句墙</view>
+    <view class="head-sub">练习里说得最好的那些瞬间。一周后回来翻，会看见自己的变化。</view>
+  </view>
+
+  <view wx:if="{{quotes.length}}" class="quote-count fade-up">
+    <view class="count-num serif">{{quotes.length}}</view>
+    <view class="count-body">
+      <view class="count-title">句话被你留下</view>
+      <view class="count-desc">来自真实的练习录音 · 只存文字</view>
+    </view>
+    <view class="count-mark serif">句</view>
+  </view>
+
+  <view wx:if="{{quotes.length}}" class="quote-list">
+    <view wx:for="{{quotes}}" wx:key="id" class="quote-card fade-up">
+      <view class="quote-index serif">{{item.label}}</view>
+      <view class="quote-body serif">“{{item.text}}”</view>
+      <view class="quote-meta">
+        <text>{{item.source}}</text>
+        <text class="quote-dot">·</text>
+        <text>{{item.dateText}}</text>
+        <text class="quote-dot">·</text>
+        <text>{{item.score}} 分</text>
+      </view>
+      <view class="quote-actions">
+        <view class="quote-action" data-text="{{item.text}}" bindtap="copy">复制</view>
+        <view class="quote-action quote-remove" data-id="{{item.id}}" bindtap="remove">移除</view>
+      </view>
+    </view>
+  </view>
+
+  <empty-state
+    wx:else
+    mark="句"
+    title="还没有金句"
+    desc="当一次练习超过 86 分，或者你主动收藏时，那句话会出现在这里。"
+    action="去练一次"
+    bind:action="goPractice"
+  />
+
+  <view class="quotes-note">
+    金句只保存文字，不保存音频。想回听原声，去「录音档案」找对应的那一次。
+  </view>
+</view>

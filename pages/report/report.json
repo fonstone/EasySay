@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "点评报告",
+  "navigationBarBackgroundColor": "#F4F7F5",
+  "usingComponents": {
+    "score-ring": "/components/score-ring/index"
+  }
+}

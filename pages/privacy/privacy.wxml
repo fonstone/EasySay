@@ -1,0 +1,105 @@
+<view class="page privacy">
+  <view class="head fade-up">
+    <text class="eyebrow">PRIVACY</text>
+    <view class="title serif">你的声音，<br />只属于你。</view>
+    <view class="head-sub">这一页说清楚：录了什么、存在哪、谁能看到、怎么删除。</view>
+    <view class="updated">更新于 {{updated}}</view>
+  </view>
+
+  <view class="promise-card fade-up">
+    <view class="promise-mark serif">诺</view>
+    <view class="promise-body">
+      <view class="promise-title">录音不离开这台设备</view>
+      <view class="promise-desc">当前版本是纯本地演示版。录音、文字和练习记录都保存在微信本地存储里，不上传服务器，不用于模型训练，也不会被任何人听到。</view>
+    </view>
+  </view>
+
+  <view class="section fade-up">
+    <view class="section-title">我们保存什么</view>
+    <view class="info-card">
+      <view class="info-row">
+        <view class="info-label">个人资料</view>
+        <view class="info-text">昵称、练习目标、当前水平、每日时长。用于生成练习建议。</view>
+      </view>
+      <view class="info-row">
+        <view class="info-label">练习记录</view>
+        <view class="info-text">题目、得分、七个维度、时长、打卡日期。</view>
+      </view>
+      <view class="info-row">
+        <view class="info-label">录音文件</view>
+        <view class="info-text">仅保留最近 15 条。超过上限会自动删除最旧的一条。</view>
+      </view>
+      <view class="info-row">
+        <view class="info-label">文字稿与金句</view>
+        <view class="info-text">你主动补充的文字稿，以及被收藏的句子。只存在本机。</view>
+      </view>
+      <view class="info-row">
+        <view class="info-label">会员状态</view>
+        <view class="info-text">演示版的会员状态为本地模拟，不涉及真实支付。</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section fade-up">
+    <view class="section-title">需要什么权限</view>
+    <view class="info-card">
+      <view class="info-row">
+        <view class="info-label">麦克风</view>
+        <view class="info-text">只在你点击「开始录音」后启动，用于录下本次练习。拒绝后无法使用录音功能，但思维题和课程仍可使用。</view>
+      </view>
+      <view class="info-row">
+        <view class="info-label">不申请</view>
+        <view class="info-text">不读取通讯录、位置、相册、剪贴板，不获取微信好友信息。</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section fade-up">
+    <view class="section-title">分数是怎么来的</view>
+    <view class="card-body">
+      <view class="p">当前版本的点评由本地确定性规则引擎计算：</view>
+      <view class="bullet">· 声音侧：从真实 PCM 录音中计算有效发声比例、停顿、音量起伏和完成度。</view>
+      <view class="bullet">· 文字侧：只有你补充文字稿后，才计算要点覆盖、结构信号、语速、用词和口头禅。</view>
+      <view class="bullet">· 同一段录音、同一段文字，永远得到同一个分数。规则可复现，不随机。</view>
+      <view class="bullet">· 没有文字稿时，不假装能给内容打分，只呈现可测的四项声音表现。</view>
+      <view class="p">正式上线若接入云端语音识别或大模型，会在启用前单独弹窗说明，并重新征得你的同意。</view>
+    </view>
+  </view>
+
+  <view class="section fade-up">
+    <view class="section-title">怎么删除</view>
+    <view class="info-card">
+      <view class="info-row">
+        <view class="info-label">单条录音</view>
+        <view class="info-text">「我的 - 录音档案」里可以逐条删除，文件会从本机移除。</view>
+      </view>
+      <view class="info-row">
+        <view class="info-label">练习数据</view>
+        <view class="info-text">「设置 - 清空练习数据」会删除记录、点评、录音、金句、复盘和闯关进度。</view>
+      </view>
+      <view class="info-row">
+        <view class="info-label">全部数据</view>
+        <view class="info-text">「设置 - 重置所有数据」会回到第一次打开的状态。</view>
+      </view>
+      <view class="info-row">
+        <view class="info-label">卸载小程序</view>
+        <view class="info-text">本地数据会被微信清理。重要录音请先回听，或使用手机录屏保存。</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section fade-up">
+    <view class="section-title">边界与承诺</view>
+    <view class="card-body">
+      <view class="bullet">· 我们不做医疗、心理或法律建议。练习中出现的不适，请及时停止并寻求专业帮助。</view>
+      <view class="bullet">· 我们不承诺提分、不承诺 30 天蜕变。分数只是一个反馈入口，不是能力鉴定。</view>
+      <view class="bullet">· 点评只引用你实际说过的话和录音里测到的事实，不编造你没说过的内容。</view>
+      <view class="bullet">· 会员为演示功能，不会真实扣款；正式支付上线前会明确展示价格、有效期和退款规则。</view>
+    </view>
+  </view>
+
+  <view class="privacy-foot">
+    <view class="foot-line"></view>
+    <view class="foot-text">清述 · 先说清楚，再被听见</view>
+  </view>
+</view>

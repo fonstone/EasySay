@@ -1,0 +1,82 @@
+<view class="page detail" wx:if="{{ready}}">
+  <view class="cat-hero fade-up" style="background: {{category.soft}};">
+    <view class="cat-hero-top">
+      <view class="cat-hero-glyph serif" style="background: {{category.color}};">{{category.glyph}}</view>
+      <view class="grow">
+        <view class="cat-hero-en">{{category.en}}</view>
+        <view class="cat-hero-name serif">{{category.name}}</view>
+        <view class="cat-hero-tagline">{{category.tagline}}</view>
+      </view>
+      <view class="cat-hero-progress">
+        <view class="cat-hero-num serif">{{done}}</view>
+        <view class="cat-hero-total">/ {{total}}</view>
+      </view>
+    </view>
+    <view class="cat-hero-desc">{{category.longDesc}}</view>
+    <view class="cat-hero-bar">
+      <view class="bar"><view class="bar-fill" style="width: {{percent}}%; background: {{category.color}};"></view></view>
+    </view>
+  </view>
+
+  <view class="level-list">
+    <view wx:for="{{levels}}" wx:key="n" class="level-block {{item.unlocked ? '' : 'locked'}}">
+      <view class="level-head" data-n="{{item.n}}" bindtap="toggleLevel">
+        <view class="level-index {{item.unlocked ? 'index-on' : ''}}">{{item.n}}</view>
+        <view class="grow">
+          <view class="level-name-row">
+            <view class="level-name">{{item.name}}</view>
+            <view wx:if="{{!item.unlocked}}" class="level-lock">未解锁</view>
+            <view wx:elif="{{item.done === item.total}}" class="level-clear">已通关</view>
+          </view>
+          <view class="level-desc">{{item.desc}} · {{item.done}}/{{item.total}}</view>
+        </view>
+        <view class="level-chev {{expanded === item.n ? 'up' : ''}}"></view>
+      </view>
+
+      <view wx:if="{{expanded === item.n}}" class="question-list">
+        <view
+          wx:for="{{item.questions}}"
+          wx:for-item="q"
+          wx:key="id"
+          class="question-card {{q.done ? 'q-done' : ''}}"
+          data-id="{{q.id}}"
+          data-level="{{item.n}}"
+          bindtap="startQuestion"
+        >
+          <view class="q-left">
+            <view class="q-mark {{q.done ? 'q-mark-done' : ''}}">{{q.done ? '✓' : '▶'}}</view>
+          </view>
+          <view class="grow">
+            <view class="q-title">{{q.title}}</view>
+            <view class="q-sub">{{q.subtitle}}</view>
+            <view class="q-meta">
+              <text>{{q.minSeconds}}–{{q.maxSeconds}} 秒</text>
+              <text class="q-dot">·</text>
+              <text>{{q.tips.length}} 条提示</text>
+              <text wx:if="{{q.done}}" class="q-dot">·</text>
+              <text wx:if="{{q.done}}" class="q-best">最好 {{q.best}} 分</text>
+            </view>
+          </view>
+          <view wx:if="{{!item.unlocked}}" class="q-lock-icon">锁</view>
+          <view wx:else class="q-arrow">→</view>
+        </view>
+        <view wx:if="{{!item.unlocked}}" class="unlock-hint">
+          完成「{{item.prevName}}」任意 1 题，自动解锁本关
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{nextQuestion}}" class="detail-foot">
+    <view class="next-card">
+      <view class="next-eyebrow">下一题</view>
+      <view class="next-title">{{nextQuestion.title}}</view>
+      <view class="next-sub">{{nextQuestion.subtitle}}</view>
+      <view class="btn btn-primary btn-block mt-24" bindtap="startNext">开始这一题</view>
+    </view>
+  </view>
+
+  <view class="detail-note">
+    每完成任意 1 题，下一关自动解锁。不必按顺序练完，但建议从低关开始。
+  </view>
+</view>

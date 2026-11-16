@@ -1,0 +1,166 @@
+.track {
+  padding-top: 24rpx;
+  padding-bottom: calc(60rpx + env(safe-area-inset-bottom));
+}
+
+.track-hero {
+  border-radius: var(--radius-lg);
+  padding: 34rpx 32rpx 30rpx;
+}
+
+.track-hero-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 20rpx;
+}
+
+.track-hero-glyph {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 26rpx;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38rpx;
+  flex-shrink: 0;
+}
+
+.track-hero-en {
+  font-size: 16rpx;
+  letter-spacing: 3rpx;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.track-hero-name {
+  margin-top: 2rpx;
+  font-size: 46rpx;
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+.track-hero-desc {
+  margin-top: 2rpx;
+  font-size: 21rpx;
+  color: var(--muted);
+}
+
+.track-hero-num {
+  font-size: 44rpx;
+  color: var(--ink);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.track-hero-num text {
+  font-size: 18rpx;
+  color: var(--muted);
+}
+
+.track-hero-long {
+  margin-top: 22rpx;
+  font-size: 24rpx;
+  line-height: 1.75;
+  color: var(--ink-2);
+}
+
+.track-hero-outcome {
+  margin-top: 18rpx;
+  display: inline-block;
+  font-size: 20rpx;
+  color: var(--green-800);
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 8rpx;
+  padding: 8rpx 14rpx;
+}
+
+.track-hero-bar {
+  margin-top: 22rpx;
+}
+
+.section-head {
+  margin-top: 40rpx;
+  margin-bottom: 20rpx;
+}
+
+.lesson-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+}
+
+.lesson-row {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  background: var(--card);
+  border-radius: 22rpx;
+  padding: 24rpx 26rpx;
+  box-shadow: var(--shadow-soft);
+  border: 1rpx solid transparent;
+}
+
+.lesson-row:active {
+  border-color: var(--green-200);
+}
+
+.lesson-index {
+  width: 52rpx;
+  height: 52rpx;
+  border-radius: 50%;
+  background: var(--bg-deep);
+  color: var(--muted);
+  font-size: 22rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: "Songti SC", serif;
+}
+
+.lesson-done .lesson-index {
+  background: var(--green-600);
+  color: #fff;
+}
+
+.lesson-title {
+  font-size: 27rpx;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.4;
+}
+
+.lesson-sub {
+  margin-top: 3rpx;
+  font-size: 21rpx;
+  color: var(--muted);
+}
+
+.lesson-meta {
+  margin-top: 5rpx;
+  font-size: 18rpx;
+  color: var(--muted-2);
+}
+
+.lesson-done-tag {
+  color: var(--green-600);
+}
+
+.lesson-arrow {
+  font-size: 24rpx;
+  color: var(--muted-2);
+  flex-shrink: 0;
+}
+
+.track-foot {
+  margin-top: 34rpx;
+}
+
+.track-note {
+  margin-top: 16rpx;
+  text-align: center;
+  font-size: 20rpx;
+  color: var(--muted-2);
+  line-height: 1.6;
+}

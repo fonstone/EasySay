@@ -1,0 +1,49 @@
+.radar-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.radar-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.radar-empty {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40rpx;
+}
+
+.radar-empty-mark {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  background: #f0f6f2;
+  color: #2f7b63;
+  font-size: 38rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20rpx;
+}
+
+.radar-empty-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #34433d;
+}
+
+.radar-empty-desc {
+  font-size: 22rpx;
+  color: #9aa6a1;
+  margin-top: 8rpx;
+  line-height: 1.6;
+  max-width: 380rpx;
+}

@@ -1,0 +1,47 @@
+<view class="page archive">
+  <view class="head fade-up">
+    <text class="eyebrow">VOICE ARCHIVE</text>
+    <view class="title serif">录音档案</view>
+    <view class="head-sub">共 {{items.length}} 条，最多保留 15 条。回听时，先听停顿和收尾。</view>
+  </view>
+
+  <view wx:if="{{items.length}}" class="archive-list">
+    <view
+      wx:for="{{items}}"
+      wx:key="id"
+      class="archive-card fade-up"
+      data-report="{{item.reportId}}"
+      bindtap="openReport"
+    >
+      <view class="between archive-top">
+        <view class="archive-date">{{item.dateText}}</view>
+        <view class="archive-score serif">{{item.score}}<text> 分</text></view>
+      </view>
+      <view class="archive-title">{{item.title}}</view>
+      <view class="archive-meta">{{item.categoryName}} · {{item.durationText}}</view>
+
+      <view class="archive-actions">
+        <view class="play-pill" data-id="{{item.id}}" catchtap="togglePlay">
+          <view class="play-dot {{playingId === item.id ? 'on' : ''}}"></view>
+          <text>{{playingId === item.id ? '暂停' : '回听'}}</text>
+        </view>
+        <view class="archive-remove" data-id="{{item.id}}" catchtap="remove">删除</view>
+        <view class="grow"></view>
+        <view class="archive-report">看点评 →</view>
+      </view>
+    </view>
+  </view>
+
+  <empty-state
+    wx:else
+    mark="录"
+    title="还没有录音"
+    desc="完成一次练习后，录音会自动存到这里。录音只保存在本机。"
+    action="去练一次"
+    bind:action="goPractice"
+  />
+
+  <view wx:if="{{items.length}}" class="archive-note">
+    录音文件保存在微信本地目录，清理微信缓存或卸载小程序后可能丢失。重要的录音请及时回听。
+  </view>
+</view>

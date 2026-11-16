@@ -1,0 +1,46 @@
+<view class="page quiz" wx:if="{{question}}">
+  <view class="quiz-top fade-up">
+    <view class="between">
+      <view class="quiz-type" style="color: {{question.typeColor}}; background: {{question.typeSoft}};">{{question.typeName}}</view>
+      <view class="quiz-progress">{{progressText}}</view>
+    </view>
+    <view class="quiz-stem serif">{{question.stem}}</view>
+    <view wx:if="{{typeAccuracy}}" class="quiz-acc">这一类你目前的正确率 {{typeAccuracy}}%</view>
+  </view>
+
+  <view class="option-list fade-up">
+    <view
+      wx:for="{{options}}"
+      wx:key="key"
+      class="option {{item.state}}"
+      data-index="{{index}}"
+      bindtap="choose"
+    >
+      <view class="option-key">{{item.key}}</view>
+      <view class="option-text">{{item.text}}</view>
+      <view wx:if="{{item.state === 'correct'}}" class="option-icon">✓</view>
+      <view wx:if="{{item.state === 'wrong'}}" class="option-icon">✕</view>
+    </view>
+  </view>
+
+  <view wx:if="{{answered}}" class="answer-card fade-up">
+    <view class="answer-head">
+      <view class="answer-mark {{isCorrect ? 'right' : 'wrong'}}">{{isCorrect ? '✓' : '!'}}</view>
+      <view class="grow">
+        <view class="answer-title">{{isCorrect ? '判断正确' : '这次判断偏了'}}</view>
+        <view class="answer-sub">{{isCorrect ? '保持这个分辨力，再看下一题。' : '看懂为什么，比记住答案更重要。'}}</view>
+      </view>
+    </view>
+    <view class="answer-explain">{{question.explanation}}</view>
+    <view class="answer-tip">
+      <text class="answer-tip-label">带走一句</text>
+      <text>{{question.tip}}</text>
+    </view>
+  </view>
+
+  <view class="quiz-foot">
+    <view wx:if="{{answered}}" class="btn btn-primary btn-block" bindtap="next">下一题 →</view>
+    <view wx:else class="quiz-hint">选一个你认为最准确的答案</view>
+    <view class="quiz-back" bindtap="back">返回题目列表</view>
+  </view>
+</view>

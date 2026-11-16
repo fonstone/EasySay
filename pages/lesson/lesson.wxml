@@ -1,0 +1,50 @@
+<view class="page lesson" wx:if="{{lesson}}">
+  <view class="lesson-hero fade-up" style="background: {{track.soft}};">
+    <view class="lesson-crumb">{{track.name}} · 第 {{lesson.order}} 课</view>
+    <view class="lesson-title serif">{{lesson.title}}</view>
+    <view class="lesson-sub">{{lesson.subtitle}}</view>
+    <view class="lesson-meta">{{lesson.minutes}} 分钟 · 学完即练</view>
+    <view wx:if="{{done}}" class="lesson-done-badge">✓ 已学完</view>
+  </view>
+
+  <view class="hook-card fade-up">
+    <view class="hook-mark serif">“</view>
+    <view class="hook-text serif">{{lesson.hook}}</view>
+  </view>
+
+  <view class="lesson-sections">
+    <view wx:for="{{lesson.sections}}" wx:key="h" class="lesson-section fade-up">
+      <view class="section-num serif">0{{index + 1}}</view>
+      <view class="section-title">{{item.h}}</view>
+      <view wx:for="{{item.ps}}" wx:for-item="p" wx:key="*this" class="section-p">{{p}}</view>
+    </view>
+  </view>
+
+  <view class="takeaway-card fade-up">
+    <view class="takeaway-label">带走一句话</view>
+    <view class="takeaway-text serif">{{lesson.takeaway}}</view>
+  </view>
+
+  <view class="practice-card fade-up">
+    <view class="practice-eyebrow">学完即练</view>
+    <view class="practice-title">{{practice ? practice.title : '把这一课用一次'}}</view>
+    <view class="practice-sub">{{practice ? practice.subtitle : '给自己 3 分钟，验证刚才的方法'}}</view>
+    <view class="practice-tags" wx:if="{{practice}}">
+      <text>{{practice.minSeconds}}–{{practice.maxSeconds}} 秒</text>
+      <text> · {{practice.categoryName}}</text>
+    </view>
+    <view class="btn btn-primary btn-block mt-24" bindtap="startPractice">
+      {{done ? '再练一次' : '现在就用一次'}}
+    </view>
+    <view wx:if="{{!done}}" class="practice-skip" bindtap="markDone">这节课我听完了，先标记完成</view>
+  </view>
+
+  <view class="lesson-quote">
+    <view class="quote-text serif">{{lesson.quote}}</view>
+  </view>
+
+  <view class="lesson-actions">
+    <view wx:if="{{nextLesson}}" class="btn btn-ghost btn-block" bindtap="openNext">下一课：{{nextLesson.title}}</view>
+    <view wx:else class="btn btn-ghost btn-block" bindtap="openNext">回到课程列表</view>
+  </view>
+</view>

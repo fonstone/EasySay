@@ -1,0 +1,104 @@
+<view class="page member" wx:if="{{ready}}">
+  <view class="member-hero fade-up">
+    <view class="between">
+      <view class="hero-eyebrow">CLEARSAY MEMBER</view>
+      <view class="hero-status">{{memberLabel}}</view>
+    </view>
+    <view class="hero-title serif">把练习，<br />变成日常。</view>
+    <view class="hero-desc">口才不是听会的。它需要很多次有人给你具体反馈的开口。</view>
+
+    <view class="quota-card">
+      <view class="quota-left">
+        <view class="quota-label">{{isMember ? '今日点评' : '今日免费点评'}}</view>
+        <view class="quota-value serif">
+          {{isMember ? '无限' : quota.freeLeft}}<text wx:if="{{!isMember}}"> / {{quota.freeTotal}}</text>
+        </view>
+      </view>
+      <view class="quota-line"></view>
+      <view class="quota-left">
+        <view class="quota-label">点评点数</view>
+        <view class="quota-value serif">{{quota.points}}<text> 点</text></view>
+      </view>
+      <view class="quota-line"></view>
+      <view class="quota-left">
+        <view class="quota-label">有效期</view>
+        <view class="quota-value quota-date">{{isMember ? expireText : '未开通'}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{!isMember && !trialUsed}}" class="trial-card fade-up" bindtap="startTrial">
+    <view class="trial-mark serif">试</view>
+    <view class="grow">
+      <view class="trial-title">先领 7 天体验会员</view>
+      <view class="trial-desc">无限点评 + 3 次额外点数，不花钱</view>
+    </view>
+    <view class="trial-btn">领取</view>
+  </view>
+
+  <view class="section fade-up">
+    <view class="section-head">
+      <view class="section-title">会员包含什么</view>
+    </view>
+    <view class="benefit-list">
+      <view wx:for="{{benefits}}" wx:key="title" class="benefit-item">
+        <view class="benefit-check">✓</view>
+        <view class="grow">
+          <view class="benefit-title">{{item.title}}</view>
+          <view class="benefit-desc">{{item.desc}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section fade-up">
+    <view class="section-head">
+      <view class="section-title">选择方案</view>
+      <view class="section-more">演示版 · 不发起真实支付</view>
+    </view>
+    <view class="plan-row">
+      <view
+        wx:for="{{plans}}"
+        wx:key="id"
+        class="plan-card {{selected === item.id ? 'plan-on' : ''}} {{item.highlight ? 'plan-hot' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="selectPlan"
+      >
+        <view wx:if="{{item.tag}}" class="plan-tag">{{item.tag}}</view>
+        <view class="plan-name">{{item.name}}</view>
+        <view class="plan-price serif"><text class="plan-yen">¥</text>{{item.price}}</view>
+        <view class="plan-perday">{{item.perDayText}}</view>
+        <view class="plan-check {{selected === item.id ? 'on' : ''}}"></view>
+      </view>
+    </view>
+
+    <view class="selected-summary">
+      <view class="summary-left">
+        <view class="summary-name">{{selectedPlan.name}}</view>
+        <view class="summary-desc">{{isMember ? '续费后有效期顺延' : '一次开通，立即生效'}}</view>
+      </view>
+      <view class="summary-price serif">¥{{selectedPlan.price}}</view>
+    </view>
+
+    <view class="btn btn-primary btn-block mt-24" bindtap="buyPlan">
+      {{membership.type === 'lifetime' ? '你已是永久会员' : '模拟开通 ' + selectedPlan.name}}
+    </view>
+    <view class="pay-note">本地演示：不会调用微信支付，不会产生任何扣款。</view>
+  </view>
+
+  <view class="section fade-up">
+    <view class="section-head">
+      <view class="section-title">为什么不是免费</view>
+    </view>
+    <view class="why-card">
+      <view class="why-p">免费层保留每天 5 次点评和全部思维题，足够验证「你愿不愿意每天开口」。</view>
+      <view class="why-p">会员费用覆盖持续的内容制作、题库更新和后续开发。把价格定低，是为了让更多人先练起来。</view>
+      <view class="why-p">不承诺提分，不承诺 30 天蜕变。我们只提供一个具体的反馈入口。</view>
+    </view>
+  </view>
+
+  <view class="member-foot">
+    <view class="foot-line"></view>
+    <view class="foot-text">虚拟商品演示 · 正式上线前需按微信支付与小程序类目规则接入</view>
+  </view>
+</view>

@@ -1,0 +1,72 @@
+{
+  "pages": [
+    "pages/today/today",
+    "pages/practice/practice",
+    "pages/discover/discover",
+    "pages/course/course",
+    "pages/mine/mine",
+    "pages/onboarding/onboarding",
+    "pages/practice-detail/practice-detail",
+    "pages/session/session",
+    "pages/report/report",
+    "pages/thinking/thinking",
+    "pages/thinking-quiz/thinking-quiz",
+    "pages/pronounce/pronounce",
+    "pages/pronounce-detail/pronounce-detail",
+    "pages/review/review",
+    "pages/review-history/review-history",
+    "pages/coach/coach",
+    "pages/course-track/course-track",
+    "pages/lesson/lesson",
+    "pages/archive/archive",
+    "pages/quotes/quotes",
+    "pages/member/member",
+    "pages/settings/settings",
+    "pages/privacy/privacy"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#F4F7F5",
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "清述",
+    "backgroundColor": "#F4F7F5",
+    "backgroundTextStyle": "dark",
+    "enablePullDownRefresh": false
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#8A938F",
+    "selectedColor": "#1B5A47",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/today/today",
+        "text": "今日"
+      },
+      {
+        "pagePath": "pages/practice/practice",
+        "text": "练习"
+      },
+      {
+        "pagePath": "pages/discover/discover",
+        "text": "发现"
+      },
+      {
+        "pagePath": "pages/course/course",
+        "text": "课程"
+      },
+      {
+        "pagePath": "pages/mine/mine",
+        "text": "我的"
+      }
+    ]
+  },
+  "permission": {
+    "scope.record": {
+      "desc": "用于记录你的口才练习，录音仅保存在本机，不会上传"
+    }
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

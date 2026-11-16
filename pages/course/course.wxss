@@ -1,0 +1,277 @@
+.course {
+  padding-top: 30rpx;
+}
+
+.head {
+  margin-bottom: 32rpx;
+}
+
+.course-title {
+  margin-top: 12rpx;
+  font-size: 60rpx;
+  line-height: 1.26;
+}
+
+.head-sub {
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  color: var(--muted);
+  line-height: 1.7;
+  max-width: 580rpx;
+}
+
+.course-overview {
+  display: flex;
+  align-items: center;
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  padding: 30rpx 32rpx;
+  box-shadow: var(--shadow-soft);
+  border: 1rpx solid var(--line);
+}
+
+.overview-left {
+  flex: 1;
+}
+
+.overview-eyebrow {
+  font-size: 18rpx;
+  letter-spacing: 3rpx;
+  color: var(--muted-2);
+}
+
+.overview-num {
+  margin-top: 8rpx;
+  font-size: 62rpx;
+  line-height: 1;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.overview-total {
+  font-size: 24rpx;
+  color: var(--muted-2);
+  font-weight: 400;
+}
+
+.overview-desc {
+  margin-top: 8rpx;
+  font-size: 20rpx;
+  color: var(--muted);
+}
+
+.overview-ring {
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: 50%;
+  border: 10rpx solid var(--green-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--green-50);
+}
+
+.ring-num {
+  font-size: 34rpx;
+  color: var(--green-800);
+  font-weight: 600;
+}
+
+.ring-num text {
+  font-size: 17rpx;
+  color: var(--muted);
+}
+
+.continue-card {
+  margin-top: 24rpx;
+  background: linear-gradient(120deg, #1b5a47, #143d31);
+  color: #fff;
+  border-radius: var(--radius-lg);
+  padding: 30rpx 32rpx;
+  box-shadow: 0 18rpx 40rpx rgba(14, 46, 38, 0.18);
+}
+
+.continue-tag {
+  font-size: 18rpx;
+  letter-spacing: 2rpx;
+  color: #d8b36c;
+}
+
+.continue-title {
+  margin-top: 10rpx;
+  font-size: 36rpx;
+  line-height: 1.4;
+  color: #fff;
+}
+
+.continue-sub {
+  margin-top: 6rpx;
+  font-size: 20rpx;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.continue-cta {
+  margin-top: 22rpx;
+  font-size: 22rpx;
+  color: #fff;
+  font-weight: 600;
+}
+
+.section-head {
+  margin-top: 42rpx;
+  margin-bottom: 20rpx;
+}
+
+.track-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.track-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 28rpx;
+  box-shadow: var(--shadow-soft);
+  border: 1rpx solid transparent;
+}
+
+.track-card:active {
+  border-color: var(--green-200);
+}
+
+.track-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 20rpx;
+}
+
+.track-glyph {
+  width: 84rpx;
+  height: 84rpx;
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  flex-shrink: 0;
+}
+
+.track-en {
+  font-size: 16rpx;
+  letter-spacing: 3rpx;
+  color: var(--muted-2);
+  font-weight: 600;
+}
+
+.track-name {
+  margin-top: 2rpx;
+  font-size: 38rpx;
+  line-height: 1.3;
+  color: var(--ink);
+}
+
+.track-desc {
+  margin-top: 2rpx;
+  font-size: 21rpx;
+  color: var(--muted);
+}
+
+.track-percent {
+  font-size: 38rpx;
+  color: var(--ink);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.track-percent text {
+  font-size: 18rpx;
+  color: var(--muted-2);
+}
+
+.track-bottom {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  margin-top: 22rpx;
+}
+
+.track-bar {
+  flex: 1;
+}
+
+.track-count {
+  font-size: 19rpx;
+  color: var(--muted-2);
+  flex-shrink: 0;
+}
+
+.track-outcome {
+  margin-top: 16rpx;
+  font-size: 21rpx;
+  color: var(--green-700);
+  background: var(--green-50);
+  border-radius: 10rpx;
+  padding: 10rpx 14rpx;
+}
+
+.track-lessons {
+  margin-top: 18rpx;
+  border-top: 1rpx dashed var(--line);
+  padding-top: 14rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+.track-lesson {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.track-lesson-dot {
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: 50%;
+  background: var(--line-strong);
+  flex-shrink: 0;
+}
+
+.track-lesson-dot.current {
+  background: var(--brass);
+  box-shadow: 0 0 0 4rpx var(--brass-soft);
+}
+
+.track-lesson-title {
+  font-size: 21rpx;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.course-quote {
+  position: relative;
+  margin-top: 40rpx;
+  padding: 34rpx 30rpx;
+  background: var(--card);
+  border-radius: var(--radius);
+  border: 1rpx solid var(--line);
+}
+
+.course-quote .quote-mark {
+  position: absolute;
+  top: 0;
+  left: 20rpx;
+  font-size: 80rpx;
+  line-height: 1;
+  color: var(--green-100);
+}
+
+.course-quote .quote-text {
+  position: relative;
+  font-size: 29rpx;
+  line-height: 1.7;
+  color: var(--ink-2);
+}

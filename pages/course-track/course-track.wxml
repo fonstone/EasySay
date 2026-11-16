@@ -1,0 +1,55 @@
+<view class="page track" wx:if="{{track}}">
+  <view class="track-hero fade-up" style="background: {{track.soft}};">
+    <view class="track-hero-top">
+      <view class="track-hero-glyph serif" style="background: {{track.color}};">{{track.glyph}}</view>
+      <view class="grow">
+        <view class="track-hero-en">{{track.en}}</view>
+        <view class="track-hero-name serif">{{track.name}}</view>
+        <view class="track-hero-desc">{{track.desc}}</view>
+      </view>
+      <view class="track-hero-num serif">{{percent}}<text>%</text></view>
+    </view>
+    <view class="track-hero-long">{{track.longDesc}}</view>
+    <view class="track-hero-outcome">{{track.outcome}}</view>
+    <view class="track-hero-bar">
+      <view class="bar"><view class="bar-fill" style="width: {{percent}}%; background: {{track.color}};"></view></view>
+    </view>
+  </view>
+
+  <view class="section-head fade-up">
+    <view class="section-title">课程目录</view>
+    <view class="section-more">{{done}} / {{total}} 已完成</view>
+  </view>
+
+  <view class="lesson-list">
+    <view
+      wx:for="{{lessons}}"
+      wx:key="id"
+      class="lesson-row fade-up {{item.done ? 'lesson-done' : ''}}"
+      data-id="{{item.id}}"
+      bindtap="openLesson"
+    >
+      <view class="lesson-index">
+        <text wx:if="{{item.done}}">✓</text>
+        <text wx:else>{{item.order}}</text>
+      </view>
+      <view class="grow">
+        <view class="lesson-title">{{item.title}}</view>
+        <view class="lesson-sub">{{item.subtitle}}</view>
+        <view class="lesson-meta">
+          <text>{{item.minutes}} 分钟</text>
+          <text> · 学完即练</text>
+          <text wx:if="{{item.done}}" class="lesson-done-tag"> · 已完成</text>
+        </view>
+      </view>
+      <view class="lesson-arrow">→</view>
+    </view>
+  </view>
+
+  <view wx:if="{{nextLesson}}" class="track-foot">
+    <view class="btn btn-primary btn-block" bindtap="startNext">
+      {{ctaText}}
+    </view>
+    <view class="track-note">每节课约 5 分钟，建议学完立刻做一次对应练习。</view>
+  </view>
+</view>

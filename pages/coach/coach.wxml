@@ -1,0 +1,100 @@
+<view class="page coach" wx:if="{{ready}}">
+  <view wx:if="{{!plan}}" class="setup fade-up">
+    <view class="head">
+      <text class="eyebrow">AI COACH</text>
+      <view class="coach-title serif">让私教<br />替你排一周。</view>
+      <view class="head-sub">选一个目标。七天里，每天只练一道最该练的题，不用再纠结练什么。</view>
+    </view>
+
+    <view class="goal-grid">
+      <view
+        wx:for="{{goals}}"
+        wx:key="id"
+        class="goal-card {{selectedId === item.id ? 'goal-on' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="selectGoal"
+      >
+        <view class="goal-top">
+          <view class="goal-glyph serif" style="background: {{item.soft}}; color: {{item.color}};">{{item.glyph}}</view>
+          <view wx:if="{{selectedId === item.id}}" class="goal-check">✓</view>
+        </view>
+        <view class="goal-name">{{item.name}}</view>
+        <view class="goal-desc">{{item.desc}}</view>
+      </view>
+    </view>
+
+    <view wx:if="{{selectedGoal}}" class="preview-card">
+      <view class="preview-eyebrow">私教判断</view>
+      <view class="preview-intro">{{selectedGoal.intro}}</view>
+      <view class="preview-days">
+        <view wx:for="{{previewItems}}" wx:key="qid" class="preview-day">
+          <view class="preview-day-num serif">D{{item.day}}</view>
+          <view class="preview-day-body">
+            <view class="preview-day-title">{{item.title}}</view>
+            <view class="preview-day-cat">{{item.categoryName}}</view>
+          </view>
+        </view>
+      </view>
+      <view class="btn btn-primary btn-block mt-24" bindtap="createPlan">生成我的 7 天计划</view>
+      <view class="preview-note">计划基于本地选题规则生成 · 不联网 · 可随时重排</view>
+    </view>
+  </view>
+
+  <view wx:else class="plan fade-up">
+    <view class="plan-hero">
+      <view class="between">
+        <view class="plan-badge">7 天私教计划</view>
+        <view class="plan-day">{{planDayLabel}}</view>
+      </view>
+      <view class="plan-title serif">{{planGoal.name}}</view>
+      <view class="plan-intro">{{planGoal.intro}}</view>
+      <view wx:if="{{nextItem}}" class="today-card" bindtap="startNext">
+        <view class="today-label">今天练这个</view>
+        <view class="today-title">{{nextItem.title}}</view>
+        <view class="today-meta">{{nextItem.categoryName}} · 约 {{nextItem.minutes}} 分钟</view>
+        <view class="today-cta">开始 →</view>
+      </view>
+      <view wx:else class="today-card today-done">
+        <view class="today-label">七天计划完成</view>
+        <view class="today-title">这一轮，走完了。</view>
+        <view class="today-meta">可以重新排一周，或者把最弱的一天再练一次。</view>
+      </view>
+    </view>
+
+    <view class="plan-progress">
+      <view class="bar"><view class="bar-fill" style="width: {{completedCount / 7 * 100}}%;"></view></view>
+      <view class="plan-progress-text">{{completedCount}} / 7 已完成</view>
+    </view>
+
+    <view class="timeline">
+      <view
+        wx:for="{{planItems}}"
+        wx:key="qid"
+        class="timeline-item {{item.done ? 'done' : ''}} {{item.current ? 'current' : ''}}"
+        data-index="{{index}}"
+        bindtap="openItem"
+      >
+        <view class="timeline-left">
+          <view class="timeline-dot">{{item.done ? '✓' : item.day}}</view>
+          <view class="timeline-line"></view>
+        </view>
+        <view class="timeline-body">
+          <view class="timeline-head">
+            <view class="timeline-day">DAY {{item.day}}</view>
+            <view wx:if="{{item.done}}" class="timeline-status done-status">已完成</view>
+            <view wx:elif="{{item.current}}" class="timeline-status current-status">今天</view>
+            <view wx:else class="timeline-status">待解锁</view>
+          </view>
+          <view class="timeline-title">{{item.title}}</view>
+          <view class="timeline-sub">{{item.subtitle}}</view>
+          <view class="timeline-meta">{{item.categoryName}} · 约 {{item.minutes}} 分钟</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="plan-actions">
+      <view wx:if="{{allDone}}" class="btn btn-primary btn-block" bindtap="resetPlan">重新排一周</view>
+      <view wx:else class="btn btn-ghost btn-block" bindtap="resetPlan">换一个目标</view>
+    </view>
+  </view>
+</view>

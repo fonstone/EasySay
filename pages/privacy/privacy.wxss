@@ -1,0 +1,147 @@
+.privacy {
+  padding-top: 26rpx;
+  padding-bottom: calc(60rpx + env(safe-area-inset-bottom));
+}
+
+.head {
+  margin-bottom: 28rpx;
+}
+
+.title {
+  margin-top: 12rpx;
+  font-size: 58rpx;
+  line-height: 1.3;
+}
+
+.head-sub {
+  margin-top: 14rpx;
+  font-size: 23rpx;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.updated {
+  margin-top: 12rpx;
+  font-size: 18rpx;
+  color: var(--muted-2);
+}
+
+.promise-card {
+  display: flex;
+  gap: 18rpx;
+  background: var(--green-800);
+  border-radius: var(--radius-lg);
+  padding: 28rpx;
+  color: #fff;
+}
+
+.promise-mark {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26rpx;
+  flex-shrink: 0;
+}
+
+.promise-title {
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.promise-desc {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.section {
+  margin-top: 34rpx;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  margin-bottom: 14rpx;
+}
+
+.info-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 6rpx 26rpx;
+  box-shadow: var(--shadow-soft);
+}
+
+.info-row {
+  display: flex;
+  gap: 20rpx;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid var(--line);
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  width: 140rpx;
+  font-size: 21rpx;
+  color: var(--green-700);
+  flex-shrink: 0;
+  padding-top: 2rpx;
+}
+
+.info-text {
+  flex: 1;
+  font-size: 21rpx;
+  line-height: 1.75;
+  color: var(--ink-2);
+}
+
+.card-body {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24rpx 26rpx;
+  box-shadow: var(--shadow-soft);
+}
+
+.p {
+  font-size: 22rpx;
+  line-height: 1.8;
+  color: var(--ink-2);
+}
+
+.p + .p {
+  margin-top: 14rpx;
+}
+
+.bullet {
+  margin-top: 10rpx;
+  font-size: 21rpx;
+  line-height: 1.75;
+  color: var(--ink-2);
+}
+
+.privacy-foot {
+  margin-top: 44rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14rpx;
+}
+
+.foot-line {
+  width: 40rpx;
+  height: 2rpx;
+  background: var(--line-strong);
+}
+
+.foot-text {
+  font-size: 18rpx;
+  color: var(--muted-2);
+  letter-spacing: 2rpx;
+}

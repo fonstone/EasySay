@@ -1,0 +1,66 @@
+<view class="page has-tabbar course" wx:if="{{ready}}">
+  <view class="head fade-up">
+    <text class="eyebrow">COURSES</text>
+    <view class="course-title serif">先把方法<br />装进口袋。</view>
+    <view class="head-sub">每节课 5 分钟，学完立刻练一次。不是听完就会，是练完才会。</view>
+  </view>
+
+  <view class="course-overview fade-up">
+    <view class="overview-left">
+      <view class="overview-eyebrow">学习进度</view>
+      <view class="overview-num serif">{{totalDone}}<text class="overview-total">/{{totalLessons}}</text></view>
+      <view class="overview-desc">已完成的课程小节</view>
+    </view>
+    <view class="overview-ring">
+      <view class="ring-num serif">{{percent}}<text>%</text></view>
+    </view>
+  </view>
+
+  <view wx:if="{{nextLesson}}" class="continue-card fade-up" bindtap="continueLearning">
+    <view class="continue-tag">继续学习 · {{nextTrack.name}}</view>
+    <view class="continue-title serif">{{nextLesson.title}}</view>
+    <view class="continue-sub">{{nextLesson.subtitle}} · {{nextLesson.minutes}} 分钟</view>
+    <view class="continue-cta">进入这一课 →</view>
+  </view>
+
+  <view class="section-head fade-up">
+    <view class="section-title">三条学习线</view>
+    <view class="section-more">建议按顺序学</view>
+  </view>
+
+  <view class="track-list">
+    <view
+      wx:for="{{tracks}}"
+      wx:key="id"
+      class="track-card fade-up"
+      data-id="{{item.id}}"
+      bindtap="openTrack"
+    >
+      <view class="track-top">
+        <view class="track-glyph serif" style="background: {{item.soft}}; color: {{item.color}};">{{item.glyph}}</view>
+        <view class="grow">
+          <view class="track-en">{{item.en}}</view>
+          <view class="track-name serif">{{item.name}}</view>
+          <view class="track-desc">{{item.desc}}</view>
+        </view>
+        <view class="track-percent serif">{{item.percent}}<text>%</text></view>
+      </view>
+      <view class="track-bottom">
+        <view class="track-bar"><view class="bar"><view class="bar-fill" style="width: {{item.percent}}%; background: {{item.color}};"></view></view></view>
+        <view class="track-count">{{item.done}}/{{item.total}} 课</view>
+      </view>
+      <view class="track-outcome">{{item.outcome}}</view>
+      <view class="track-lessons">
+        <view wx:for="{{item.lessons}}" wx:for-item="lesson" wx:key="id" class="track-lesson">
+          <text class="track-lesson-dot {{nextLesson && lesson.id === nextLesson.id ? 'current' : ''}}"></text>
+          <text class="track-lesson-title">{{lesson.title}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="course-quote">
+    <view class="quote-mark serif">“</view>
+    <view class="quote-text serif">方法不是听会的，是用一次之后留下的。</view>
+  </view>
+</view>

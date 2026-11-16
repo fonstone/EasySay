@@ -1,0 +1,267 @@
+.drill-detail {
+  padding-top: 24rpx;
+  padding-bottom: calc(60rpx + env(safe-area-inset-bottom));
+}
+
+.hero {
+  border-radius: var(--radius-lg);
+  padding: 34rpx 32rpx 32rpx;
+}
+
+.hero-tag {
+  font-size: 18rpx;
+  letter-spacing: 2rpx;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 999rpx;
+  padding: 6rpx 16rpx;
+}
+
+.hero-done {
+  font-size: 18rpx;
+  color: var(--green-700);
+}
+
+.hero-title {
+  margin-top: 22rpx;
+  font-size: 46rpx;
+  line-height: 1.35;
+  color: var(--ink);
+}
+
+.hero-pinyin {
+  margin-top: 10rpx;
+  font-size: 23rpx;
+  color: var(--muted);
+  letter-spacing: 1rpx;
+}
+
+.demo-row {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  margin-top: 22rpx;
+  flex-wrap: wrap;
+}
+
+.demo-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10rpx;
+  height: 64rpx;
+  padding: 0 22rpx;
+  border-radius: 999rpx;
+  background: #ffffff;
+  color: var(--green-800);
+  font-size: 22rpx;
+  font-weight: 600;
+  box-shadow: 0 6rpx 18rpx rgba(14, 46, 38, 0.06);
+}
+
+.demo-icon {
+  width: 0;
+  height: 0;
+  border-top: 9rpx solid transparent;
+  border-bottom: 9rpx solid transparent;
+  border-left: 14rpx solid var(--green-700);
+}
+
+.demo-icon.pause {
+  width: 10rpx;
+  height: 20rpx;
+  border: none;
+  background: var(--green-700);
+  border-radius: 2rpx;
+}
+
+.demo-note {
+  font-size: 18rpx;
+  color: var(--muted-2);
+}
+
+.word-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12rpx;
+  margin-top: 24rpx;
+}
+
+.word-card {
+  background: var(--card);
+  border-radius: 18rpx;
+  padding: 18rpx 20rpx;
+  border: 1rpx solid var(--line);
+}
+
+.word-text {
+  font-size: 32rpx;
+  color: var(--ink);
+}
+
+.word-pinyin {
+  margin-top: 4rpx;
+  font-size: 19rpx;
+  color: var(--muted-2);
+}
+
+.tip-card {
+  margin-top: 24rpx;
+  background: var(--green-50);
+  border: 1rpx solid var(--green-100);
+  border-radius: var(--radius);
+  padding: 26rpx 28rpx;
+}
+
+.tip-label {
+  font-size: 18rpx;
+  letter-spacing: 3rpx;
+  color: var(--green-600);
+  font-weight: 600;
+}
+
+.tip-text {
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  line-height: 1.75;
+  color: var(--green-900);
+}
+
+.text-card {
+  margin-top: 24rpx;
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 28rpx;
+  box-shadow: var(--shadow-soft);
+}
+
+.text-hint {
+  font-size: 19rpx;
+  color: var(--muted-2);
+}
+
+.text-body {
+  margin-top: 18rpx;
+  font-size: 32rpx;
+  line-height: 2;
+  color: var(--ink);
+  letter-spacing: 1rpx;
+  white-space: pre-wrap;
+}
+
+.ladder {
+  margin-top: 26rpx;
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 26rpx 28rpx 18rpx;
+  box-shadow: var(--shadow-soft);
+}
+
+.ladder-title {
+  font-size: 20rpx;
+  letter-spacing: 3rpx;
+  color: var(--muted-2);
+  font-weight: 600;
+  margin-bottom: 12rpx;
+}
+
+.ladder-step {
+  display: flex;
+  gap: 18rpx;
+  padding: 14rpx 0;
+  align-items: flex-start;
+}
+
+.ladder-num {
+  font-size: 20rpx;
+  color: var(--brass);
+  width: 44rpx;
+  flex-shrink: 0;
+}
+
+.ladder-name {
+  font-size: 25rpx;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.ladder-desc {
+  margin-top: 2rpx;
+  font-size: 21rpx;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.challenge-card {
+  margin-top: 22rpx;
+  border: 1rpx dashed var(--green-200);
+  border-radius: var(--radius);
+  padding: 22rpx 26rpx;
+}
+
+.challenge-label {
+  font-size: 18rpx;
+  letter-spacing: 2rpx;
+  color: var(--green-600);
+}
+
+.challenge-text {
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  line-height: 1.65;
+  color: var(--ink-2);
+}
+
+.detail-cta {
+  margin-top: 30rpx;
+}
+
+.detail-note {
+  margin-top: 14rpx;
+  text-align: center;
+  font-size: 19rpx;
+  color: var(--muted-2);
+}
+
+.related {
+  margin-top: 44rpx;
+}
+
+.related-title {
+  font-size: 21rpx;
+  letter-spacing: 2rpx;
+  color: var(--muted-2);
+  margin-bottom: 14rpx;
+}
+
+.related-row {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid var(--line);
+}
+
+.related-focus {
+  font-size: 17rpx;
+  color: var(--green-700);
+  background: var(--green-50);
+  border-radius: 6rpx;
+  padding: 3rpx 9rpx;
+  flex-shrink: 0;
+}
+
+.related-name {
+  font-size: 24rpx;
+  color: var(--ink);
+}
+
+.related-pinyin {
+  font-size: 18rpx;
+  color: var(--muted-2);
+  margin-top: 2rpx;
+}
+
+.related-arrow {
+  font-size: 22rpx;
+  color: var(--muted-2);
+}

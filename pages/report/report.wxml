@@ -1,0 +1,196 @@
+<view class="page report" wx:if="{{ready}}">
+  <view class="report-top fade-up">
+    <view class="eyebrow">{{dateText}} · {{sourceLabel}}</view>
+    <view class="report-title serif">{{report.grade.title}}</view>
+    <view class="report-line">{{report.grade.line}}</view>
+  </view>
+
+  <view class="score-card fade-up">
+    <score-ring score="{{report.overall}}" size="{{260}}" label="{{report.grade.label}}" />
+    <view class="score-side">
+      <view class="score-cat">{{report.question.categoryName}}</view>
+      <view class="score-q serif">{{report.question.title}}</view>
+      <view class="score-note">这次的声音与表达事实</view>
+      <view class="score-tags">
+        <text class="score-tag">{{durationClock}}</text>
+        <text class="score-tag">{{dims.length}} 个维度</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="fact-strip fade-up">
+    <view wx:for="{{facts}}" wx:key="label" class="fact">
+      <view class="fact-value serif">{{item.value}}<text class="fact-unit">{{item.unit}}</text></view>
+      <view class="fact-label">{{item.label}}</view>
+    </view>
+  </view>
+
+  <view class="section fade-up">
+    <view class="section-head">
+      <view class="section-title">{{isDelivery ? '这次的声音表现' : '这次的能力切面'}}</view>
+      <view class="section-more">同段录音，结果可复现</view>
+    </view>
+    <view class="dim-card">
+      <view wx:for="{{dims}}" wx:key="key" class="dim-row">
+        <view class="dim-head">
+          <view class="dim-name">{{item.name}}<text wx:if="{{item.muted}}" class="dim-muted">参考</text></view>
+          <view class="dim-score {{item.tone}}">{{item.score}}</view>
+        </view>
+        <view class="dim-bar">
+          <view class="dim-fill {{item.tone}}" style="width: {{item.score}}%;"></view>
+        </view>
+        <view class="dim-detail">{{item.detail}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{!locked}}" class="section fade-up">
+    <view class="coach-card">
+      <view class="between coach-top">
+        <view class="coach-badge">
+          <view class="coach-dot"></view>
+          <text>教练点评</text>
+        </view>
+        <view class="coach-engine">本地确定性分析</view>
+      </view>
+
+      <view class="coach-reason">{{report.coach.reasoning}}</view>
+
+      <view wx:if="{{report.coach.evidence.length}}" class="evidence-row">
+        <view wx:for="{{report.coach.evidence}}" wx:key="text" class="evidence-chip">
+          <text class="evidence-label">{{item.label}}</text>
+          <text class="evidence-text">{{item.text}}</text>
+        </view>
+      </view>
+
+      <view class="coach-group">
+        <view class="coach-group-label">这次做得好的</view>
+        <view wx:for="{{report.coach.strengths}}" wx:key="*this" class="coach-item">
+          <view class="coach-icon good">+</view>
+          <view class="coach-text">{{item}}</view>
+        </view>
+      </view>
+
+      <view class="coach-group">
+        <view class="coach-group-label">下一次可以改的</view>
+        <view wx:for="{{report.coach.weaknesses}}" wx:key="*this" class="coach-item">
+          <view class="coach-icon bad">!</view>
+          <view class="coach-text">{{item}}</view>
+        </view>
+      </view>
+
+      <view class="next-focus">
+        <view class="next-focus-label">下次只练这一件事</view>
+        <view class="next-focus-text">{{report.coach.nextFocus}}</view>
+        <view class="next-focus-arrow">→</view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:else class="section fade-up">
+    <view class="locked-card">
+      <view class="locked-mark serif">锁</view>
+      <view class="locked-title">这一次的教练点评已锁定</view>
+      <view class="locked-desc">今日免费点评已用完。体验会员可解锁完整点评、无限练习和全部课程。</view>
+      <view class="locked-benefits">
+        <view class="locked-benefit">· 7 天体验会员，送 3 次额外点评</view>
+        <view class="locked-benefit">· 年卡 38 元，平均每天一毛钱</view>
+      </view>
+      <view class="btn btn-primary btn-block mt-24" bindtap="goMember">解锁完整点评</view>
+    </view>
+  </view>
+
+  <view wx:if="{{!locked && !isDelivery}}" class="section fade-up">
+    <view class="transcript-card">
+      <view class="between">
+        <view>
+          <view class="card-label">文字稿</view>
+          <view class="transcript-title">{{report.text ? '内容维度已计入' : '补上文字，拿到完整点评'}}</view>
+        </view>
+        <view wx:if="{{report.text}}" class="material-toggle" bindtap="toggleTranscript">{{transcriptOpen ? '收起' : '展开'}}</view>
+      </view>
+
+      <view wx:if="{{report.text}}" class="text-stats">
+        <view class="text-stat"><text class="text-stat-num serif">{{report.text.chars}}</text><text class="text-stat-label">字</text></view>
+        <view class="text-stat"><text class="text-stat-num serif">{{report.text.pace}}</text><text class="text-stat-label">字/分</text></view>
+        <view class="text-stat"><text class="text-stat-num serif">{{report.text.fillerCount}}</text><text class="text-stat-label">口头禅</text></view>
+        <view class="text-stat"><text class="text-stat-num serif">{{textCoverage}}</text><text class="text-stat-label">要点</text></view>
+      </view>
+
+      <view wx:if="{{transcriptOpen && report.text}}" class="transcript-body">{{report.transcript}}</view>
+
+      <view wx:if="{{!report.text}}" class="transcript-input-wrap">
+        <textarea
+          class="field-textarea"
+          value="{{transcriptInput}}"
+          maxlength="2000"
+          placeholder="把刚才说的话记下来。可以用输入法的语音输入，边说边转文字。"
+          placeholder-class="placeholder"
+          bindinput="onTranscriptInput"
+        ></textarea>
+        <view class="transcript-hint">文字稿只保存在本机，用来计算内容、结构和用词。</view>
+        <view class="btn btn-soft btn-block mt-16 {{submitting ? 'btn-loading' : ''}}" bindtap="submitTranscript">
+          {{submitting ? '正在重算…' : '生成完整点评'}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{isDelivery && !locked}}" class="delivery-note">
+    朗读与跟读题只评声音表现：流畅、节奏、能量和完成度。
+  </view>
+
+  <view class="section fade-up">
+    <view class="audio-card">
+      <view class="between">
+        <view class="card-label">回听这一遍</view>
+        <view class="audio-time">{{currentClock}} / {{durationClock}}</view>
+      </view>
+      <view class="audio-main">
+        <view class="play-btn {{playing ? 'playing' : ''}}" bindtap="togglePlay">
+          <view wx:if="{{!playing}}" class="play-tri"></view>
+          <view wx:else class="pause-icon"><view></view><view></view></view>
+        </view>
+        <view class="audio-wave">
+          <view
+            wx:for="{{bars}}"
+            wx:key="id"
+            class="audio-bar {{index < activeBars ? 'on' : ''}}"
+            style="height: {{item.h}}rpx;"
+          ></view>
+        </view>
+      </view>
+      <view wx:if="{{audioError}}" class="audio-error">本地录音文件已失效，可以回看文字点评。</view>
+      <view wx:else class="audio-note">录音只保存在本机 · 可在「我的 - 录音档案」里删除</view>
+    </view>
+  </view>
+
+  <view wx:if="{{report.quote}}" class="section fade-up">
+    <view class="quote-card">
+      <view class="between">
+        <view class="card-label">这句话，值得留下</view>
+        <view class="quote-actions">
+          <view wx:if="{{!quoteSaved}}" class="quote-action" bindtap="addQuote">收藏</view>
+          <view wx:else class="quote-action quote-action-done">已收藏</view>
+          <view class="quote-action" bindtap="copyQuote">复制</view>
+        </view>
+      </view>
+      <view class="quote-text serif">“{{report.quote}}”</view>
+      <view class="quote-note">来自这次练习 · {{report.question.title}}</view>
+    </view>
+  </view>
+
+  <view class="report-actions fade-up">
+    <view class="btn btn-ghost" bindtap="practiceAgain">再练一次</view>
+    <view class="btn btn-primary" bindtap="goToday">回到今日</view>
+  </view>
+
+  <button class="share-btn" open-type="share">把这次进步分享出去 →</button>
+
+  <view class="report-foot">
+    <view class="foot-line"></view>
+    <view class="foot-text">
+      分数由本地规则引擎计算，同一段录音永远得到同一个分。补充文字稿只增加内容维度，不改写声音事实。
+    </view>
+  </view>
+</view>

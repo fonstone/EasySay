@@ -1,0 +1,102 @@
+<view class="page has-tabbar practice" wx:if="{{ready}}">
+  <view class="head fade-up">
+    <view class="between">
+      <view>
+        <text class="eyebrow">PRACTICE</text>
+        <view class="h1 practice-title">六个抽屉，<br />练六种能力。</view>
+      </view>
+      <view class="random-btn" bindtap="randomPractice">
+        <view class="random-glyph serif">抽</view>
+        <view class="random-text">随机一题</view>
+      </view>
+    </view>
+    <view class="head-sub">不知道练什么的时候，从最不敢开口的那一类开始。</view>
+  </view>
+
+  <view class="overview fade-up">
+    <view class="overview-item">
+      <view class="overview-num serif">{{monthSessions}}</view>
+      <view class="overview-label">本月开口</view>
+    </view>
+    <view class="overview-line"></view>
+    <view class="overview-item">
+      <view class="overview-num serif">{{totalDone}}<text class="overview-total">/{{totalQuestions}}</text></view>
+      <view class="overview-label">已完成题目</view>
+    </view>
+    <view class="overview-line"></view>
+    <view class="overview-item">
+      <view class="overview-num serif">{{plan ? '7' : '∞'}}</view>
+      <view class="overview-label">{{plan ? '私教计划天数' : '自由练习'}}</view>
+    </view>
+  </view>
+
+  <view wx:if="{{last}}" class="continue-card fade-up" bindtap="openLast">
+    <view class="continue-left">
+      <view class="continue-eyebrow">继续上次</view>
+      <view class="continue-title">{{last.title}}</view>
+      <view class="continue-meta">{{last.categoryName}} · {{last.overall}} 分 · {{last.gradeLabel}}</view>
+    </view>
+    <view class="continue-btn">查看 →</view>
+  </view>
+
+  <view wx:if="{{plan && planGoal}}" class="plan-strip fade-up" bindtap="openPlan">
+    <view class="plan-mark serif">师</view>
+    <view class="grow">
+      <view class="plan-title">{{planGoal.name}} · 第 {{planDone + 1}} 天</view>
+      <view class="plan-desc">{{planNext ? planNext.title : '七天计划已完成，重新排一轮'}}</view>
+    </view>
+    <view class="plan-arrow">→</view>
+  </view>
+
+  <view wx:else class="plan-strip plan-strip-empty fade-up" bindtap="goCoach">
+    <view class="plan-mark serif">师</view>
+    <view class="grow">
+      <view class="plan-title">还没有私教计划</view>
+      <view class="plan-desc">选一个目标，让 AI 私教排一周</view>
+    </view>
+    <view class="plan-arrow">→</view>
+  </view>
+
+  <view class="section-head fade-up">
+    <view class="section-title">练习方向</view>
+    <view class="section-more">每完成 1 题解锁下一关</view>
+  </view>
+
+  <view class="cat-list">
+    <view
+      wx:for="{{categories}}"
+      wx:key="id"
+      class="cat-card fade-up"
+      data-id="{{item.id}}"
+      bindtap="openCategory"
+    >
+      <view class="cat-top">
+        <view class="cat-glyph serif" style="background: {{item.soft}}; color: {{item.color}};">{{item.glyph}}</view>
+        <view class="grow">
+          <view class="cat-name-row">
+            <view class="cat-name">{{item.name}}</view>
+            <view class="cat-level">{{item.levelLabel}}</view>
+          </view>
+          <view class="cat-tagline">{{item.tagline}}</view>
+        </view>
+        <view class="cat-arrow">→</view>
+      </view>
+      <view class="cat-desc">{{item.desc}}</view>
+      <view class="cat-bottom">
+        <view class="cat-bar">
+          <view class="bar"><view class="bar-fill" style="width: {{item.percent}}%; background: {{item.color}};"></view></view>
+        </view>
+        <view class="cat-progress">{{item.done}}/{{item.total}}</view>
+      </view>
+      <view wx:if="{{item.nextQuestion}}" class="cat-next">
+        <text class="cat-next-label">{{item.nextLabel}}</text>
+        <text class="cat-next-title ellipsis">{{item.nextQuestion.title}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="practice-foot">
+    <view class="foot-line"></view>
+    <view class="foot-text">每完成 1 道题，下一关自动解锁。不用一次练完，每天一关就够。</view>
+  </view>
+</view>

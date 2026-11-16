@@ -1,0 +1,162 @@
+<view class="page settings" wx:if="{{ready}}">
+  <view class="head fade-up">
+    <text class="eyebrow">SETTINGS</text>
+    <view class="title serif">设置</view>
+    <view class="head-sub">所有改动即时生效，录音与文字只保存在本机。</view>
+  </view>
+
+  <view class="block fade-up">
+    <view class="block-title">个人资料</view>
+    <view class="field-row">
+      <view class="field-key">昵称</view>
+      <input
+        class="field-value-input"
+        value="{{nickname}}"
+        maxlength="12"
+        placeholder="练习者"
+        placeholder-class="placeholder"
+        bindinput="onNickname"
+      />
+    </view>
+    <view class="field-col">
+      <view class="field-key">这次最想练</view>
+      <view class="chip-grid">
+        <view
+          wx:for="{{goals}}"
+          wx:key="id"
+          class="pick-chip {{goalId === item.id ? 'pick-on' : ''}}"
+          data-id="{{item.id}}"
+          bindtap="pickGoal"
+        >{{item.name}}</view>
+      </view>
+    </view>
+    <view class="field-col">
+      <view class="field-key">当前水平</view>
+      <view class="chip-grid">
+        <view
+          wx:for="{{levels}}"
+          wx:key="*this"
+          class="pick-chip {{level === item ? 'pick-on' : ''}}"
+          data-value="{{item}}"
+          bindtap="pickLevel"
+        >{{item}}</view>
+      </view>
+    </view>
+    <view class="field-col">
+      <view class="field-key">每天计划练多久</view>
+      <view class="chip-grid">
+        <view
+          wx:for="{{times}}"
+          wx:key="*this"
+          class="pick-chip {{dailyMinutes === item ? 'pick-on' : ''}}"
+          data-value="{{item}}"
+          bindtap="pickTime"
+        >{{item}} 分钟</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="block fade-up">
+    <view class="block-title">练习设置</view>
+    <view class="field-col">
+      <view class="field-key">构思时间</view>
+      <view class="field-hint">时间一到自动开始录音。设为 15 秒更接近真实临场。</view>
+      <view class="chip-grid">
+        <view
+          wx:for="{{preps}}"
+          wx:key="*this"
+          class="pick-chip {{prepSeconds === item ? 'pick-on' : ''}}"
+          data-value="{{item}}"
+          bindtap="pickPrep"
+        >{{item}} 秒</view>
+      </view>
+    </view>
+    <view class="field-col">
+      <view class="field-key">今日挑战机会</view>
+      <view class="field-hint">每重录一次消耗一次机会，用来模拟真实发言压力。</view>
+      <view class="chip-grid">
+        <view
+          wx:for="{{chanceOptions}}"
+          wx:key="*this"
+          class="pick-chip {{chances === item ? 'pick-on' : ''}}"
+          data-value="{{item}}"
+          bindtap="pickChances"
+        >{{item}} 次</view>
+      </view>
+    </view>
+    <view class="field-col">
+      <view class="field-key">每日目标</view>
+      <view class="chip-grid">
+        <view
+          wx:for="{{dailyGoals}}"
+          wx:key="*this"
+          class="pick-chip {{dailyGoal === item ? 'pick-on' : ''}}"
+          data-value="{{item}}"
+          bindtap="pickDailyGoal"
+        >{{item}} 次</view>
+      </view>
+    </view>
+    <view class="field-row">
+      <view class="grow">
+        <view class="field-key">按键震动</view>
+        <view class="field-hint">开始、结束录音时轻震一下</view>
+      </view>
+      <switch checked="{{haptic}}" color="#1B5A47" bindchange="toggleHaptic" />
+    </view>
+  </view>
+
+  <view class="btn btn-primary btn-block save-btn" bindtap="save">保存设置</view>
+
+  <view class="block fade-up">
+    <view class="block-title">账户与数据</view>
+    <view class="row-item" bindtap="goMember">
+      <view class="grow">
+        <view class="row-title">会员状态</view>
+        <view class="row-desc">{{membershipLabel}}</view>
+      </view>
+      <view class="row-arrow">→</view>
+    </view>
+    <view class="row-item">
+      <view class="grow">
+        <view class="row-title">本地存储占用</view>
+        <view class="row-desc">{{storageText}}</view>
+      </view>
+    </view>
+    <view class="row-item" bindtap="clearPractice">
+      <view class="grow">
+        <view class="row-title">清空练习数据</view>
+        <view class="row-desc">保留个人资料与会员状态</view>
+      </view>
+      <view class="row-arrow row-danger">清空</view>
+    </view>
+    <view class="row-item" bindtap="resetAll">
+      <view class="grow">
+        <view class="row-title row-danger">重置所有数据</view>
+        <view class="row-desc">回到第一次打开的状态</view>
+      </view>
+      <view class="row-arrow">→</view>
+    </view>
+  </view>
+
+  <view class="block fade-up">
+    <view class="block-title">关于</view>
+    <view class="row-item" bindtap="goPrivacy">
+      <view class="grow">
+        <view class="row-title">隐私与录音说明</view>
+        <view class="row-desc">录音不上传、数据如何保存、如何删除</view>
+      </view>
+      <view class="row-arrow">→</view>
+    </view>
+    <view class="row-item">
+      <view class="grow">
+        <view class="row-title">版本</view>
+        <view class="row-desc">清述 · 本地演示版 v{{version}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="settings-foot">
+    <image class="foot-logo" src="/assets/logo.png" mode="aspectFit" />
+    <view class="foot-text">先把话说清楚，再把话说漂亮。</view>
+  </view>
+</view>

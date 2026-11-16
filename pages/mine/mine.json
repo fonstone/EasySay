@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "",
+  "navigationBarBackgroundColor": "#F4F7F5",
+  "usingComponents": {
+    "radar-chart": "/components/radar-chart/index"
+  }
+}

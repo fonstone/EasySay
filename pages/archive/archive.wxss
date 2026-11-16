@@ -1,0 +1,124 @@
+.archive {
+  padding-top: 26rpx;
+  padding-bottom: calc(60rpx + env(safe-area-inset-bottom));
+}
+
+.head {
+  margin-bottom: 28rpx;
+}
+
+.title {
+  margin-top: 12rpx;
+  font-size: 56rpx;
+  line-height: 1.3;
+}
+
+.head-sub {
+  margin-top: 12rpx;
+  font-size: 23rpx;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.archive-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.archive-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24rpx 26rpx;
+  box-shadow: var(--shadow-soft);
+  border: 1rpx solid var(--line);
+}
+
+.archive-date {
+  font-size: 18rpx;
+  color: var(--muted-2);
+  letter-spacing: 1rpx;
+}
+
+.archive-score {
+  font-size: 30rpx;
+  color: var(--green-700);
+  font-weight: 600;
+}
+
+.archive-score text {
+  font-size: 17rpx;
+  color: var(--muted-2);
+  font-weight: 400;
+}
+
+.archive-title {
+  margin-top: 6rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.archive-meta {
+  margin-top: 4rpx;
+  font-size: 20rpx;
+  color: var(--muted);
+}
+
+.archive-actions {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  margin-top: 18rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid var(--line);
+}
+
+.play-pill {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  height: 56rpx;
+  padding: 0 20rpx;
+  border-radius: 999rpx;
+  background: var(--green-50);
+  color: var(--green-700);
+  font-size: 21rpx;
+}
+
+.play-dot {
+  width: 0;
+  height: 0;
+  border-top: 8rpx solid transparent;
+  border-bottom: 8rpx solid transparent;
+  border-left: 12rpx solid var(--green-700);
+}
+
+.play-dot.on {
+  width: 10rpx;
+  height: 18rpx;
+  border: none;
+  background: var(--green-700);
+  border-radius: 2rpx;
+}
+
+.archive-remove {
+  font-size: 20rpx;
+  color: var(--muted-2);
+  padding: 10rpx 0;
+}
+
+.archive-report {
+  font-size: 20rpx;
+  color: var(--green-600);
+}
+
+.archive-note {
+  margin-top: 30rpx;
+  padding: 18rpx 22rpx;
+  background: var(--bg-deep);
+  border-radius: 14rpx;
+  font-size: 19rpx;
+  line-height: 1.7;
+  color: var(--muted-2);
+}

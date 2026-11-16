@@ -1,0 +1,103 @@
+<view class="page review" wx:if="{{ready}}">
+  <view class="head fade-up">
+    <view class="between">
+      <view>
+        <text class="eyebrow">REVIEW</text>
+        <view class="review-title serif">把一次练习，<br />变成下一次的预案。</view>
+      </view>
+      <view class="history-btn" bindtap="goHistory">
+        <view class="history-num serif">{{reviewCount}}</view>
+        <view class="history-label">历史</view>
+      </view>
+    </view>
+    <view class="head-sub">不复盘的练习，只是在重复自己。只记一个失误，只写一个动作。</view>
+  </view>
+
+  <view wx:if="{{!saved}}" class="form fade-up">
+    <view class="field-block">
+      <view class="field-title"><text class="field-index">01</text>今天练了什么</view>
+      <view class="field-desc">写具体一点：哪道题、什么场景、大概说了多久。</view>
+      <textarea
+        class="field-area"
+        value="{{learned}}"
+        maxlength="500"
+        placeholder="例如：练了「汇报项目延期」，说了 48 秒，中间卡了一次。"
+        placeholder-class="placeholder"
+        bindinput="onLearned"
+      ></textarea>
+    </view>
+
+    <view class="field-block">
+      <view class="field-title"><text class="field-index">02</text>哪里卡住了</view>
+      <view class="field-desc">可以多选。选那个最影响听众理解的，不是最让你难堪的。</view>
+      <view class="stuck-grid">
+        <view
+          wx:for="{{options}}"
+          wx:key="label"
+          class="stuck-chip {{item.on ? 'stuck-on' : ''}}"
+          data-value="{{item.label}}"
+          bindtap="toggleStuck"
+        >{{item.label}}</view>
+      </view>
+      <textarea
+        class="field-area field-area-sm"
+        value="{{stuckText}}"
+        maxlength="300"
+        placeholder="如果选项里没有，写在这里。"
+        placeholder-class="placeholder"
+        bindinput="onStuckText"
+      ></textarea>
+    </view>
+
+    <view class="field-block field-key">
+      <view class="field-title"><text class="field-index">03</text>下次只改一件什么事</view>
+      <view class="field-desc">必须是一个动作，不是一种态度。比如「先说结论，再讲背景」。</view>
+      <input
+        class="field-input"
+        value="{{next}}"
+        maxlength="100"
+        placeholder="下次先说结论，再补两条理由。"
+        placeholder-class="placeholder"
+        bindinput="onNext"
+      />
+    </view>
+
+    <view class="field-block">
+      <view class="field-title"><text class="field-index">04</text>给今天的自己一句话</view>
+      <view class="field-desc">不用励志。写一句你下次还想看到的话。</view>
+      <textarea
+        class="field-area field-area-sm"
+        value="{{message}}"
+        maxlength="200"
+        placeholder="今天至少开口了，这比在脑子里演练十遍强。"
+        placeholder-class="placeholder"
+        bindinput="onMessage"
+      ></textarea>
+    </view>
+
+    <view class="btn btn-primary btn-block mt-32" bindtap="save">存下这次复盘</view>
+  </view>
+
+  <view wx:else class="saved-card fade-up">
+    <view class="saved-mark serif">✓</view>
+    <view class="saved-title">这次复盘已经存下</view>
+    <view class="saved-desc">下次练习前，先看一眼「只改一件什么事」。</view>
+    <view wx:if="{{lastReview}}" class="saved-next">
+      <view class="saved-next-label">下一次只练</view>
+      <view class="saved-next-text">{{lastReview.next}}</view>
+    </view>
+    <view class="saved-actions">
+      <view class="btn btn-ghost" bindtap="writeAnother">再写一次</view>
+      <view class="btn btn-primary" bindtap="goHistory">查看历史</view>
+    </view>
+  </view>
+
+  <view wx:if="{{lastReview && !saved}}" class="last-review fade-up">
+    <view class="between">
+      <view class="last-label">上一次复盘</view>
+      <view class="last-date">{{lastReview.date}}</view>
+    </view>
+    <view class="last-next">{{lastReview.next}}</view>
+    <view wx:if="{{lastReview.message}}" class="last-message serif">“{{lastReview.message}}”</view>
+  </view>
+</view>
