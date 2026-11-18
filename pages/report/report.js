@@ -1,6 +1,7 @@
 const store = require('../../utils/store')
 const util = require('../../utils/util')
 const scoring = require('../../utils/scoring')
+const guide = require('../../data/dimension-guide')
 
 const SOURCE_LABEL = {
   today: '今日挑战',
@@ -29,10 +30,14 @@ Page({
     transcriptLocked: false,
     audioExpired: false,
     quoteSaved: false,
+    questionFavorited: false,
     locked: false,
     isDelivery: false,
     textCoverage: '—',
-    submitting: false
+    submitting: false,
+    expandedDim: '',
+    scoreGuideOpen: false,
+    scoreGuide: guide.SCORE_GUIDE
   },
 
   onLoad(options) {
@@ -64,14 +69,20 @@ Page({
       report.question.categoryId === 'pronounce' ||
       report.question.categoryId === 'read'
 
-    const dims = (report.dimensions || []).map(d => ({
-      key: d.key,
-      name: d.name,
-      detail: d.detail,
-      score: d.score,
-      tone: d.score >= 85 ? 'high' : d.score >= 70 ? 'mid' : 'low',
-      muted: d.weight === 0
-    }))
+    const dims = (report.dimensions || []).map(d => {
+      const g = guide.getDimensionGuide(d.key)
+      return {
+        key: d.key,
+        name: d.name,
+        detail: d.detail,
+        score: d.score,
+        tone: d.score >= 85 ? 'high' : d.score >= 70 ? 'mid' : 'low',
+        muted: d.weight === 0,
+        guide: g,
+        fromLabel: guide.fromLabel(d.key),
+        fromTone: g.from === 'text' ? 'text' : 'voice'
+      }
+    })
 
     const bars = ((report.audio && report.audio.waveform) || []).map((v, i) => ({
       id: i,
@@ -104,6 +115,7 @@ Page({
       transcriptInput: report.transcript || '',
       transcriptOpen: !!report.transcript,
       quoteSaved: store.isQuoteSaved(report.quote),
+      questionFavorited: report.question ? store.isFavorite(report.question.id) : false,
       textCoverage: report.text && report.text.coverage !== null
         ? report.text.matchedPoints.length + '/' + (report.question.keyPoints ? report.question.keyPoints.length : 1)
         : '—'
@@ -301,6 +313,27 @@ Page({
   copyQuote() {
     if (!this.data.report || !this.data.report.quote) return
     wx.setClipboardData({ data: this.data.report.quote })
+  },
+
+  toggleDim(e) {
+    const key = e.currentTarget.dataset.key
+    this.setData({ expandedDim: this.data.expandedDim === key ? '' : key })
+  },
+
+  toggleScoreGuide() {
+    this.setData({ scoreGuideOpen: !this.data.scoreGuideOpen })
+  },
+
+  toggleQuestionFavorite() {
+    const report = this.data.report
+    if (!report || !report.question) return
+    const res = store.toggleFavorite(report.question.id)
+    if (!res.ok) return
+    this.setData({ questionFavorited: res.favorited })
+    wx.showToast({
+      title: res.favorited ? '已收藏，可在练习页找到' : '已取消收藏',
+      icon: 'none'
+    })
   },
 
   practiceAgain() {

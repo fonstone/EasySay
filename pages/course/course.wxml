@@ -16,7 +16,7 @@
     </view>
   </view>
 
-  <view wx:if="{{nextLesson}}" class="continue-card fade-up" bindtap="continueLearning">
+  <view wx:if="{{nextLesson}}" class="continue-card fade-up" bindtap="continueLearning" hover-class="tap-hover" aria-role="button">
     <view class="continue-tag">继续学习 · {{nextTrack.name}}</view>
     <view class="continue-title serif">{{nextLesson.title}}</view>
     <view class="continue-sub">{{nextLesson.subtitle}} · {{nextLesson.minutes}} 分钟</view>
@@ -34,8 +34,7 @@
       wx:key="id"
       class="track-card fade-up"
       data-id="{{item.id}}"
-      bindtap="openTrack"
-    >
+      bindtap="openTrack" hover-class="tap-hover" aria-role="button">
       <view class="track-top">
         <view class="track-glyph serif" style="background: {{item.soft}}; color: {{item.color}};">{{item.glyph}}</view>
         <view class="grow">
@@ -63,4 +62,12 @@
     <view class="quote-mark serif">“</view>
     <view class="quote-text serif">方法不是听会的，是用一次之后留下的。</view>
   </view>
+</view>
+
+<view wx:else class="page has-tabbar skeleton-page" aria-label="正在加载页面内容">
+  <view class="sk sk-title"></view>
+  <view class="sk sk-card"></view>
+  <view class="sk sk-strip"></view>
+  <view class="sk sk-card"></view>
+  <view class="sk sk-card sk-tall"></view>
 </view>

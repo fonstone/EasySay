@@ -11,8 +11,7 @@
       wx:key="id"
       class="archive-card fade-up"
       data-report="{{item.reportId}}"
-      bindtap="openReport"
-    >
+      bindtap="openReport" hover-class="tap-hover" aria-role="button">
       <view class="between archive-top">
         <view class="archive-date">{{item.dateText}}</view>
         <view class="archive-score serif">{{item.score}}<text> 分</text></view>
@@ -21,11 +20,11 @@
       <view class="archive-meta">{{item.categoryName}} · {{item.durationText}}</view>
 
       <view class="archive-actions">
-        <view class="play-pill" data-id="{{item.id}}" catchtap="togglePlay">
+        <view class="play-pill" data-id="{{item.id}}" catchtap="togglePlay" hover-class="tap-hover" aria-role="button">
           <view class="play-dot {{playingId === item.id ? 'on' : ''}}"></view>
           <text>{{playingId === item.id ? '暂停' : '回听'}}</text>
         </view>
-        <view class="archive-remove" data-id="{{item.id}}" catchtap="remove">删除</view>
+        <view class="archive-remove" data-id="{{item.id}}" catchtap="remove" hover-class="tap-hover" aria-role="button">删除</view>
         <view class="grow"></view>
         <view class="archive-report">看点评 →</view>
       </view>

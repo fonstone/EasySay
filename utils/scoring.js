@@ -909,7 +909,7 @@ function aggregateDimensions(reports) {
       map[d.key].count++
     })
   })
-  const order = ['content', 'structure', 'fluency', 'rhythm', 'vocabulary', 'energy']
+  const order = ['content', 'structure', 'fluency', 'rhythm', 'vocabulary', 'energy', 'completion']
   return order
     .filter(k => map[k])
     .map(k => ({

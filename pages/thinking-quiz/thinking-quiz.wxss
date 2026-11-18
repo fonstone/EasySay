@@ -9,14 +9,14 @@
 
 .quiz-type {
   display: inline-flex;
-  font-size: 19rpx;
-  border-radius: 999rpx;
+  font-size: var(--fs-min);
+  border-radius: var(--radius-pill);
   padding: 6rpx 16rpx;
   letter-spacing: 1rpx;
 }
 
 .quiz-progress {
-  font-size: 19rpx;
+  font-size: var(--fs-min);
   color: var(--muted-2);
 }
 
@@ -108,7 +108,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 19rpx;
+  font-size: var(--fs-min);
   flex-shrink: 0;
   margin-top: 4rpx;
 }

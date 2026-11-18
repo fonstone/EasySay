@@ -84,6 +84,10 @@ Page({
     util.goBack()
   },
 
+  goBack() {
+    util.goBack()
+  },
+
   onShareAppMessage() {
     return {
       title: this.data.question ? this.data.question.stem : '一道思维小题',

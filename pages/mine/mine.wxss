@@ -40,10 +40,10 @@
 }
 
 .member-chip {
-  font-size: 17rpx;
+  font-size: var(--fs-min);
   color: var(--muted);
   border: 1rpx solid var(--line-strong);
-  border-radius: 999rpx;
+  border-radius: var(--radius-pill);
   padding: 3rpx 12rpx;
 }
 
@@ -61,7 +61,7 @@
 
 .profile-meta {
   margin-top: 2rpx;
-  font-size: 19rpx;
+  font-size: var(--fs-min);
   color: var(--muted-2);
 }
 
@@ -69,7 +69,7 @@
   font-size: 20rpx;
   color: var(--muted);
   border: 1rpx solid var(--line);
-  border-radius: 999rpx;
+  border-radius: var(--radius-pill);
   padding: 8rpx 18rpx;
   flex-shrink: 0;
 }
@@ -78,7 +78,7 @@
   display: flex;
   align-items: center;
   gap: 16rpx;
-  background: linear-gradient(110deg, #f7f2e8, #fbf8f1);
+  background: var(--gradient-paper);
   border: 1rpx solid var(--brass-soft);
   border-radius: var(--radius);
   padding: 22rpx 24rpx;
@@ -105,7 +105,7 @@
 
 .member-desc {
   margin-top: 2rpx;
-  font-size: 19rpx;
+  font-size: var(--fs-min);
   color: #9c7c4b;
 }
 
@@ -147,13 +147,13 @@
 }
 
 .stats-unit {
-  font-size: 17rpx;
+  font-size: var(--fs-min);
   color: var(--muted-2);
 }
 
 .stats-label {
   margin-top: 6rpx;
-  font-size: 17rpx;
+  font-size: var(--fs-min);
   color: var(--muted-2);
 }
 
@@ -167,15 +167,15 @@
 
 .radar-sub {
   margin-top: 4rpx;
-  font-size: 19rpx;
+  font-size: var(--fs-min);
   color: var(--muted-2);
 }
 
 .radar-tag {
-  font-size: 18rpx;
+  font-size: var(--fs-min);
   color: var(--green-700);
   background: var(--green-50);
-  border-radius: 999rpx;
+  border-radius: var(--radius-pill);
   padding: 4rpx 12rpx;
 }
 
@@ -212,23 +212,6 @@
 .dim-item-value.mid { color: var(--brass); }
 .dim-item-value.low { color: var(--danger); }
 
-.dim-item-bar {
-  height: 6rpx;
-  background: var(--bg-deep);
-  border-radius: 999rpx;
-  margin-top: 6rpx;
-  overflow: hidden;
-}
-
-.dim-item-fill {
-  height: 100%;
-  border-radius: 999rpx;
-}
-
-.dim-item-fill.high { background: var(--green-600); }
-.dim-item-fill.mid { background: var(--brass); }
-.dim-item-fill.low { background: var(--danger); }
-
 .heat-card {
   margin-top: 22rpx;
   background: var(--card);
@@ -238,10 +221,10 @@
 }
 
 .heat-current {
-  font-size: 18rpx;
+  font-size: var(--fs-min);
   color: var(--green-700);
   background: var(--green-50);
-  border-radius: 999rpx;
+  border-radius: var(--radius-pill);
   padding: 4rpx 12rpx;
 }
 
@@ -260,7 +243,7 @@
 
 .heat-weekdays text {
   height: 56rpx;
-  font-size: 15rpx;
+  font-size: var(--fs-min);
   color: var(--muted-2);
   line-height: 56rpx;
 }
@@ -281,7 +264,7 @@
 .heat-cell {
   width: 100%;
   height: 56rpx;
-  border-radius: 8rpx;
+  border-radius: var(--radius-xs);
   background: var(--bg-deep);
 }
 
@@ -313,7 +296,7 @@
 }
 
 .heat-legend text {
-  font-size: 16rpx;
+  font-size: var(--fs-min);
   color: var(--muted-2);
   margin: 0 4rpx;
 }
@@ -359,7 +342,7 @@
 .menu-icon {
   width: 64rpx;
   height: 64rpx;
-  border-radius: 18rpx;
+  border-radius: var(--radius-sm);
   background: var(--green-50);
   color: var(--green-700);
   display: flex;
@@ -377,7 +360,7 @@
 
 .menu-desc {
   margin-top: 2rpx;
-  font-size: 19rpx;
+  font-size: var(--fs-min);
   color: var(--muted-2);
 }
 
@@ -403,12 +386,97 @@
 }
 
 .mine-brand {
-  font-size: 18rpx;
+  font-size: var(--fs-min);
   letter-spacing: 3rpx;
   color: var(--muted-2);
 }
 
 .mine-version {
-  font-size: 16rpx;
+  font-size: var(--fs-min);
   color: var(--muted-2);
+}
+
+/* ---------- 图谱与维度解释 ---------- */
+
+.radar-tag {
+  font-size: var(--fs-min);
+}
+
+.radar-guide {
+  margin: 18rpx 0 6rpx;
+  padding: 22rpx 24rpx;
+  background: var(--green-50);
+  border-radius: var(--radius-sm);
+}
+
+.radar-guide-title {
+  font-size: 25rpx;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 10rpx;
+}
+
+.radar-guide-line {
+  font-size: var(--fs-min);
+  color: var(--muted);
+  line-height: 1.8;
+  padding-left: 18rpx;
+  position: relative;
+}
+
+.radar-guide-line::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 16rpx;
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: 50%;
+  background: var(--green-500);
+}
+
+.dim-from-mini {
+  margin-left: 8rpx;
+  font-size: var(--fs-min);
+  color: var(--muted-2);
+}
+
+.radar-explain {
+  margin-top: 18rpx;
+  padding: 20rpx 22rpx;
+  background: var(--card);
+  border: 1rpx solid var(--line);
+  border-radius: var(--radius-sm);
+}
+
+.radar-explain-head {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--green-700);
+  margin-bottom: 10rpx;
+}
+
+.radar-explain-row {
+  display: flex;
+  gap: 14rpx;
+  align-items: flex-start;
+  line-height: 1.7;
+}
+
+.radar-explain-row + .radar-explain-row {
+  margin-top: 6rpx;
+}
+
+.radar-explain-label {
+  flex-shrink: 0;
+  font-size: var(--fs-min);
+  color: var(--green-700);
+  font-weight: 600;
+}
+
+.radar-explain-text {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-min);
+  color: var(--ink-2);
 }

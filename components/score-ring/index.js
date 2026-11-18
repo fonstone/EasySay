@@ -3,7 +3,8 @@ Component({
     score: { type: Number, value: 0 },
     size: { type: Number, value: 220 },
     label: { type: String, value: '' },
-    sublabel: { type: String, value: '' }
+    sublabel: { type: String, value: '' },
+    animated: { type: Boolean, value: true }
   },
 
   data: {
@@ -12,18 +13,60 @@ Component({
 
   observers: {
     score(value) {
-      this.setData({ displayScore: Math.round(value || 0) })
-      this.draw(value || 0)
+      this.animateTo(value || 0)
     }
   },
 
   lifetimes: {
     ready() {
-      this.draw(this.data.score)
+      this.animateTo(this.data.score)
+    },
+    detached() {
+      this.clearTimer()
     }
   },
 
   methods: {
+    clearTimer() {
+      if (this._timer) {
+        clearInterval(this._timer)
+        this._timer = null
+      }
+    },
+
+    /** 数字与圆环一起渐进；observers 与 ready 可能各触发一次，用 target 去重 */
+    animateTo(target) {
+      const to = Math.max(0, Math.round(target || 0))
+      if (this._lastTarget === to && this._timer) return
+      this._lastTarget = to
+      this.clearTimer()
+      if (!this.data.animated || to === 0) {
+        this.setData({ displayScore: to })
+        this.draw(to)
+        return
+      }
+      const steps = 18
+      let step = 0
+      this.setData({ displayScore: 0 })
+      this._timer = setInterval(() => {
+        step++
+        const t = step / steps
+        const eased = 1 - Math.pow(1 - t, 3)
+        const current = Math.round(to * eased)
+        this.setData({ displayScore: current })
+        this.draw(current)
+        if (step >= steps) {
+          this.clearTimer()
+          this.draw(to)
+        }
+      }, 28)
+    },
+
+    onTap() {
+      this.triggerEvent('explain')
+    },
+
+    // canvas 不支持 CSS 变量，这里沿用设计令牌对应的具体色值
     draw(score) {
       const query = this.createSelectorQuery()
       query.select('#ring').fields({ node: true, size: true }).exec(res => {
@@ -49,14 +92,12 @@ Component({
         const line = Math.max(5, width * 0.045)
         const radius = Math.min(cx, cy) - line - 2
 
-        // 底环
         ctx.beginPath()
         ctx.arc(cx, cy, radius, 0, Math.PI * 2)
         ctx.strokeStyle = 'rgba(27, 90, 71, 0.10)'
         ctx.lineWidth = line
         ctx.stroke()
 
-        // 进度环
         const pct = Math.max(0, Math.min(100, score)) / 100
         const start = -Math.PI / 2
         const end = start + Math.PI * 2 * pct
@@ -70,7 +111,6 @@ Component({
           ctx.lineCap = 'round'
           ctx.stroke()
 
-          // 端点
           const dotX = cx + radius * Math.cos(end)
           const dotY = cy + radius * Math.sin(end)
           ctx.beginPath()
@@ -79,7 +119,6 @@ Component({
           ctx.fill()
         }
 
-        // 刻度
         for (let i = 0; i < 12; i++) {
           const a = start + (Math.PI * 2 / 12) * i
           const r1 = radius - line - 4

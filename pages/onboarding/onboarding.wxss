@@ -185,7 +185,7 @@
 .goal-glyph {
   width: 56rpx;
   height: 56rpx;
-  border-radius: 18rpx;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -215,7 +215,7 @@
   border-radius: 50%;
   background: var(--green-600);
   color: #fff;
-  font-size: 18rpx;
+  font-size: var(--fs-min);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -318,7 +318,7 @@
 }
 
 .time-desc {
-  font-size: 19rpx;
+  font-size: var(--fs-min);
   color: var(--muted-2);
   margin-top: 12rpx;
 }
@@ -367,7 +367,7 @@
 
 .dot-item.on {
   width: 34rpx;
-  border-radius: 999rpx;
+  border-radius: var(--radius-pill);
   background: var(--green-600);
 }
 

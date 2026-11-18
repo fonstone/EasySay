@@ -27,7 +27,7 @@
     </view>
   </view>
 
-  <view wx:if="{{!isMember && !trialUsed}}" class="trial-card fade-up" bindtap="startTrial">
+  <view wx:if="{{!isMember && !trialUsed}}" class="trial-card fade-up" bindtap="startTrial" hover-class="tap-hover" aria-role="button">
     <view class="trial-mark serif">试</view>
     <view class="grow">
       <view class="trial-title">先领 7 天体验会员</view>
@@ -62,8 +62,7 @@
         wx:key="id"
         class="plan-card {{selected === item.id ? 'plan-on' : ''}} {{item.highlight ? 'plan-hot' : ''}}"
         data-id="{{item.id}}"
-        bindtap="selectPlan"
-      >
+        bindtap="selectPlan" hover-class="tap-hover" aria-role="button">
         <view wx:if="{{item.tag}}" class="plan-tag">{{item.tag}}</view>
         <view class="plan-name">{{item.name}}</view>
         <view class="plan-price serif"><text class="plan-yen">¥</text>{{item.price}}</view>
@@ -80,7 +79,7 @@
       <view class="summary-price serif">¥{{selectedPlan.price}}</view>
     </view>
 
-    <view class="btn btn-primary btn-block mt-24" bindtap="buyPlan">
+    <view class="btn btn-primary btn-block mt-24" bindtap="buyPlan" hover-class="tap-hover" aria-role="button">
       {{membership.type === 'lifetime' ? '你已是永久会员' : '模拟开通 ' + selectedPlan.name}}
     </view>
     <view class="pay-note">本地演示：不会调用微信支付，不会产生任何扣款。</view>

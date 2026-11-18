@@ -25,6 +25,7 @@ Page({
     dailyQuestion: null,
     dailyMeta: '',
     drills: [],
+    drillTotal: 0,
     quote: '',
     todayThinking: 0
   },
@@ -58,6 +59,7 @@ Page({
       dailyQuestion,
       dailyMeta,
       drills,
+      drillTotal: pronounceData.DRILLS.length,
       quote,
       todayThinking: thinking.todayCount
     })

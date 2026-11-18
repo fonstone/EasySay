@@ -27,8 +27,12 @@ Page({
 
   refresh(categoryId) {
     const progress = store.getCategoryProgress(categoryId)
+    const favIds = store.getFavoriteIds()
     const levels = progress.levels.map((lv, i) => Object.assign({}, lv, {
-      prevName: i > 0 ? progress.levels[i - 1].name : ''
+      prevName: i > 0 ? progress.levels[i - 1].name : '',
+      questions: lv.questions.map(q => Object.assign({}, q, {
+        fav: favIds.indexOf(q.id) >= 0
+      }))
     }))
     let nextQuestion = null
     let expanded = this.data.expanded || 1
@@ -75,6 +79,14 @@ Page({
       return
     }
     wx.navigateTo({ url: '/pages/session/session?source=practice&qid=' + id })
+  },
+
+  toggleFav(e) {
+    const id = e.currentTarget.dataset.id
+    const res = store.toggleFavorite(id)
+    if (!res.ok) return
+    wx.showToast({ title: res.favorited ? '已收藏，可在找题页查看' : '已取消收藏', icon: 'none' })
+    if (this.data.category) this.refresh(this.data.category.id)
   },
 
   startNext() {

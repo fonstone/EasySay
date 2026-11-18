@@ -156,6 +156,7 @@ const cases = [
   ['pages/course/course', {}],
   ['pages/mine/mine', {}],
   ['pages/practice-detail/practice-detail', { category: 'read' }],
+  ['pages/search/search', {}],
   ['pages/session/session', { source: 'practice', qid: 'str1' }],
   ['pages/report/report', { id: 'smoke_report' }],
   ['pages/thinking/thinking', {}],

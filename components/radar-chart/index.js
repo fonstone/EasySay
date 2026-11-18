@@ -11,6 +11,7 @@ Component({
   observers: {
     dimensions(list) {
       const empty = !list || list.length < 3
+      if (empty) this._lastDrawKey = ''
       this.setData({ empty }, () => {
         if (!empty) this.draw(list)
       })
@@ -26,11 +27,19 @@ Component({
   },
 
   methods: {
+    onTap() {
+      this.triggerEvent('explain')
+    },
+
     draw(dims) {
       if (!dims || dims.length < 3) return
+      const key = dims.map(d => (d.key || d.name) + ':' + d.value).join('|')
       const query = this.createSelectorQuery()
       query.select('#radar').fields({ node: true, size: true }).exec(res => {
         if (!res || !res[0] || !res[0].node) return
+        // observers 与 ready 都会触发 draw；数据没变时只画一次，避免首帧重复绘制
+        if (this._lastDrawKey === key) return
+        this._lastDrawKey = key
         const canvas = res[0].node
         const width = res[0].width
         const height = res[0].height

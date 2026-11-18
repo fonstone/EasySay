@@ -40,7 +40,7 @@
 
 .history-label {
   margin-top: 6rpx;
-  font-size: 17rpx;
+  font-size: var(--fs-min);
   color: var(--muted-2);
 }
 
@@ -74,7 +74,7 @@
 }
 
 .field-index {
-  font-size: 18rpx;
+  font-size: var(--fs-min);
   color: var(--brass);
   letter-spacing: 1rpx;
   font-family: "Songti SC", serif;
@@ -113,7 +113,7 @@
 .stuck-chip {
   height: 56rpx;
   padding: 0 20rpx;
-  border-radius: 999rpx;
+  border-radius: var(--radius-pill);
   border: 1rpx solid var(--line);
   color: var(--muted);
   font-size: 21rpx;
@@ -178,12 +178,12 @@
   margin-top: 28rpx;
   text-align: left;
   background: var(--green-50);
-  border-radius: 18rpx;
+  border-radius: var(--radius-sm);
   padding: 22rpx;
 }
 
 .saved-next-label {
-  font-size: 18rpx;
+  font-size: var(--fs-min);
   letter-spacing: 2rpx;
   color: var(--green-600);
 }
@@ -214,13 +214,13 @@
 }
 
 .last-label {
-  font-size: 18rpx;
+  font-size: var(--fs-min);
   letter-spacing: 2rpx;
   color: var(--muted-2);
 }
 
 .last-date {
-  font-size: 18rpx;
+  font-size: var(--fs-min);
   color: var(--muted-2);
 }
 

@@ -1,0 +1,373 @@
+.search-page {
+  padding-top: 24rpx;
+}
+
+/* ---------- 搜索框 ---------- */
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+}
+
+.search-input-wrap {
+  flex: 1;
+  height: 84rpx;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 0 12rpx 0 24rpx;
+  background: var(--card);
+  border: 1rpx solid var(--line);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-soft);
+}
+
+.search-glyph {
+  font-size: 40rpx;
+  line-height: 1;
+  color: var(--green-600);
+  margin-top: -6rpx;
+}
+
+.search-input {
+  flex: 1;
+  height: 100%;
+  font-size: 27rpx;
+  color: var(--ink);
+  border: none;
+  outline: none;
+  background: transparent;
+}
+
+.search-placeholder {
+  color: var(--muted);
+  font-size: 26rpx;
+}
+
+.search-clear {
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border-radius: 50%;
+  color: var(--muted);
+  font-size: 38rpx;
+  line-height: 1;
+}
+
+.search-cancel {
+  min-width: 88rpx;
+  height: 84rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26rpx;
+  color: var(--green-700);
+  font-weight: 600;
+}
+
+/* ---------- 筛选 ---------- */
+
+.chip-scroll {
+  width: 100%;
+  white-space: nowrap;
+  margin-bottom: 14rpx;
+}
+
+.chip-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 4rpx 2rpx 8rpx;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 60rpx;
+  padding: 0 24rpx;
+  border-radius: var(--radius-pill);
+  background: var(--card);
+  border: 1rpx solid var(--line);
+  color: var(--ink-2);
+  font-size: 23rpx;
+  flex-shrink: 0;
+}
+
+.chip-soft {
+  background: var(--green-50);
+  border-color: transparent;
+  color: var(--muted);
+}
+
+.chip-on {
+  background: var(--green-700);
+  border-color: var(--green-700);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.chip-fav {
+  color: var(--brass);
+  border-color: var(--brass-soft);
+}
+
+.chip-sep {
+  width: 1rpx;
+  height: 34rpx;
+  background: var(--line-strong);
+  margin: 0 6rpx;
+  flex-shrink: 0;
+}
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 22rpx;
+  margin: 8rpx 0 20rpx;
+  background: var(--green-50);
+  border-radius: var(--radius-sm);
+  font-size: 23rpx;
+  color: var(--muted);
+}
+
+.filter-reset {
+  color: var(--green-700);
+  font-weight: 600;
+}
+
+/* ---------- 默认引导 ---------- */
+
+.intro {
+  margin: 12rpx 0 30rpx;
+}
+
+.intro-block {
+  margin-bottom: 26rpx;
+}
+
+.intro-label {
+  font-size: 23rpx;
+  color: var(--muted);
+  letter-spacing: 2rpx;
+  margin-bottom: 16rpx;
+}
+
+.intro-clear {
+  font-size: 23rpx;
+  color: var(--green-700);
+  padding: 6rpx 12rpx;
+}
+
+.word-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14rpx;
+}
+
+.word {
+  padding: 10rpx 24rpx;
+  border-radius: var(--radius-pill);
+  background: var(--card);
+  border: 1rpx solid var(--line);
+  color: var(--ink-2);
+  font-size: 24rpx;
+}
+
+.word-hint {
+  background: var(--green-50);
+  border-color: transparent;
+  color: var(--green-700);
+}
+
+.shortcut-row {
+  display: flex;
+  gap: 16rpx;
+}
+
+.shortcut {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  padding: 22rpx 18rpx;
+  background: var(--card);
+  border: 1rpx solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+}
+
+.shortcut-mark {
+  width: 62rpx;
+  height: 62rpx;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  background: var(--green-50);
+  color: var(--green-600);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+}
+
+.shortcut-title {
+  font-size: 25rpx;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.shortcut-desc {
+  font-size: 21rpx;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.shortcut-arrow {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: 24rpx;
+}
+
+/* ---------- 结果 ---------- */
+
+.result-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 12rpx 0 20rpx;
+}
+
+.result-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.result-count {
+  font-size: 22rpx;
+  color: var(--muted);
+}
+
+.result-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+}
+
+.q-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 18rpx;
+  padding: 24rpx 18rpx;
+  background: var(--card);
+  border: 1rpx solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+}
+
+.q-card-done {
+  background: var(--green-50);
+}
+
+.q-glyph {
+  width: 72rpx;
+  height: 72rpx;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34rpx;
+}
+
+.q-body {
+  min-width: 0;
+  padding-top: 2rpx;
+}
+
+.q-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.45;
+}
+
+.q-sub {
+  font-size: 23rpx;
+  color: var(--muted);
+  margin-top: 4rpx;
+}
+
+.q-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8rpx;
+  margin-top: 12rpx;
+  font-size: 21rpx;
+  color: var(--muted);
+}
+
+.q-dot {
+  color: var(--line-strong);
+}
+
+.q-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-top: 10rpx;
+}
+
+.q-badge {
+  font-size: 20rpx;
+  color: var(--green-700);
+  background: var(--green-50);
+  border: 1rpx solid var(--green-100);
+  padding: 3rpx 12rpx;
+  border-radius: var(--radius-pill);
+}
+
+.q-badge.done {
+  color: var(--brass);
+  background: var(--brass-soft);
+  border-color: transparent;
+}
+
+.fav-btn {
+  width: var(--tap-min);
+  height: var(--tap-min);
+  flex-shrink: 0;
+  border-radius: 50%;
+  font-size: 38rpx;
+  color: var(--muted-2);
+  align-self: center;
+}
+
+.fav-on {
+  color: var(--brass);
+}
+
+.search-foot {
+  margin-top: 44rpx;
+  text-align: center;
+}
+
+.foot-line {
+  width: 80rpx;
+  height: 1rpx;
+  background: var(--line-strong);
+  margin: 0 auto 20rpx;
+}
+
+.foot-text {
+  font-size: 21rpx;
+  color: var(--muted);
+  line-height: 1.8;
+  padding: 0 40rpx;
+}

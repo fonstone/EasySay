@@ -63,6 +63,10 @@ Page({
     wx.redirectTo({ url: '/pages/lesson/lesson?id=' + this.data.nextLesson.id })
   },
 
+  goBack() {
+    util.goBack()
+  },
+
   onShareAppMessage() {
     return {
       title: this.data.lesson ? this.data.lesson.title : '清述课程',

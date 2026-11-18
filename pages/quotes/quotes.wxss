@@ -24,7 +24,7 @@
   display: flex;
   align-items: center;
   gap: 18rpx;
-  background: linear-gradient(120deg, #f7f2e8, #fbf8f1);
+  background: var(--gradient-paper);
   border: 1rpx solid var(--brass-soft);
   border-radius: var(--radius);
   padding: 24rpx 26rpx;
@@ -45,7 +45,7 @@
 
 .count-desc {
   margin-top: 3rpx;
-  font-size: 19rpx;
+  font-size: var(--fs-min);
   color: #9c7c4b;
 }
 
@@ -94,7 +94,7 @@
 
 .quote-meta {
   margin-top: 16rpx;
-  font-size: 18rpx;
+  font-size: var(--fs-min);
   color: var(--muted-2);
 }
 
@@ -125,7 +125,7 @@
   padding: 18rpx 22rpx;
   background: var(--bg-deep);
   border-radius: 14rpx;
-  font-size: 19rpx;
+  font-size: var(--fs-min);
   line-height: 1.7;
   color: var(--muted-2);
 }

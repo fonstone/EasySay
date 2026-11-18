@@ -23,7 +23,10 @@ const KEYS = {
   THINKING: 'cs_thinking',
   PRONOUNCE: 'cs_pronounce',
   TODAY: 'cs_today',
-  SCHEMA: 'cs_schema'
+  SCHEMA: 'cs_schema',
+  FAVORITES: 'cs_favorites',
+  RECENT_QUESTIONS: 'cs_recent_questions',
+  SEARCH_HISTORY: 'cs_search_history'
 }
 
 /**
@@ -34,7 +37,10 @@ const KEYS = {
 const MAX_REPORTS = 40
 /** 音频文件体积大，单独设更小的上限，淘汰时同步清理报告里的引用 */
 const MAX_AUDIO_FILES = 15
-const SCHEMA_VERSION = 2
+const SCHEMA_VERSION = 3
+const MAX_FAVORITES = 60
+const MAX_RECENT_QUESTIONS = 12
+const MAX_SEARCH_HISTORY = 10
 
 const MEMORY = {}
 const hasWx = typeof wx !== 'undefined' && typeof wx.getStorageSync === 'function'
@@ -172,6 +178,9 @@ function init() {
   if (!read(KEYS.QUOTES, null)) write(KEYS.QUOTES, [])
   if (!read(KEYS.REVIEWS, null)) write(KEYS.REVIEWS, [])
   if (KEYS.THINKING && !read(KEYS.THINKING, null)) write(KEYS.THINKING, [])
+  if (!Array.isArray(read(KEYS.FAVORITES, null))) write(KEYS.FAVORITES, [])
+  if (!Array.isArray(read(KEYS.RECENT_QUESTIONS, null))) write(KEYS.RECENT_QUESTIONS, [])
+  if (!Array.isArray(read(KEYS.SEARCH_HISTORY, null))) write(KEYS.SEARCH_HISTORY, [])
   migrate()
   repairData()
   getMembership()
@@ -181,6 +190,7 @@ function init() {
 /**
  * 数据结构升级。所有迁移必须幂等，且能处理旧版本缺失字段。
  * v1 -> v2：补报告锁稿字段、补历史/档案的 reportId 外键、补音频有效性标记。
+ * v2 -> v3：新增题目收藏、最近练习、搜索历史三个键，并清洗失效题目 id。
  */
 function migrate() {
   const current = Number(read(KEYS.SCHEMA, 0)) || 0
@@ -218,6 +228,26 @@ function migrate() {
     archive.forEach(a => { if (a && !a.reportId) a.reportId = a.id || '' })
     write(KEYS.ARCHIVE, archive)
   }
+
+  // v3：新键缺失时补默认值；顺带清掉已不存在的题目 id，避免收藏页出现空卡
+  const normalizeIds = (key, max) => {
+    const raw = read(key, [])
+    const seen = {}
+    const list = (Array.isArray(raw) ? raw : [])
+      .map(x => (typeof x === 'string' ? { id: x } : x))
+      .filter(x => {
+        if (!x || !x.id || !questionData.getQuestion(x.id) || seen[x.id]) return false
+        seen[x.id] = true
+        return true
+      })
+      .slice(0, max)
+    if (list.length !== (Array.isArray(raw) ? raw.length : 0)) write(key, list)
+    return list
+  }
+  normalizeIds(KEYS.FAVORITES, MAX_FAVORITES)
+  normalizeIds(KEYS.RECENT_QUESTIONS, MAX_RECENT_QUESTIONS)
+  const historyWords = read(KEYS.SEARCH_HISTORY, [])
+  if (!Array.isArray(historyWords)) write(KEYS.SEARCH_HISTORY, [])
 
   write(KEYS.SCHEMA, SCHEMA_VERSION)
   return { from: current, to: SCHEMA_VERSION, migrated: true }
@@ -1147,6 +1177,85 @@ function getOverview() {
 }
 
 /* ==========================================================
+   找题：收藏 / 最近练习 / 搜索历史
+   48 道题原先只能靠六个抽屉逐层翻找，这里提供跨页面共享的轻量索引。
+   三个键都只存题目 id 与时间戳，避免题目文案更新后出现脏数据。
+   ========================================================== */
+
+function readIdList(key, max) {
+  const raw = read(key, [])
+  const seen = {}
+  return (Array.isArray(raw) ? raw : [])
+    .map(x => (typeof x === 'string' ? { id: x, at: 0 } : x))
+    .filter(x => {
+      if (!x || !x.id || !questionData.getQuestion(x.id) || seen[x.id]) return false
+      seen[x.id] = true
+      return true
+    })
+    .slice(0, max)
+}
+
+function getFavorites() {
+  return readIdList(KEYS.FAVORITES, MAX_FAVORITES)
+}
+
+function getFavoriteIds() {
+  return getFavorites().map(x => x.id)
+}
+
+function isFavorite(id) {
+  return getFavoriteIds().indexOf(id) >= 0
+}
+
+function toggleFavorite(id) {
+  if (!questionData.getQuestion(id)) {
+    return { ok: false, favorited: false, total: getFavorites().length }
+  }
+  const list = getFavorites()
+  const had = list.some(x => x.id === id)
+  const next = had
+    ? list.filter(x => x.id !== id)
+    : [{ id, at: Date.now() }].concat(list)
+  const trimmed = next.slice(0, MAX_FAVORITES)
+  write(KEYS.FAVORITES, trimmed)
+  return { ok: true, favorited: !had, total: trimmed.length }
+}
+
+function getRecentQuestionIds(limit) {
+  const ids = readIdList(KEYS.RECENT_QUESTIONS, MAX_RECENT_QUESTIONS).map(x => x.id)
+  return limit ? ids.slice(0, limit) : ids
+}
+
+function pushRecentQuestion(id) {
+  if (!questionData.getQuestion(id)) return getRecentQuestionIds()
+  const rest = getRecentQuestionIds().filter(x => x !== id)
+  const next = [id].concat(rest).slice(0, MAX_RECENT_QUESTIONS)
+    .map((qid, i) => ({ id: qid, at: Date.now() - i }))
+  write(KEYS.RECENT_QUESTIONS, next)
+  return next.map(x => x.id)
+}
+
+function getSearchHistory() {
+  const raw = read(KEYS.SEARCH_HISTORY, [])
+  return (Array.isArray(raw) ? raw : [])
+    .filter(x => typeof x === 'string' && x.trim())
+    .slice(0, MAX_SEARCH_HISTORY)
+}
+
+function pushSearchHistory(keyword) {
+  const kw = String(keyword || '').trim().slice(0, 30)
+  if (!kw) return getSearchHistory()
+  const next = [kw].concat(getSearchHistory().filter(x => x !== kw)).slice(0, MAX_SEARCH_HISTORY)
+  write(KEYS.SEARCH_HISTORY, next)
+  return next
+}
+
+function clearSearchHistory() {
+  write(KEYS.SEARCH_HISTORY, [])
+  return []
+}
+
+/* ==========================================================
    备份 / 恢复
    纯本地小程序没有云端，卸载或清缓存就会丢全部练习记录。
    导出为 JSON 文本（录音文件本身不导出，仅导出记录与报告）。
@@ -1189,7 +1298,8 @@ function importData(input) {
 
 const RESET_KEYS = [
   KEYS.STATS, KEYS.PROGRESS, KEYS.HISTORY, KEYS.REPORTS, KEYS.ARCHIVE,
-  KEYS.QUOTES, KEYS.REVIEWS, KEYS.COACH, KEYS.THINKING, KEYS.PRONOUNCE, KEYS.TODAY
+  KEYS.QUOTES, KEYS.REVIEWS, KEYS.COACH, KEYS.THINKING, KEYS.PRONOUNCE, KEYS.TODAY,
+  KEYS.RECENT_QUESTIONS, KEYS.SEARCH_HISTORY
 ]
 
 function clearPractice() {
@@ -1241,6 +1351,15 @@ module.exports = {
   markTodayDone,
   addHistory,
   getHistory,
+  getFavorites,
+  getFavoriteIds,
+  isFavorite,
+  toggleFavorite,
+  getRecentQuestionIds,
+  pushRecentQuestion,
+  getSearchHistory,
+  pushSearchHistory,
+  clearSearchHistory,
   saveReport,
   getReport,
   updateReport,

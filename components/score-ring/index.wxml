@@ -1,4 +1,4 @@
-<view class="score-ring" style="width: {{size}}rpx; height: {{size}}rpx;">
+<view class="score-ring" style="width: {{size}}rpx; height: {{size}}rpx;" bindtap="onTap" hover-class="tap-hover" aria-label="本次得分 {{displayScore}} 分，点击查看评分说明" aria-role="button">
   <canvas type="2d" id="ring" class="ring-canvas"></canvas>
   <view class="ring-content">
     <view class="ring-score serif">{{displayScore}}</view>

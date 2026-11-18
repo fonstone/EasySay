@@ -77,13 +77,13 @@
   margin-top: 26rpx;
   padding: 8rpx;
   background: var(--bg-deep);
-  border-radius: 999rpx;
+  border-radius: var(--radius-pill);
 }
 
 .tab {
   flex: 1;
   height: 66rpx;
-  border-radius: 999rpx;
+  border-radius: var(--radius-pill);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -100,7 +100,7 @@
 }
 
 .tab-count {
-  font-size: 17rpx;
+  font-size: var(--fs-min);
   color: var(--muted-2);
 }
 
@@ -121,7 +121,7 @@
 }
 
 .section-intro-en {
-  font-size: 15rpx;
+  font-size: var(--fs-min);
   letter-spacing: 2rpx;
   color: var(--muted-2);
 }
@@ -157,10 +157,10 @@
 }
 
 .drill-focus {
-  font-size: 17rpx;
+  font-size: var(--fs-min);
   color: var(--green-700);
   background: var(--green-50);
-  border-radius: 6rpx;
+  border-radius: var(--radius-xs);
   padding: 3rpx 9rpx;
   white-space: nowrap;
 }
@@ -180,7 +180,7 @@
 
 .drill-pinyin {
   margin-top: 3rpx;
-  font-size: 19rpx;
+  font-size: var(--fs-min);
   color: var(--muted-2);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -189,7 +189,7 @@
 
 .drill-tip {
   margin-top: 6rpx;
-  font-size: 19rpx;
+  font-size: var(--fs-min);
   color: var(--muted);
   max-width: 440rpx;
 }
@@ -209,7 +209,7 @@
   border-radius: 50%;
   background: var(--green-600);
   color: #fff;
-  font-size: 18rpx;
+  font-size: var(--fs-min);
   display: flex;
   align-items: center;
   justify-content: center;

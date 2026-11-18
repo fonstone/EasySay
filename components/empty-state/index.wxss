@@ -1,3 +1,4 @@
+/* 空态是全局唯一的：颜色、字号、圆角全部引用 app.wxss 令牌 */
 .empty-state {
   padding: 90rpx 40rpx;
   display: flex;
@@ -6,12 +7,16 @@
   text-align: center;
 }
 
+.empty-compact {
+  padding: 56rpx 36rpx;
+}
+
 .empty-mark {
   width: 120rpx;
   height: 120rpx;
   border-radius: 50%;
-  background: #f0f6f2;
-  color: #2f7b63;
+  background: var(--green-50);
+  color: var(--green-500);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -19,15 +24,22 @@
   margin-bottom: 26rpx;
 }
 
+.empty-compact .empty-mark {
+  width: 96rpx;
+  height: 96rpx;
+  font-size: 38rpx;
+  margin-bottom: 20rpx;
+}
+
 .empty-title {
   font-size: 30rpx;
   font-weight: 600;
-  color: #16211d;
+  color: var(--ink);
 }
 
 .empty-desc {
-  font-size: 24rpx;
-  color: #74827c;
+  font-size: var(--fs-min);
+  color: var(--muted);
   margin-top: 10rpx;
   line-height: 1.7;
   max-width: 460rpx;
@@ -35,13 +47,16 @@
 
 .empty-action {
   margin-top: 30rpx;
-  height: 68rpx;
+  min-height: var(--tap-min);
   padding: 0 34rpx;
-  border-radius: 999rpx;
-  background: #f0f6f2;
-  color: #1b5a47;
+  border-radius: var(--radius-pill);
+  background: var(--green-50);
+  color: var(--green-700);
   font-size: 24rpx;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
 }
+
+.tap-hover { opacity: 0.74; }

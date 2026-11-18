@@ -1,0 +1,156 @@
+<view class="page search-page" wx:if="{{ready}}">
+  <view class="search-bar">
+    <view class="search-input-wrap">
+      <text class="search-glyph" aria-hidden="true">⌕</text>
+      <input
+        class="search-input"
+        value="{{keyword}}"
+        placeholder="搜题目、场景或提示词"
+        placeholder-class="search-placeholder"
+        confirm-type="search"
+        focus="{{focus}}"
+        bindinput="onInput"
+        bindconfirm="onConfirm"
+        aria-label="搜索练习题"
+      />
+      <view wx:if="{{keyword}}" class="search-clear tap-target" catchtap="clearKeyword" hover-class="tap-hover" aria-label="清空搜索词" aria-role="button">×</view>
+    </view>
+    <view class="search-cancel" bindtap="goBack" hover-class="tap-hover" aria-label="返回上一页" aria-role="button">取消</view>
+  </view>
+
+  <scroll-view class="chip-scroll" scroll-x enable-flex>
+    <view class="chip-row">
+      <view
+        wx:for="{{categories}}"
+        wx:key="id"
+        class="chip {{categoryId === item.id ? 'chip-on' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="pickCategory"
+        hover-class="tap-hover"
+        aria-label="按{{item.name}}筛选"
+        aria-role="button"
+      >{{item.name}}</view>
+    </view>
+  </scroll-view>
+
+  <scroll-view class="chip-scroll" scroll-x enable-flex>
+    <view class="chip-row">
+      <view
+        wx:for="{{levels}}"
+        wx:key="n"
+        class="chip chip-soft {{level === item.n ? 'chip-on' : ''}}"
+        data-n="{{item.n}}"
+        bindtap="pickLevel"
+        hover-class="tap-hover"
+        aria-label="按{{item.name}}筛选"
+        aria-role="button"
+      >{{item.name}}</view>
+      <view class="chip-sep"></view>
+      <view
+        wx:for="{{sorts}}"
+        wx:key="key"
+        class="chip chip-soft {{sort === item.key ? 'chip-on' : ''}}"
+        data-key="{{item.key}}"
+        bindtap="pickSort"
+        hover-class="tap-hover"
+        aria-label="按{{item.name}}排序"
+        aria-role="button"
+      >{{item.name}}</view>
+      <view class="chip chip-fav {{onlyFavorites ? 'chip-on' : ''}}" bindtap="toggleFavoritesOnly" hover-class="tap-hover" aria-label="只看收藏的题目" aria-role="button">☆ 只看收藏</view>
+    </view>
+  </scroll-view>
+
+  <view wx:if="{{activeFilterCount}}" class="filter-bar">
+    <view class="filter-text">已启用 {{activeFilterCount}} 个筛选条件</view>
+    <view class="filter-reset" bindtap="resetFilters" hover-class="tap-hover" aria-label="清空全部筛选" aria-role="button">清空 →</view>
+  </view>
+
+  <view wx:if="{{showIntro}}" class="intro">
+    <view wx:if="{{history.length}}" class="intro-block">
+      <view class="between">
+        <view class="intro-label">最近搜过</view>
+        <view class="intro-clear" bindtap="clearHistory" hover-class="tap-hover" aria-label="清空搜索记录" aria-role="button">清空</view>
+      </view>
+      <view class="word-row">
+        <view wx:for="{{history}}" wx:key="*this" class="word" data-word="{{item}}" bindtap="applyHint" hover-class="tap-hover" aria-label="搜索{{item}}" aria-role="button">{{item}}</view>
+      </view>
+    </view>
+
+    <view class="intro-block">
+      <view class="intro-label">试试这些词</view>
+      <view class="word-row">
+        <view wx:for="{{hints}}" wx:key="*this" class="word word-hint" data-word="{{item}}" bindtap="applyHint" hover-class="tap-hover" aria-label="搜索{{item}}" aria-role="button">{{item}}</view>
+      </view>
+    </view>
+
+    <view class="shortcut-row">
+      <view class="shortcut" bindtap="openFavorites" hover-class="tap-hover" aria-label="打开我收藏的题目" aria-role="button">
+        <view class="shortcut-mark serif">★</view>
+        <view class="grow">
+          <view class="shortcut-title">我的收藏</view>
+          <view class="shortcut-desc">{{favoriteCount}} 道题等着你</view>
+        </view>
+        <view class="shortcut-arrow">→</view>
+      </view>
+      <view class="shortcut" bindtap="openRecent" hover-class="tap-hover" aria-label="打开最近练过的题目" aria-role="button">
+        <view class="shortcut-mark serif">近</view>
+        <view class="grow">
+          <view class="shortcut-title">最近练过</view>
+          <view class="shortcut-desc">{{recentCount}} 道题可继续</view>
+        </view>
+        <view class="shortcut-arrow">→</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="result-head">
+    <view class="result-title">{{resultTitle}}</view>
+    <view class="result-count">{{results.length}} 道 / 共 {{totalQuestions}} 题</view>
+  </view>
+
+  <view wx:if="{{results.length}}" class="result-list">
+    <view
+      wx:for="{{results}}"
+      wx:key="id"
+      class="q-card {{item.done ? 'q-card-done' : ''}}"
+      data-id="{{item.id}}"
+      bindtap="openQuestion"
+      hover-class="tap-hover"
+      aria-label="开始练习{{item.title}}"
+      aria-role="button"
+    >
+      <view class="q-glyph serif" style="background: {{item.soft}}; color: {{item.color}};" aria-hidden="true">{{item.glyph}}</view>
+      <view class="grow q-body">
+        <view class="q-title ellipsis">{{item.title}}</view>
+        <view class="q-sub ellipsis">{{item.subtitle}}</view>
+        <view class="q-meta">
+          <text>{{item.categoryName}}</text>
+          <text class="q-dot">·</text>
+          <text>{{item.levelName}}</text>
+          <text class="q-dot">·</text>
+          <text>{{item.duration}}</text>
+        </view>
+        <view class="q-badges">
+          <text wx:if="{{item.done}}" class="q-badge done">练过 · 最好 {{item.best}} 分</text>
+          <text wx:if="{{item.recent}}" class="q-badge">最近练过</text>
+        </view>
+      </view>
+      <view class="fav-btn tap-target {{item.favorite ? 'fav-on' : ''}}" catchtap="toggleFav" data-id="{{item.id}}" hover-class="tap-hover" aria-label="{{item.favorite ? '取消收藏' : '收藏'}}{{item.title}}" aria-role="button">{{item.favorite ? '★' : '☆'}}</view>
+    </view>
+  </view>
+
+  <empty-state wx:else compact="{{true}}" mark="题" title="{{emptyTitle}}" desc="{{emptyDesc}}" action="{{emptyAction}}" bind:action="onEmptyAction" />
+
+  <view class="search-foot">
+    <view class="foot-line"></view>
+    <view class="foot-text">搜索、收藏和最近练习都只保存在本机；题目按录音事实评分，不联网。</view>
+  </view>
+</view>
+
+<view wx:else class="skeleton-page" aria-label="正在加载题库">
+  <view class="sk sk-title"></view>
+  <view class="sk sk-strip"></view>
+  <view class="sk sk-card"></view>
+  <view class="sk sk-card"></view>
+  <view class="sk sk-strip"></view>
+</view>

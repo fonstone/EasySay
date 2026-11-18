@@ -1,4 +1,5 @@
 const store = require('../../utils/store')
+const util = require('../../utils/util')
 const courses = require('../../data/courses')
 
 Page({
@@ -49,6 +50,10 @@ Page({
     if (this.data.nextLesson) {
       wx.navigateTo({ url: '/pages/lesson/lesson?id=' + this.data.nextLesson.id })
     }
+  },
+
+  goBack() {
+    util.goBack()
   },
 
   onShareAppMessage() {

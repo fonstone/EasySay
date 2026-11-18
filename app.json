@@ -7,6 +7,7 @@
     "pages/mine/mine",
     "pages/onboarding/onboarding",
     "pages/practice-detail/practice-detail",
+    "pages/search/search",
     "pages/session/session",
     "pages/report/report",
     "pages/thinking/thinking",

@@ -20,7 +20,7 @@
 
   <view class="level-list">
     <view wx:for="{{levels}}" wx:key="n" class="level-block {{item.unlocked ? '' : 'locked'}}">
-      <view class="level-head" data-n="{{item.n}}" bindtap="toggleLevel">
+      <view class="level-head" data-n="{{item.n}}" bindtap="toggleLevel" hover-class="tap-hover" aria-role="button">
         <view class="level-index {{item.unlocked ? 'index-on' : ''}}">{{item.n}}</view>
         <view class="grow">
           <view class="level-name-row">
@@ -41,8 +41,7 @@
           class="question-card {{q.done ? 'q-done' : ''}}"
           data-id="{{q.id}}"
           data-level="{{item.n}}"
-          bindtap="startQuestion"
-        >
+          bindtap="startQuestion" hover-class="tap-hover" aria-role="button">
           <view class="q-left">
             <view class="q-mark {{q.done ? 'q-mark-done' : ''}}">{{q.done ? '✓' : '▶'}}</view>
           </view>
@@ -57,8 +56,8 @@
               <text wx:if="{{q.done}}" class="q-best">最好 {{q.best}} 分</text>
             </view>
           </view>
-          <view wx:if="{{!item.unlocked}}" class="q-lock-icon">锁</view>
-          <view wx:else class="q-arrow">→</view>
+          <view wx:if="{{!item.unlocked}}" class="q-lock-icon" aria-hidden="true">锁</view>
+          <view class="q-fav tap-target {{q.fav ? 'q-fav-on' : ''}}" catchtap="toggleFav" data-id="{{q.id}}" hover-class="tap-hover" aria-label="{{q.fav ? '取消收藏' : '收藏'}}{{q.title}}" aria-role="button">{{q.fav ? '★' : '☆'}}</view>
         </view>
         <view wx:if="{{!item.unlocked}}" class="unlock-hint">
           完成「{{item.prevName}}」任意 1 题，自动解锁本关
@@ -72,7 +71,7 @@
       <view class="next-eyebrow">下一题</view>
       <view class="next-title">{{nextQuestion.title}}</view>
       <view class="next-sub">{{nextQuestion.subtitle}}</view>
-      <view class="btn btn-primary btn-block mt-24" bindtap="startNext">开始这一题</view>
+      <view class="btn btn-primary btn-block mt-24" bindtap="startNext" hover-class="tap-hover" aria-role="button">开始这一题</view>
     </view>
   </view>
 

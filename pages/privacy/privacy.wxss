@@ -22,7 +22,7 @@
 
 .updated {
   margin-top: 12rpx;
-  font-size: 18rpx;
+  font-size: var(--fs-min);
   color: var(--muted-2);
 }
 
@@ -141,7 +141,7 @@
 }
 
 .foot-text {
-  font-size: 18rpx;
+  font-size: var(--fs-min);
   color: var(--muted-2);
   letter-spacing: 2rpx;
 }

@@ -27,7 +27,7 @@
 }
 
 .track-hero-en {
-  font-size: 16rpx;
+  font-size: var(--fs-min);
   letter-spacing: 3rpx;
   color: var(--muted);
   font-weight: 600;
@@ -54,7 +54,7 @@
 }
 
 .track-hero-num text {
-  font-size: 18rpx;
+  font-size: var(--fs-min);
   color: var(--muted);
 }
 
@@ -71,7 +71,7 @@
   font-size: 20rpx;
   color: var(--green-800);
   background: rgba(255, 255, 255, 0.6);
-  border-radius: 8rpx;
+  border-radius: var(--radius-xs);
   padding: 8rpx 14rpx;
 }
 
@@ -139,7 +139,7 @@
 
 .lesson-meta {
   margin-top: 5rpx;
-  font-size: 18rpx;
+  font-size: var(--fs-min);
   color: var(--muted-2);
 }
 

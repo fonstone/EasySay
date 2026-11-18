@@ -13,6 +13,9 @@ Page({
     planGoal: null,
     planDone: 0,
     planNext: null,
+    favoriteCount: 0,
+    recentCount: 0,
+    recentItems: [],
     ready: false
   },
 
@@ -70,6 +73,21 @@ Page({
     }
 
     const stats = store.getStats()
+    const favoriteIds = store.getFavoriteIds()
+    const recentAll = store.getRecentQuestionIds()
+    const recentIds = recentAll.slice(0, 6)
+    const recentItems = recentIds
+      .map(id => questionData.getQuestion(id))
+      .filter(Boolean)
+      .map(q => ({
+        id: q.id,
+        title: q.title,
+        categoryName: q.categoryName,
+        levelName: q.levelName,
+        glyph: q.categoryGlyph,
+        color: q.categoryColor,
+        soft: q.categorySoft
+      }))
     let monthSessions = 0
     const now = util.dateKey()
     Object.keys(stats.days || {}).forEach(key => {
@@ -86,8 +104,23 @@ Page({
       plan: plan || null,
       planGoal,
       planDone,
-      planNext
+      planNext,
+      favoriteCount: favoriteIds.length,
+      recentCount: recentAll.length,
+      recentItems
     })
+  },
+
+  goSearch() {
+    wx.navigateTo({ url: '/pages/search/search' })
+  },
+
+  goFavorites() {
+    wx.navigateTo({ url: '/pages/search/search?scope=favorites' })
+  },
+
+  goRecent() {
+    wx.navigateTo({ url: '/pages/search/search?scope=recent' })
   },
 
   openCategory(e) {

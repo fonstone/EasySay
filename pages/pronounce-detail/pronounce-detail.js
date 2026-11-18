@@ -1,4 +1,5 @@
 const store = require('../../utils/store')
+const util = require('../../utils/util')
 const pronounce = require('../../data/pronounce')
 
 Page({
@@ -74,6 +75,10 @@ Page({
 
   openRelated(e) {
     wx.redirectTo({ url: '/pages/pronounce-detail/pronounce-detail?id=' + e.currentTarget.dataset.id })
+  },
+
+  goBack() {
+    util.goBack()
   },
 
   onShareAppMessage() {

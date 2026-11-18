@@ -5,7 +5,7 @@
         <text class="eyebrow">REVIEW</text>
         <view class="review-title serif">把一次练习，<br />变成下一次的预案。</view>
       </view>
-      <view class="history-btn" bindtap="goHistory">
+      <view class="history-btn" bindtap="goHistory" hover-class="tap-hover" aria-role="button">
         <view class="history-num serif">{{reviewCount}}</view>
         <view class="history-label">历史</view>
       </view>
@@ -36,8 +36,7 @@
           wx:key="label"
           class="stuck-chip {{item.on ? 'stuck-on' : ''}}"
           data-value="{{item.label}}"
-          bindtap="toggleStuck"
-        >{{item.label}}</view>
+          bindtap="toggleStuck" hover-class="tap-hover" aria-role="button">{{item.label}}</view>
       </view>
       <textarea
         class="field-area field-area-sm"
@@ -75,7 +74,7 @@
       ></textarea>
     </view>
 
-    <view class="btn btn-primary btn-block mt-32" bindtap="save">存下这次复盘</view>
+    <view class="btn btn-primary btn-block mt-32" bindtap="save" hover-class="tap-hover" aria-role="button">存下这次复盘</view>
   </view>
 
   <view wx:else class="saved-card fade-up">
@@ -87,8 +86,8 @@
       <view class="saved-next-text">{{lastReview.next}}</view>
     </view>
     <view class="saved-actions">
-      <view class="btn btn-ghost" bindtap="writeAnother">再写一次</view>
-      <view class="btn btn-primary" bindtap="goHistory">查看历史</view>
+      <view class="btn btn-ghost" bindtap="writeAnother" hover-class="tap-hover" aria-role="button">再写一次</view>
+      <view class="btn btn-primary" bindtap="goHistory" hover-class="tap-hover" aria-role="button">查看历史</view>
     </view>
   </view>
 

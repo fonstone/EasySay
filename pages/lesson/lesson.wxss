@@ -10,7 +10,7 @@
 }
 
 .lesson-crumb {
-  font-size: 19rpx;
+  font-size: var(--fs-min);
   letter-spacing: 2rpx;
   color: var(--muted);
 }
@@ -38,10 +38,10 @@
   position: absolute;
   right: 28rpx;
   top: 28rpx;
-  font-size: 18rpx;
+  font-size: var(--fs-min);
   color: var(--green-700);
   background: rgba(255, 255, 255, 0.7);
-  border-radius: 999rpx;
+  border-radius: var(--radius-pill);
   padding: 5rpx 14rpx;
 }
 
@@ -105,14 +105,14 @@
 
 .takeaway-card {
   margin-top: 40rpx;
-  background: linear-gradient(135deg, #f7f2e8, #fbf8f1);
+  background: var(--gradient-paper);
   border: 1rpx solid var(--brass-soft);
   border-radius: var(--radius);
   padding: 28rpx 30rpx;
 }
 
 .takeaway-label {
-  font-size: 18rpx;
+  font-size: var(--fs-min);
   letter-spacing: 3rpx;
   color: var(--brass);
   font-weight: 600;
@@ -135,7 +135,7 @@
 }
 
 .practice-eyebrow {
-  font-size: 18rpx;
+  font-size: var(--fs-min);
   letter-spacing: 3rpx;
   color: var(--green-600);
   font-weight: 600;
@@ -157,7 +157,7 @@
 
 .practice-tags {
   margin-top: 10rpx;
-  font-size: 19rpx;
+  font-size: var(--fs-min);
   color: var(--muted-2);
 }
 

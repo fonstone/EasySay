@@ -438,6 +438,9 @@ Page({
       this.resetToIntro()
       return
     }
+    // 只有麦克风真正启动，才算「练过这道题」，最近练习据此更新
+    const recentId = this.data.question && this.data.question.id
+    if (recentId) store.pushRecentQuestion(recentId)
     this.recordStartedAt = Date.now()
     this.setData({ recordActive: true, phase: 'recording' })
     this.startRecordTimer()

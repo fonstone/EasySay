@@ -35,7 +35,7 @@
 }
 
 .archive-date {
-  font-size: 18rpx;
+  font-size: var(--fs-min);
   color: var(--muted-2);
   letter-spacing: 1rpx;
 }
@@ -47,7 +47,7 @@
 }
 
 .archive-score text {
-  font-size: 17rpx;
+  font-size: var(--fs-min);
   color: var(--muted-2);
   font-weight: 400;
 }
@@ -80,7 +80,7 @@
   gap: 10rpx;
   height: 56rpx;
   padding: 0 20rpx;
-  border-radius: 999rpx;
+  border-radius: var(--radius-pill);
   background: var(--green-50);
   color: var(--green-700);
   font-size: 21rpx;
@@ -118,7 +118,7 @@
   padding: 18rpx 22rpx;
   background: var(--bg-deep);
   border-radius: 14rpx;
-  font-size: 19rpx;
+  font-size: var(--fs-min);
   line-height: 1.7;
   color: var(--muted-2);
 }

@@ -1,12 +1,12 @@
 <view class="onboard" style="padding-top: {{statusBarHeight + 16}}px;">
   <view class="nav">
-    <view wx:if="{{step > 0}}" class="nav-back" bindtap="prev">←</view>
+    <view wx:if="{{step > 0}}" class="nav-back" bindtap="prev" hover-class="tap-hover" aria-role="button">←</view>
     <view wx:else class="nav-back nav-ghost"></view>
     <view class="nav-brand">
       <image class="nav-logo" src="/assets/logo.png" mode="aspectFit" />
       <text class="nav-name">清述</text>
     </view>
-    <view class="nav-skip" bindtap="skip">跳过</view>
+    <view class="nav-skip" bindtap="skip" hover-class="tap-hover" aria-role="button">跳过</view>
   </view>
 
   <view wx:if="{{step === 0}}" class="step step-welcome fade-up">
@@ -39,7 +39,7 @@
       </view>
     </view>
     <view class="welcome-cta">
-      <view class="btn btn-primary btn-block" bindtap="next">开始设置我的练习</view>
+      <view class="btn btn-primary btn-block" bindtap="next" hover-class="tap-hover" aria-role="button">开始设置我的练习</view>
       <view class="welcome-hint">大约 30 秒 · 之后可随时修改</view>
     </view>
   </view>
@@ -54,8 +54,7 @@
         wx:key="id"
         class="goal-card {{goalId === item.id ? 'goal-active' : ''}}"
         data-id="{{item.id}}"
-        bindtap="pickGoal"
-      >
+        bindtap="pickGoal" hover-class="tap-hover" aria-role="button">
         <view class="goal-glyph serif" style="background: {{item.soft}}; color: {{item.color}};">{{item.glyph}}</view>
         <view class="goal-name">{{item.name}}</view>
         <view class="goal-desc">{{item.desc}}</view>
@@ -74,8 +73,7 @@
         wx:key="id"
         class="level-card {{level === item.id ? 'level-active' : ''}}"
         data-id="{{item.id}}"
-        bindtap="pickLevel"
-      >
+        bindtap="pickLevel" hover-class="tap-hover" aria-role="button">
         <view class="level-glyph serif">{{item.glyph}}</view>
         <view class="grow">
           <view class="level-name">{{item.name}}</view>
@@ -96,8 +94,7 @@
         wx:key="minutes"
         class="time-card {{minutes === item.minutes ? 'time-active' : ''}}"
         data-minutes="{{item.minutes}}"
-        bindtap="pickTime"
-      >
+        bindtap="pickTime" hover-class="tap-hover" aria-role="button">
         <view class="time-num serif">{{item.minutes}}</view>
         <view class="time-unit">分钟</view>
         <view class="time-desc">{{item.desc}}</view>
@@ -125,7 +122,7 @@
     <view wx:if="{{step > 0}}" class="dots">
       <view wx:for="{{dots}}" wx:key="*this" class="dot-item {{step === index ? 'on' : ''}}"></view>
     </view>
-    <view wx:if="{{step > 0}}" class="btn btn-primary btn-block" bindtap="next">
+    <view wx:if="{{step > 0}}" class="btn btn-primary btn-block" bindtap="next" hover-class="tap-hover" aria-role="button">
       {{step === 3 ? '进入清述' : '继续'}}
     </view>
     <view wx:if="{{step === 0}}" class="foot-hint">今天就可以完成第一次练习</view>

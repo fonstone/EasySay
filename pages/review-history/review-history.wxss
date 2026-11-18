@@ -35,13 +35,13 @@
 }
 
 .review-date {
-  font-size: 19rpx;
+  font-size: var(--fs-min);
   letter-spacing: 1rpx;
   color: var(--muted-2);
 }
 
 .review-delete {
-  font-size: 19rpx;
+  font-size: var(--fs-min);
   color: var(--muted-2);
   padding: 6rpx 0 6rpx 20rpx;
 }
@@ -51,7 +51,7 @@
 }
 
 .block-label {
-  font-size: 17rpx;
+  font-size: var(--fs-min);
   letter-spacing: 2rpx;
   color: var(--muted-2);
   margin-bottom: 6rpx;
@@ -71,10 +71,10 @@
 }
 
 .stuck-tag {
-  font-size: 18rpx;
+  font-size: var(--fs-min);
   color: var(--danger);
   background: var(--danger-soft);
-  border-radius: 6rpx;
+  border-radius: var(--radius-xs);
   padding: 3rpx 10rpx;
 }
 
@@ -86,7 +86,7 @@
 }
 
 .next-label {
-  font-size: 17rpx;
+  font-size: var(--fs-min);
   letter-spacing: 2rpx;
   color: var(--green-600);
 }

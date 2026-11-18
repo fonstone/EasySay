@@ -51,7 +51,7 @@
 
 .stat-label {
   margin-top: 6rpx;
-  font-size: 19rpx;
+  font-size: var(--fs-min);
   color: var(--muted-2);
 }
 
@@ -102,7 +102,7 @@
 
 .type-desc {
   margin-top: 6rpx;
-  font-size: 19rpx;
+  font-size: var(--fs-min);
   line-height: 1.55;
   color: var(--muted);
 }
@@ -112,7 +112,7 @@
   padding-top: 12rpx;
   display: flex;
   justify-content: space-between;
-  font-size: 18rpx;
+  font-size: var(--fs-min);
   color: var(--muted-2);
 }
 
@@ -147,8 +147,8 @@
 .q-type {
   width: 64rpx;
   height: 44rpx;
-  border-radius: 8rpx;
-  font-size: 18rpx;
+  border-radius: var(--radius-xs);
+  font-size: var(--fs-min);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -163,7 +163,7 @@
 
 .q-meta {
   margin-top: 4rpx;
-  font-size: 18rpx;
+  font-size: var(--fs-min);
   color: var(--muted-2);
 }
 

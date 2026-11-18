@@ -29,17 +29,17 @@
 }
 
 .daily-badge {
-  font-size: 18rpx;
+  font-size: var(--fs-min);
   letter-spacing: 3rpx;
   color: #8a6630;
   background: rgba(255, 255, 255, 0.7);
   border: 1rpx solid #e6d3b0;
-  border-radius: 999rpx;
+  border-radius: var(--radius-pill);
   padding: 6rpx 16rpx;
 }
 
 .daily-type {
-  font-size: 19rpx;
+  font-size: var(--fs-min);
   color: #a08356;
 }
 
@@ -86,14 +86,14 @@
 }
 
 .grid-card-green {
-  background: linear-gradient(145deg, #1b5a47, #143d31);
+  background: var(--gradient-green-soft);
   color: #fff;
 }
 
 .grid-glyph {
   width: 62rpx;
   height: 62rpx;
-  border-radius: 18rpx;
+  border-radius: var(--radius-sm);
   background: var(--green-50);
   color: var(--green-700);
   display: flex;
@@ -132,7 +132,7 @@
 .grid-stat {
   margin-top: auto;
   padding-top: 16rpx;
-  font-size: 18rpx;
+  font-size: var(--fs-min);
   color: var(--green-600);
 }
 
@@ -158,11 +158,31 @@
   vertical-align: top;
 }
 
+.drill-more {
+  width: 210rpx;
+  background: var(--green-50);
+  border-color: transparent;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.drill-more-num {
+  margin-top: 12rpx;
+  font-size: 46rpx;
+  color: var(--green-700);
+  line-height: 1.2;
+}
+
+.drill-more .drill-go {
+  margin-top: 12rpx;
+}
+
 .drill-focus {
-  font-size: 18rpx;
+  font-size: var(--fs-min);
   color: var(--green-700);
   background: var(--green-50);
-  border-radius: 6rpx;
+  border-radius: var(--radius-xs);
   padding: 2rpx 10rpx;
   align-self: flex-start;
 }
@@ -178,7 +198,7 @@
 
 .drill-pinyin {
   margin-top: 6rpx;
-  font-size: 19rpx;
+  font-size: var(--fs-min);
   color: var(--muted-2);
   overflow: hidden;
   text-overflow: ellipsis;

@@ -33,10 +33,10 @@
       <text>{{practice.minSeconds}}–{{practice.maxSeconds}} 秒</text>
       <text> · {{practice.categoryName}}</text>
     </view>
-    <view class="btn btn-primary btn-block mt-24" bindtap="startPractice">
+    <view class="btn btn-primary btn-block mt-24" bindtap="startPractice" hover-class="tap-hover" aria-role="button">
       {{done ? '再练一次' : '现在就用一次'}}
     </view>
-    <view wx:if="{{!done}}" class="practice-skip" bindtap="markDone">这节课我听完了，先标记完成</view>
+    <view wx:if="{{!done}}" class="practice-skip" bindtap="markDone" hover-class="tap-hover" aria-role="button">这节课我听完了，先标记完成</view>
   </view>
 
   <view class="lesson-quote">
@@ -44,7 +44,14 @@
   </view>
 
   <view class="lesson-actions">
-    <view wx:if="{{nextLesson}}" class="btn btn-ghost btn-block" bindtap="openNext">下一课：{{nextLesson.title}}</view>
-    <view wx:else class="btn btn-ghost btn-block" bindtap="openNext">回到课程列表</view>
+    <view wx:if="{{nextLesson}}" class="btn btn-ghost btn-block" bindtap="openNext" hover-class="tap-hover" aria-role="button">下一课：{{nextLesson.title}}</view>
+    <view wx:else class="btn btn-ghost btn-block" bindtap="openNext" hover-class="tap-hover" aria-role="button">回到课程列表</view>
   </view>
+</view>
+
+<view wx:else class="page state-fallback">
+  <view class="state-fallback-mark serif" aria-hidden="true">?</view>
+  <view class="state-fallback-title">内容暂时打不开</view>
+  <view class="state-fallback-desc">可能是从旧链接进入，或这条内容已被清理。回到首页继续练习吧。</view>
+  <view class="btn btn-primary btn-block" bindtap="goBack" hover-class="tap-hover" aria-label="返回首页" aria-role="button">返回</view>
 </view>

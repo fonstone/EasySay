@@ -5,7 +5,7 @@
     <view class="head-sub">有些话说不清，不是嘴的问题，是判断还没分开。</view>
   </view>
 
-  <view class="daily-card fade-up" bindtap="startDailyThinking">
+  <view class="daily-card fade-up" bindtap="startDailyThinking" hover-class="tap-hover" aria-role="button">
     <view class="daily-top between">
       <view class="daily-badge">今日思维题</view>
       <view class="daily-type">{{dailyQuestion.typeName}}</view>
@@ -18,25 +18,25 @@
   </view>
 
   <view class="grid fade-up">
-    <view class="grid-card" bindtap="goPronounce">
+    <view class="grid-card" bindtap="goPronounce" hover-class="tap-hover" aria-role="button">
       <view class="grid-glyph serif">音</view>
       <view class="grid-name">普通话纠音</view>
       <view class="grid-desc">平翘舌、前后鼻音、绕口令</view>
       <view class="grid-stat">已练 {{pronounceDone}} 个</view>
     </view>
-    <view class="grid-card" bindtap="goThinking">
+    <view class="grid-card" bindtap="goThinking" hover-class="tap-hover" aria-role="button">
       <view class="grid-glyph serif">思</view>
       <view class="grid-name">锤炼思考力</view>
       <view class="grid-desc">事实、结构、论证、类比</view>
       <view class="grid-stat">正确率 {{thinking.accuracy}}% · 已做 {{thinking.uniqueDone}} 题</view>
     </view>
-    <view class="grid-card" bindtap="goReview">
+    <view class="grid-card" bindtap="goReview" hover-class="tap-hover" aria-role="button">
       <view class="grid-glyph serif">复</view>
       <view class="grid-name">高效能复盘</view>
       <view class="grid-desc">只记一个失误，写一个预案</view>
       <view class="grid-stat">已写 {{reviews}} 次复盘</view>
     </view>
-    <view class="grid-card grid-card-green" bindtap="goCoach">
+    <view class="grid-card grid-card-green" bindtap="goCoach" hover-class="tap-hover" aria-role="button">
       <view class="grid-glyph serif">师</view>
       <view class="grid-name">私教计划</view>
       <view class="grid-desc">按目标排一周，只练该练的</view>
@@ -47,7 +47,7 @@
   <view class="section fade-up">
     <view class="section-head">
       <view class="section-title">声母诊所</view>
-      <view class="section-more" bindtap="goPronounce">全部 →</view>
+      <view class="section-more" bindtap="goPronounce" hover-class="tap-hover" aria-role="button" aria-label="查看全部纠音练习">全部 {{drillTotal}} 个 →</view>
     </view>
     <scroll-view class="drill-scroll" scroll-x enable-flex>
       <view
@@ -55,12 +55,16 @@
         wx:key="id"
         class="drill-card"
         data-id="{{item.id}}"
-        bindtap="goDrill"
-      >
+        bindtap="goDrill" hover-class="tap-hover" aria-role="button">
         <view class="drill-focus">{{item.focus}}</view>
         <view class="drill-title">{{item.title}}</view>
         <view class="drill-pinyin">{{item.pinyin}}</view>
         <view class="drill-go">跟读 →</view>
+      </view>
+      <view class="drill-card drill-more" bindtap="goPronounce" hover-class="tap-hover" aria-role="button" aria-label="查看全部纠音练习">
+        <view class="drill-focus">还有更多</view>
+        <view class="drill-more-num serif">{{drillTotal}}</view>
+        <view class="drill-go">查看全部 →</view>
       </view>
     </scroll-view>
   </view>
@@ -69,4 +73,12 @@
     <view class="micro-line"></view>
     <view class="micro-text serif">{{quote}}</view>
   </view>
+</view>
+
+<view wx:else class="page has-tabbar skeleton-page" aria-label="正在加载页面内容">
+  <view class="sk sk-title"></view>
+  <view class="sk sk-card"></view>
+  <view class="sk sk-strip"></view>
+  <view class="sk sk-card"></view>
+  <view class="sk sk-card sk-tall"></view>
 </view>

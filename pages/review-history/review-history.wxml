@@ -2,14 +2,45 @@
   <view class="head fade-up">
     <text class="eyebrow">REVIEW ARCHIVE</text>
     <view class="title serif">复盘档案</view>
-    <view class="head-sub">共 {{reviews.length}} 次复盘。每一次，都是你给下一次写的说明书。</view>
+    <view class="head-sub">共 {{total}} 次复盘。每一次，都是你给下一次写的说明书。</view>
   </view>
 
-  <view wx:if="{{reviews.length}}" class="review-list">
-    <view wx:for="{{reviews}}" wx:key="id" class="review-card fade-up">
+  <view wx:if="{{total}}" class="list-tools fade-up">
+    <view class="list-search">
+      <input
+        class="list-search-input"
+        value="{{keyword}}"
+        placeholder="搜练了什么、卡在哪里"
+        placeholder-class="list-search-placeholder"
+        confirm-type="search"
+        bindinput="onInput"
+        aria-label="搜索复盘"
+      />
+      <view wx:if="{{keyword}}" class="list-clear" catchtap="clearKeyword" hover-class="tap-hover" aria-label="清空搜索词" aria-role="button">×</view>
+    </view>
+    <scroll-view class="list-chips" scroll-x enable-flex>
+      <view class="list-chip-row">
+        <view
+          wx:for="{{sorts}}"
+          wx:key="key"
+          class="list-chip {{sort === item.key ? 'list-chip-on' : ''}}"
+          data-key="{{item.key}}"
+          bindtap="pickSort"
+          hover-class="tap-hover"
+          aria-label="按{{item.name}}排序"
+          aria-role="button"
+        >{{item.name}}</view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view wx:if="{{keyword && filtered.length}}" class="list-result-note">找到 {{filtered.length}} 次复盘</view>
+
+  <view wx:if="{{filtered.length}}" class="review-list">
+    <view wx:for="{{filtered}}" wx:key="id" class="review-card fade-up">
       <view class="between">
         <view class="review-date">{{item.dateText}}</view>
-        <view class="review-delete" data-id="{{item.id}}" bindtap="remove">删除</view>
+        <view class="review-delete" data-id="{{item.id}}" bindtap="remove" hover-class="tap-hover" aria-role="button" aria-label="删除这次复盘">删除</view>
       </view>
 
       <view wx:if="{{item.learned}}" class="review-block">
@@ -35,15 +66,15 @@
   </view>
 
   <empty-state
-    wx:else
+    wx:if="{{!filtered.length}}"
     mark="复"
-    title="还没有复盘"
-    desc="完成一次练习后，花两分钟写一次。只记一个失误，写一个预案。"
-    action="去写第一次复盘"
-    bind:action="goReview"
+    title="{{emptyTitle}}"
+    desc="{{emptyDesc}}"
+    action="{{emptyAction}}"
+    bind:action="onEmptyAction"
   />
 
-  <view wx:if="{{reviews.length}}" class="history-foot">
-    <view class="btn btn-soft btn-block" bindtap="goReview">再写一次复盘</view>
+  <view wx:if="{{total}}" class="history-foot">
+    <view class="btn btn-soft btn-block" bindtap="goReview" hover-class="tap-hover" aria-role="button">再写一次复盘</view>
   </view>
 </view>

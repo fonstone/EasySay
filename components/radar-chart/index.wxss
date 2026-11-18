@@ -25,8 +25,8 @@
   width: 96rpx;
   height: 96rpx;
   border-radius: 50%;
-  background: #f0f6f2;
-  color: #2f7b63;
+  background: var(--green-50);
+  color: var(--green-500);
   font-size: 38rpx;
   display: flex;
   align-items: center;
@@ -37,13 +37,15 @@
 .radar-empty-title {
   font-size: 28rpx;
   font-weight: 600;
-  color: #34433d;
+  color: var(--ink-2);
 }
 
 .radar-empty-desc {
-  font-size: 22rpx;
-  color: #9aa6a1;
+  font-size: var(--fs-min);
+  color: var(--muted-2);
   margin-top: 8rpx;
   line-height: 1.6;
   max-width: 380rpx;
 }
+
+.tap-hover { opacity: 0.74; }

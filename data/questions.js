@@ -1149,15 +1149,119 @@ function categoryCount(categoryId) {
   return getQuestions(categoryId).length
 }
 
+/* ---------------------------------------------------------
+   找题：关键词检索 + 结构化筛选
+   题目只有 48 道，索引在模块加载时构建一次，输入时即时过滤即可。
+   --------------------------------------------------------- */
+
+const SEARCH_HINTS = ['汇报', '说服', '讲故事', '复述', '即兴', '开场']
+
+/* 场景词扩展：用户说「即兴」「开场」，题库里用的是「临时」「第一句」。
+   不做这层映射，推荐词点进去会直接空结果。 */
+const SEARCH_SYNONYMS = {
+  '即兴': ['临时', '突然', '临场'],
+  '开场': ['开头', '第一句', '破冰'],
+  '汇报': ['进展', '报告'],
+  '说服': ['劝说', '推荐'],
+  '讲故事': ['故事', '复述'],
+  '复述': ['转述', '故事']
+}
+
+function normText(value) {
+  return String(value || '').toLowerCase().replace(/\s+/g, '')
+}
+
+const SEARCH_INDEX = QUESTIONS.map(q => {
+  const extra = []
+  ;(q.tips || []).forEach(t => extra.push(t))
+  ;(q.keyPoints || []).forEach(k => {
+    extra.push(k.label)
+    ;(k.keywords || []).forEach(w => extra.push(w))
+  })
+  return {
+    q,
+    title: normText(q.title),
+    subtitle: normText(q.subtitle),
+    meta: normText([q.id, q.categoryId, q.categoryName, q.levelName, '第' + q.level + '关'].join(' ')),
+    full: normText([q.prompt, q.material, q.coachTip].concat(extra).join(' '))
+  }
+})
+
+/**
+ * 关键词按空格拆分，全部命中才入选；权重 标题 > 副标题 > 分类/关卡 > 提示与要点。
+ * options: { categoryId, level, onlyFavorites, favoriteIds, recentIds, doneIds, sort, limit }
+ * sort: relevance(有词时默认) / recommend(无词时默认) / recent / short / hard
+ */
+function searchQuestions(keyword, options) {
+  const opts = options || {}
+  const terms = String(keyword || '').trim().toLowerCase()
+    .split(/\s+/).map(normText).filter(Boolean)
+  const favoriteIds = opts.favoriteIds || []
+  const recentIds = opts.recentIds || []
+  const doneIds = opts.doneIds || []
+  const level = Number(opts.level) || 0
+  const scored = []
+
+  SEARCH_INDEX.forEach((idx, order) => {
+    const q = idx.q
+    if (opts.categoryId && q.categoryId !== opts.categoryId) return
+    if (level && q.level !== level) return
+    if (opts.onlyFavorites && favoriteIds.indexOf(q.id) < 0) return
+    let score = 0
+    for (let i = 0; i < terms.length; i++) {
+      const variants = [terms[i]].concat(SEARCH_SYNONYMS[terms[i]] || [])
+      let best = 0
+      let matched = false
+      variants.forEach(raw => {
+        const t = normText(raw)
+        if (!t) return
+        const hitTitle = idx.title.indexOf(t) >= 0
+        const hitSub = idx.subtitle.indexOf(t) >= 0
+        const hitMeta = idx.meta.indexOf(t) >= 0
+        const hitFull = idx.full.indexOf(t) >= 0
+        if (!hitTitle && !hitSub && !hitMeta && !hitFull) return
+        matched = true
+        const gain = hitTitle ? (idx.title.indexOf(t) === 0 ? 8 : 6)
+          : hitSub ? 3 : hitMeta ? 2 : 1
+        if (gain > best) best = gain
+      })
+      if (!matched) return
+      score += best
+    }
+    scored.push({ q, score, order })
+  })
+
+  const recentRank = id => {
+    const i = recentIds.indexOf(id)
+    return i < 0 ? 9999 : i
+  }
+  const sort = opts.sort || (terms.length ? 'relevance' : 'recommend')
+  scored.sort((a, b) => {
+    if (sort === 'recent') return recentRank(a.q.id) - recentRank(b.q.id) || a.order - b.order
+    if (sort === 'short') return a.q.maxSeconds - b.q.maxSeconds || a.order - b.order
+    if (sort === 'hard') return b.q.level - a.q.level || a.order - b.order
+    if (sort === 'relevance') return b.score - a.score || a.q.level - b.q.level || a.order - b.order
+    const da = doneIds.indexOf(a.q.id) >= 0 ? 1 : 0
+    const db = doneIds.indexOf(b.q.id) >= 0 ? 1 : 0
+    return da - db || recentRank(a.q.id) - recentRank(b.q.id) ||
+      a.q.level - b.q.level || a.order - b.order
+  })
+
+  const list = scored.map(x => x.q)
+  return opts.limit ? list.slice(0, opts.limit) : list
+}
+
 module.exports = {
   LEVELS,
   CATEGORIES,
   QUESTIONS,
   DAILY_POOL,
+  SEARCH_HINTS,
   getQuestion,
   getCategory,
   getQuestions,
   getLevels,
   getDailyQuestion,
-  categoryCount
+  categoryCount,
+  searchQuestions
 }

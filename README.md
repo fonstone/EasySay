@@ -55,6 +55,8 @@
 - 每个方向 4 个难度：入门 / 初阶 / 进阶 / 高阶，每关 2 题。
 - 完成任意 1 题解锁下一关，进度本地保存。
 - 支持「随机一题」，也可以从私教计划直接进入。
+- **找题**：关键词与场景同义词搜索、方向/关卡筛选、收藏筛选、推荐/最近/最短/最高难度排序、搜索历史、收藏星标与最近练过。
+- 收藏贯通练习首页、分类详情、点评报告和「我的」，下次不用再翻六个抽屉。
 
 ### 3. 确定性评分引擎
 
@@ -135,8 +137,9 @@ clearsay/
 │  └─ empty-state/                      # 空状态
 ├─ pages/
 │  ├─ today/                            # 今日打卡
-│  ├─ practice/                         # 练习首页
+│  ├─ practice/                         # 练习首页 + 找题 / 收藏 / 最近
 │  ├─ practice-detail/                  # 方向 / 关卡 / 题目
+│  ├─ search/                           # 跨题库搜索与筛选
 │  ├─ session/                          # 构思 - 录音 - 分析
 │  ├─ report/                           # 点评报告
 │  ├─ discover/                         # 发现
@@ -150,10 +153,11 @@ clearsay/
 │  ├─ member/ settings/ privacy/        # 会员 / 设置 / 隐私
 │  └─ onboarding/                       # 首次引导
 ├─ data/
-│  ├─ questions.js                      # 48 道题 + 每日题池
+│  ├─ questions.js                      # 48 道题 + 每日题池 + 搜索索引
 │  ├─ courses.js                        # 3 条线 12 节课
 │  ├─ thinking.js                       # 20 道思维题
 │  ├─ pronounce.js                      # 15 个纠音练习
+│  ├─ dimension-guide.js                # 7 个维度的依据与改进动作
 │  └─ coach.js                          # 6 个目标 × 7 天计划
 ├─ utils/
 │  ├─ scoring.js                        # PCM / 文本 / 评分 / 点评
@@ -176,13 +180,14 @@ node tests/scoring.test.js    # 28 项：PCM、文本、评分、点评、聚合
 node tests/data.test.js       # 14 项：题库、课程、思维题、纠音、私教
 node tests/store.test.js      # 30 项：打卡、额度、进度、档案、会员
 node tests/regression.test.js # 13 项：迁移、一致性、锁稿、额度退还、备份恢复
-node tests/pages.smoke.js     # 23 个页面生命周期 + 12 个交互 + 数据绑定检查
+node tests/ux.test.js         # 17 项：找题、收藏、排序、搜索历史、维度解释与体验基线
+node tests/pages.smoke.js     # 24 个页面生命周期 + 交互 + 数据绑定检查
 node tests/session.flow.js    # 端到端：录音 → PCM → 评分 → 报告 → 档案
-node tests/check-wxml.js      # 27 个 WXML：标签配对、花括号、空表达式
-node tests/run-all.js         # 7 个套件一次跑完
+node tests/check-wxml.js      # 28 个 WXML：标签配对、花括号、空表达式
+node tests/run-all.js         # 8 个套件一次跑完
 ```
 
-WXML / WXSS 已用官方 `wcc` / `wcsc` 编译器（`miniprogram-compiler`）全量编译通过：27 个 WXML、28 个 WXSS 无语法错误。
+WXML / WXSS 已用官方 `wcc` / `wcsc` 编译器（`miniprogram-compiler`）全量编译通过：28 个 WXML、29 个 WXSS 无语法错误。
 
 评分引擎测试使用合成 PCM（带静音段与音量起伏），验证：
 

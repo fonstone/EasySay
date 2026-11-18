@@ -10,15 +10,15 @@
         <view class="profile-desc">{{profile.goalName}} · {{profile.level}}</view>
         <view class="profile-meta">累计 {{stats.sessions}} 次开口 · 连续 {{streak.current}} 天</view>
       </view>
-      <view class="edit-btn" bindtap="goSettings">编辑</view>
+      <view class="edit-btn" bindtap="goSettings" hover-class="tap-hover" aria-role="button">编辑</view>
     </view>
   </view>
 
-  <view class="member-banner fade-up" bindtap="goMember">
+  <view class="member-banner fade-up" bindtap="goMember" hover-class="tap-hover" aria-role="button">
     <view class="member-mark serif">{{membership.type === 'free' ? '试' : '会'}}</view>
     <view class="grow">
       <view class="member-title">{{membership.type === 'free' ? '7 天体验会员，送 3 次点评' : memberLabel + ' 生效中'}}</view>
-      <view class="member-desc">{{membership.type === 'free' ? '解锁完整点评与全部课程，先试七天' : memberExpire + ' · 无限点评'}}</view>
+      <view class="member-desc">{{membership.type === 'free' ? '完整点评不限次，先试七天' : memberExpire + ' · 无限点评'}}</view>
     </view>
     <view class="member-arrow">→</view>
   </view>
@@ -48,19 +48,28 @@
         <view class="section-title">能力图谱</view>
         <view class="radar-sub">{{radarSub}}</view>
       </view>
-      <view class="radar-tag">{{hasRadar ? '持续生长' : '待生成'}}</view>
+      <view class="radar-tag" bindtap="toggleRadarGuide" hover-class="tap-hover" aria-role="button" aria-label="查看能力图谱说明">{{radarGuideOpen ? '收起说明' : '图谱怎么读 →'}}</view>
     </view>
     <view class="radar-wrap">
-      <radar-chart dimensions="{{radarDims}}" size="{{500}}" />
+      <radar-chart dimensions="{{radarDims}}" size="{{500}}" bind:explain="toggleRadarGuide" />
+    </view>
+    <view wx:if="{{radarGuideOpen}}" class="radar-guide fade-up">
+      <view class="radar-guide-title">{{radarGuide.title}}</view>
+      <view wx:for="{{radarGuide.lines}}" wx:key="*this" class="radar-guide-line">{{item}}</view>
     </view>
     <view wx:if="{{hasRadar}}" class="dim-list">
-      <view wx:for="{{dims}}" wx:key="name" class="dim-item">
+      <view wx:for="{{dims}}" wx:key="key" class="dim-item" data-key="{{item.key}}" bindtap="toggleDim" hover-class="tap-hover" aria-role="button" aria-label="查看{{item.name}}的评分依据">
         <view class="dim-item-head">
-          <text class="dim-item-name">{{item.name}}</text>
+          <text class="dim-item-name">{{item.name}}<text class="dim-from-mini">{{item.fromLabel}}</text></text>
           <text class="dim-item-value {{item.tone}} serif">{{item.value}}</text>
         </view>
-        <view class="dim-item-bar"><view class="dim-item-fill {{item.tone}}" style="width: {{item.value}}%;"></view></view>
+        <view class="metric-bar compact"><view class="metric-fill {{item.tone}}" style="width: {{item.value}}%;"></view></view>
       </view>
+    </view>
+    <view wx:if="{{expandedDim && activeGuide}}" class="radar-explain fade-up">
+      <view class="radar-explain-head">{{activeGuide.name}} · {{activeGuide.fromLabel}}</view>
+      <view class="radar-explain-row"><text class="radar-explain-label">依据</text><text class="radar-explain-text">{{activeGuide.basis}}</text></view>
+      <view class="radar-explain-row"><text class="radar-explain-label">下次怎么练</text><text class="radar-explain-text">{{activeGuide.improve}}</text></view>
     </view>
   </view>
 
@@ -104,7 +113,16 @@
   </view>
 
   <view class="menu-card fade-up">
-    <view class="menu-item" bindtap="goArchive">
+    <view class="menu-item" bindtap="goFavorites" hover-class="row-hover" aria-label="打开我收藏的题目" aria-role="button">
+      <view class="menu-icon serif">题</view>
+      <view class="grow">
+        <view class="menu-title">我收藏的题</view>
+        <view class="menu-desc">想再练一遍，不用翻六个抽屉 · {{favoriteCount}} 道</view>
+      </view>
+      <view class="menu-count">{{favoriteCount}}</view>
+      <view class="chev"></view>
+    </view>
+    <view class="menu-item" bindtap="goArchive" hover-class="row-hover" aria-label="打开录音档案" aria-role="button">
       <view class="menu-icon serif">录</view>
       <view class="grow">
         <view class="menu-title">录音档案</view>
@@ -113,7 +131,7 @@
       <view class="menu-count">{{archive}}</view>
       <view class="chev"></view>
     </view>
-    <view class="menu-item" bindtap="goQuotes">
+    <view class="menu-item" bindtap="goQuotes" hover-class="tap-hover" aria-role="button">
       <view class="menu-icon serif">句</view>
       <view class="grow">
         <view class="menu-title">金句墙</view>
@@ -122,7 +140,7 @@
       <view class="menu-count">{{quotes}}</view>
       <view class="chev"></view>
     </view>
-    <view class="menu-item" bindtap="goReview">
+    <view class="menu-item" bindtap="goReview" hover-class="tap-hover" aria-role="button">
       <view class="menu-icon serif">复</view>
       <view class="grow">
         <view class="menu-title">高效能复盘</view>
@@ -131,7 +149,7 @@
       <view class="menu-count">{{reviews}}</view>
       <view class="chev"></view>
     </view>
-    <view class="menu-item" bindtap="goCoach">
+    <view class="menu-item" bindtap="goCoach" hover-class="tap-hover" aria-role="button">
       <view class="menu-icon serif">师</view>
       <view class="grow">
         <view class="menu-title">私教计划</view>
@@ -139,7 +157,7 @@
       </view>
       <view class="chev"></view>
     </view>
-    <view class="menu-item" bindtap="goCourses">
+    <view class="menu-item" bindtap="goCourses" hover-class="tap-hover" aria-role="button">
       <view class="menu-icon serif">课</view>
       <view class="grow">
         <view class="menu-title">已学课程</view>
@@ -151,7 +169,7 @@
   </view>
 
   <view class="menu-card menu-card-plain fade-up">
-    <view class="menu-item" bindtap="goSettings">
+    <view class="menu-item" bindtap="goSettings" hover-class="tap-hover" aria-role="button">
       <view class="menu-icon serif">设</view>
       <view class="grow">
         <view class="menu-title">设置</view>
@@ -159,7 +177,7 @@
       </view>
       <view class="chev"></view>
     </view>
-    <view class="menu-item" bindtap="goPrivacy">
+    <view class="menu-item" bindtap="goPrivacy" hover-class="tap-hover" aria-role="button">
       <view class="menu-icon serif">私</view>
       <view class="grow">
         <view class="menu-title">隐私与录音说明</view>
@@ -174,4 +192,12 @@
     <view class="mine-brand">清述 · 口才陪练</view>
     <view class="mine-version">本地演示版 v1.0 · 无需联网</view>
   </view>
+</view>
+
+<view wx:else class="page has-tabbar skeleton-page" aria-label="正在加载页面内容">
+  <view class="sk sk-title"></view>
+  <view class="sk sk-card"></view>
+  <view class="sk sk-strip"></view>
+  <view class="sk sk-card"></view>
+  <view class="sk sk-card sk-tall"></view>
 </view>

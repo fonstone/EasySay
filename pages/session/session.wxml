@@ -19,7 +19,7 @@
       </view>
 
       <view wx:if="{{question.audio}}" class="demo-row">
-        <view class="demo-btn" bindtap="toggleDemo">
+        <view class="demo-btn" bindtap="toggleDemo" hover-class="tap-hover" aria-role="button">
           <view class="demo-icon {{demoPlaying ? 'pause' : ''}}"></view>
           <text>{{demoPlaying ? '暂停示范' : '听教练示范'}}</text>
         </view>
@@ -35,7 +35,7 @@
     <view wx:if="{{question.material}}" class="material-card">
       <view class="between">
         <view class="card-label">材料</view>
-        <view wx:if="{{materialLong}}" class="material-toggle" bindtap="toggleMaterial">
+        <view wx:if="{{materialLong}}" class="material-toggle" bindtap="toggleMaterial" hover-class="tap-hover" aria-role="button">
           {{materialExpanded ? '收起' : '展开全文'}}
         </view>
       </view>
@@ -81,7 +81,7 @@
     <view class="privacy-line">录音只保存在本机 · 不上传 · 可随时删除</view>
 
     <view class="intro-cta">
-      <view class="btn btn-primary btn-block" bindtap="startPrepare">
+      <view class="btn btn-primary btn-block" bindtap="startPrepare" hover-class="tap-hover" aria-role="button">
         {{question.mode === 'read' ? '开始朗读' : '开始构思'}}
       </view>
       <view class="intro-cta-note">开口前先想三个关键词，不要写完整稿</view>
@@ -91,7 +91,7 @@
   <!-- ================= 构思倒计时 ================= -->
   <view wx:if="{{phase === 'prepare'}}" class="prepare-screen fade-up">
     <view class="phase-bar phase-bar-light">
-      <view class="back-btn" bindtap="goBack">←</view>
+      <view class="back-btn" bindtap="goBack" hover-class="tap-hover" aria-role="button">←</view>
       <view class="phase-source">构思时间</view>
       <view class="phase-quota phase-quota-ghost">别写稿</view>
     </view>
@@ -124,8 +124,8 @@
     </view>
 
     <view class="prepare-foot">
-      <view class="prepare-cancel" bindtap="cancelPrepare">返回题目</view>
-      <view class="btn btn-primary btn-block" bindtap="skipPrepare">跳过构思，直接开录</view>
+      <view class="prepare-cancel" bindtap="cancelPrepare" hover-class="tap-hover" aria-role="button">返回题目</view>
+      <view class="btn btn-primary btn-block" bindtap="skipPrepare" hover-class="tap-hover" aria-role="button">跳过构思，直接开录</view>
     </view>
   </view>
 
@@ -133,7 +133,7 @@
   <view wx:if="{{phase === 'recording'}}" class="record-screen" style="padding-top: {{statusBarHeight + 12}}px;">
     <view class="record-top">
       <view class="record-source">{{sourceLabel}} · {{question.categoryName}}</view>
-      <view class="record-cancel" bindtap="goBack">取消</view>
+      <view class="record-cancel" bindtap="goBack" hover-class="tap-hover" aria-role="button">取消</view>
     </view>
 
     <view class="record-center">
@@ -166,7 +166,7 @@
     </view>
 
     <view class="record-foot">
-      <view class="record-stop" bindtap="stopRecording">
+      <view class="record-stop" bindtap="stopRecording" hover-class="tap-hover" aria-role="button">
         <view class="stop-icon"></view>
         <text>说完了</text>
       </view>

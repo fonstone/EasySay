@@ -7,7 +7,7 @@
     <view class="hero-title serif">{{drill.title}}</view>
     <view class="hero-pinyin">{{drill.pinyin}}</view>
     <view class="demo-row">
-      <view class="demo-btn" bindtap="toggleDemo">
+      <view class="demo-btn" bindtap="toggleDemo" hover-class="tap-hover" aria-role="button">
         <view class="demo-icon {{playing ? 'pause' : ''}}"></view>
         <text>{{playing ? '暂停示范' : '听教练示范'}}</text>
       </view>
@@ -66,7 +66,7 @@
   </view>
 
   <view class="detail-cta">
-    <view class="btn btn-primary btn-block" bindtap="startPractice">开始跟读并录音</view>
+    <view class="btn btn-primary btn-block" bindtap="startPractice" hover-class="tap-hover" aria-role="button">开始跟读并录音</view>
     <view class="detail-note">录音只保存在本机 · 评声音表现</view>
   </view>
 
@@ -77,8 +77,7 @@
       wx:key="id"
       class="related-row"
       data-id="{{item.id}}"
-      bindtap="openRelated"
-    >
+      bindtap="openRelated" hover-class="tap-hover" aria-role="button">
       <view class="related-focus">{{item.focus}}</view>
       <view class="grow">
         <view class="related-name">{{item.title}}</view>
@@ -87,4 +86,11 @@
       <view class="related-arrow">→</view>
     </view>
   </view>
+</view>
+
+<view wx:else class="page state-fallback">
+  <view class="state-fallback-mark serif" aria-hidden="true">?</view>
+  <view class="state-fallback-title">内容暂时打不开</view>
+  <view class="state-fallback-desc">可能是从旧链接进入，或这条内容已被清理。回到首页继续练习吧。</view>
+  <view class="btn btn-primary btn-block" bindtap="goBack" hover-class="tap-hover" aria-label="返回首页" aria-role="button">返回</view>
 </view>

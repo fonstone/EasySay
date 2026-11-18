@@ -5,12 +5,59 @@
         <text class="eyebrow">PRACTICE</text>
         <view class="h1 practice-title">六个抽屉，<br />练六种能力。</view>
       </view>
-      <view class="random-btn" bindtap="randomPractice">
+      <view class="random-btn" bindtap="randomPractice" hover-class="tap-hover" aria-role="button">
         <view class="random-glyph serif">抽</view>
         <view class="random-text">随机一题</view>
       </view>
     </view>
     <view class="head-sub">不知道练什么的时候，从最不敢开口的那一类开始。</view>
+  </view>
+
+  <view class="find-bar fade-up" bindtap="goSearch" hover-class="tap-hover" aria-label="搜索全部练习题" aria-role="button">
+    <text class="find-glyph" aria-hidden="true">⌕</text>
+    <view class="grow">
+      <view class="find-title">找一道题</view>
+      <view class="find-sub">搜题目、场景或提示词 · 共 {{totalQuestions}} 道</view>
+    </view>
+    <view class="find-arrow" aria-hidden="true">→</view>
+  </view>
+
+  <view class="quick-row fade-up">
+    <view class="quick" bindtap="goFavorites" hover-class="tap-hover" aria-label="打开我收藏的题目" aria-role="button">
+      <text class="quick-mark" aria-hidden="true">★</text>
+      <text>我的收藏</text>
+      <text class="quick-num">{{favoriteCount}}</text>
+    </view>
+    <view class="quick" bindtap="goRecent" hover-class="tap-hover" aria-label="打开最近练过的题目" aria-role="button">
+      <text class="quick-mark" aria-hidden="true">近</text>
+      <text>最近练过</text>
+      <text class="quick-num">{{recentCount}}</text>
+    </view>
+  </view>
+
+  <view wx:if="{{recentItems.length}}" class="recent-strip fade-up">
+    <view class="section-head">
+      <view class="section-title">最近练过</view>
+      <view class="section-more" bindtap="goRecent" hover-class="tap-hover" aria-label="查看全部最近练习" aria-role="button">全部 →</view>
+    </view>
+    <scroll-view class="recent-scroll" scroll-x enable-flex>
+      <view class="recent-row">
+        <view
+          wx:for="{{recentItems}}"
+          wx:key="id"
+          class="recent-card"
+          data-id="{{item.id}}"
+          bindtap="openQuestion"
+          hover-class="tap-hover"
+          aria-label="再练一次{{item.title}}"
+          aria-role="button"
+        >
+          <view class="recent-glyph serif" style="background: {{item.soft}}; color: {{item.color}};" aria-hidden="true">{{item.glyph}}</view>
+          <view class="recent-title ellipsis">{{item.title}}</view>
+          <view class="recent-meta">{{item.categoryName}} · {{item.levelName}}</view>
+        </view>
+      </view>
+    </scroll-view>
   </view>
 
   <view class="overview fade-up">
@@ -30,7 +77,7 @@
     </view>
   </view>
 
-  <view wx:if="{{last}}" class="continue-card fade-up" bindtap="openLast">
+  <view wx:if="{{last}}" class="continue-card fade-up" bindtap="openLast" hover-class="tap-hover" aria-role="button">
     <view class="continue-left">
       <view class="continue-eyebrow">继续上次</view>
       <view class="continue-title">{{last.title}}</view>
@@ -39,7 +86,7 @@
     <view class="continue-btn">查看 →</view>
   </view>
 
-  <view wx:if="{{plan && planGoal}}" class="plan-strip fade-up" bindtap="openPlan">
+  <view wx:if="{{plan && planGoal}}" class="plan-strip fade-up" bindtap="openPlan" hover-class="tap-hover" aria-role="button">
     <view class="plan-mark serif">师</view>
     <view class="grow">
       <view class="plan-title">{{planGoal.name}} · 第 {{planDone + 1}} 天</view>
@@ -48,7 +95,7 @@
     <view class="plan-arrow">→</view>
   </view>
 
-  <view wx:else class="plan-strip plan-strip-empty fade-up" bindtap="goCoach">
+  <view wx:else class="plan-strip plan-strip-empty fade-up" bindtap="goCoach" hover-class="tap-hover" aria-role="button" aria-label="去创建私教计划">
     <view class="plan-mark serif">师</view>
     <view class="grow">
       <view class="plan-title">还没有私教计划</view>
@@ -68,8 +115,7 @@
       wx:key="id"
       class="cat-card fade-up"
       data-id="{{item.id}}"
-      bindtap="openCategory"
-    >
+      bindtap="openCategory" hover-class="tap-hover" aria-role="button">
       <view class="cat-top">
         <view class="cat-glyph serif" style="background: {{item.soft}}; color: {{item.color}};">{{item.glyph}}</view>
         <view class="grow">
@@ -99,4 +145,12 @@
     <view class="foot-line"></view>
     <view class="foot-text">每完成 1 道题，下一关自动解锁。不用一次练完，每天一关就够。</view>
   </view>
+</view>
+
+<view wx:else class="page has-tabbar skeleton-page" aria-label="正在加载页面内容">
+  <view class="sk sk-title"></view>
+  <view class="sk sk-card"></view>
+  <view class="sk sk-strip"></view>
+  <view class="sk sk-card"></view>
+  <view class="sk sk-card sk-tall"></view>
 </view>

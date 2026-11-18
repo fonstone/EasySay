@@ -20,8 +20,7 @@
       wx:key="id"
       class="tab {{active === item.id ? 'tab-on' : ''}}"
       data-id="{{item.id}}"
-      bindtap="switchSection"
-    >
+      bindtap="switchSection" hover-class="tap-hover" aria-role="button">
       <text>{{item.name}}</text>
       <text class="tab-count">{{item.done}}/{{item.total}}</text>
     </view>
@@ -38,8 +37,7 @@
       wx:key="id"
       class="drill-card fade-up"
       data-id="{{item.id}}"
-      bindtap="openDrill"
-    >
+      bindtap="openDrill" hover-class="tap-hover" aria-role="button">
       <view class="drill-left">
         <view class="drill-focus">{{item.focus}}</view>
         <view class="drill-index serif">{{item.label}}</view>

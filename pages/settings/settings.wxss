@@ -29,7 +29,7 @@
 }
 
 .block-title {
-  font-size: 19rpx;
+  font-size: var(--fs-min);
   letter-spacing: 3rpx;
   color: var(--muted-2);
   font-weight: 600;
@@ -62,7 +62,7 @@
 
 .field-hint {
   margin-top: 3rpx;
-  font-size: 19rpx;
+  font-size: var(--fs-min);
   line-height: 1.55;
   color: var(--muted-2);
 }
@@ -85,7 +85,7 @@
 .pick-chip {
   height: 58rpx;
   padding: 0 20rpx;
-  border-radius: 999rpx;
+  border-radius: var(--radius-pill);
   border: 1rpx solid var(--line);
   background: var(--card);
   color: var(--muted);
@@ -127,7 +127,7 @@
 
 .row-desc {
   margin-top: 2rpx;
-  font-size: 19rpx;
+  font-size: var(--fs-min);
   color: var(--muted-2);
 }
 
@@ -155,7 +155,7 @@
 }
 
 .foot-text {
-  font-size: 18rpx;
+  font-size: var(--fs-min);
   color: var(--muted-2);
   letter-spacing: 1rpx;
 }

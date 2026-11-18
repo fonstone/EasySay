@@ -6,7 +6,7 @@
   </view>
 
   <view class="score-card fade-up">
-    <score-ring score="{{report.overall}}" size="{{260}}" label="{{report.grade.label}}" />
+    <score-ring score="{{report.overall}}" size="{{260}}" label="{{report.grade.label}}" bind:explain="toggleScoreGuide" />
     <view class="score-side">
       <view class="score-cat">{{report.question.categoryName}}</view>
       <view class="score-q serif">{{report.question.title}}</view>
@@ -15,7 +15,13 @@
         <text class="score-tag">{{durationClock}}</text>
         <text class="score-tag">{{dims.length}} 个维度</text>
       </view>
+      <view class="score-help" bindtap="toggleScoreGuide" hover-class="tap-hover" aria-role="button" aria-label="查看评分说明">{{scoreGuideOpen ? '收起说明' : '这个分数怎么算 →'}}</view>
     </view>
+  </view>
+
+  <view wx:if="{{scoreGuideOpen}}" class="score-guide fade-up">
+    <view class="score-guide-title">{{scoreGuide.title}}</view>
+    <view wx:for="{{scoreGuide.lines}}" wx:key="*this" class="score-guide-line">{{item}}</view>
   </view>
 
   <view class="fact-strip fade-up">
@@ -31,15 +37,26 @@
       <view class="section-more">同段录音，结果可复现</view>
     </view>
     <view class="dim-card">
-      <view wx:for="{{dims}}" wx:key="key" class="dim-row">
+      <view wx:for="{{dims}}" wx:key="key" class="dim-row" data-key="{{item.key}}" bindtap="toggleDim" hover-class="tap-hover" aria-role="button" aria-label="查看{{item.name}}的评分依据">
         <view class="dim-head">
-          <view class="dim-name">{{item.name}}<text wx:if="{{item.muted}}" class="dim-muted">参考</text></view>
+          <view class="dim-name">{{item.name}}<text wx:if="{{item.muted}}" class="dim-muted">参考</text><text class="dim-from {{item.fromTone}}">{{item.fromLabel}}</text></view>
           <view class="dim-score {{item.tone}}">{{item.score}}</view>
+          <view class="dim-chev {{expandedDim === item.key ? 'up' : ''}}" aria-hidden="true">⌄</view>
         </view>
-        <view class="dim-bar">
-          <view class="dim-fill {{item.tone}}" style="width: {{item.score}}%;"></view>
+        <view class="metric-bar">
+          <view class="metric-fill {{item.tone}}" style="width: {{item.score}}%;"></view>
         </view>
         <view class="dim-detail">{{item.detail}}</view>
+        <view wx:if="{{expandedDim === item.key}}" class="dim-explain">
+          <view class="dim-explain-row">
+            <text class="dim-explain-label">依据</text>
+            <text class="dim-explain-text">{{item.guide.basis}}</text>
+          </view>
+          <view class="dim-explain-row">
+            <text class="dim-explain-label">下次怎么练</text>
+            <text class="dim-explain-text">{{item.guide.improve}}</text>
+          </view>
+        </view>
       </view>
     </view>
   </view>
@@ -96,7 +113,7 @@
         <view class="locked-benefit">· 7 天体验会员，送 3 次额外点评</view>
         <view class="locked-benefit">· 年卡 38 元，平均每天一毛钱</view>
       </view>
-      <view class="btn btn-primary btn-block mt-24" bindtap="goMember">解锁完整点评</view>
+      <view class="btn btn-primary btn-block mt-24" bindtap="goMember" hover-class="tap-hover" aria-role="button">解锁完整点评</view>
     </view>
   </view>
 
@@ -107,7 +124,7 @@
           <view class="card-label">文字稿</view>
           <view class="transcript-title">{{report.text ? '内容维度已计入' : '补上文字，拿到完整点评'}}</view>
         </view>
-        <view wx:if="{{report.text}}" class="material-toggle" bindtap="toggleTranscript" aria-label="展开或收起文字稿">{{transcriptOpen ? '收起' : '展开'}}</view>
+        <view wx:if="{{report.text}}" class="material-toggle" bindtap="toggleTranscript" aria-label="展开或收起文字稿" hover-class="tap-hover" aria-role="button">{{transcriptOpen ? '收起' : '展开'}}</view>
       </view>
 
       <view wx:if="{{report.text && transcriptLocked}}" class="transcript-hint">文字稿已与这次录音绑定且只能补写一次，内容维度不会再被改写。</view>
@@ -132,7 +149,7 @@
           bindinput="onTranscriptInput"
         ></textarea>
         <view class="transcript-hint">文字稿只保存在本机，用来计算内容、结构和用词。每份点评只能补写一次，提交后不可再改。</view>
-        <view wx:if="{{!transcriptLocked}}" class="btn btn-soft btn-block mt-16 {{submitting ? 'btn-loading' : ''}}" bindtap="submitTranscript" aria-label="生成完整点评">
+        <view wx:if="{{!transcriptLocked}}" class="btn btn-soft btn-block mt-16 {{submitting ? 'btn-loading' : ''}}" bindtap="submitTranscript" aria-label="生成完整点评" hover-class="tap-hover" aria-role="button">
           {{submitting ? '正在重算…' : '生成完整点评'}}
         </view>
         <view wx:else class="transcript-hint">这份点评的文字稿已锁定。</view>
@@ -151,7 +168,7 @@
         <view class="audio-time">{{currentClock}} / {{durationClock}}</view>
       </view>
       <view class="audio-main">
-        <view class="play-btn {{playing ? 'playing' : ''}}" bindtap="togglePlay" aria-label="{{playing ? '暂停回听' : '播放回听'}}">
+        <view class="play-btn {{playing ? 'playing' : ''}}" bindtap="togglePlay" aria-label="{{playing ? '暂停回听' : '播放回听'}}" hover-class="tap-hover" aria-role="button">
           <view wx:if="{{!playing}}" class="play-tri"></view>
           <view wx:else class="pause-icon"><view></view><view></view></view>
         </view>
@@ -174,9 +191,9 @@
       <view class="between">
         <view class="card-label">这句话，值得留下</view>
         <view class="quote-actions">
-          <view wx:if="{{!quoteSaved}}" class="quote-action" bindtap="addQuote">收藏</view>
+          <view wx:if="{{!quoteSaved}}" class="quote-action" bindtap="addQuote" hover-class="tap-hover" aria-role="button">收藏</view>
           <view wx:else class="quote-action quote-action-done">已收藏</view>
-          <view class="quote-action" bindtap="copyQuote">复制</view>
+          <view class="quote-action" bindtap="copyQuote" hover-class="tap-hover" aria-role="button">复制</view>
         </view>
       </view>
       <view class="quote-text serif">“{{report.quote}}”</view>
@@ -184,9 +201,18 @@
     </view>
   </view>
 
+  <view class="fav-strip fade-up" bindtap="toggleQuestionFavorite" hover-class="tap-hover" aria-label="{{questionFavorited ? '取消收藏这道题' : '收藏这道题'}}" aria-role="button">
+    <view class="fav-mark serif" aria-hidden="true">{{questionFavorited ? '★' : '☆'}}</view>
+    <view class="grow">
+      <view class="fav-title">{{questionFavorited ? '这道题已收藏' : '收藏这道题'}}</view>
+      <view class="fav-desc">{{questionFavorited ? '在「练习 - 我的收藏」里能直接再练一次' : '下次想再练一遍，不用在六个抽屉里翻'}}</view>
+    </view>
+    <view class="fav-arrow" aria-hidden="true">→</view>
+  </view>
+
   <view class="report-actions fade-up">
-    <view class="btn btn-ghost" bindtap="practiceAgain">再练一次</view>
-    <view class="btn btn-primary" bindtap="goToday">回到今日</view>
+    <view class="btn btn-ghost" bindtap="practiceAgain" hover-class="tap-hover" aria-role="button">再练一次</view>
+    <view class="btn btn-primary" bindtap="goToday" hover-class="tap-hover" aria-role="button">回到今日</view>
   </view>
 
   <button class="share-btn" open-type="share">把这次进步分享出去 →</button>

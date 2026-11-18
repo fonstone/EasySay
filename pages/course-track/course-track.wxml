@@ -27,8 +27,7 @@
       wx:key="id"
       class="lesson-row fade-up {{item.done ? 'lesson-done' : ''}}"
       data-id="{{item.id}}"
-      bindtap="openLesson"
-    >
+      bindtap="openLesson" hover-class="tap-hover" aria-role="button">
       <view class="lesson-index">
         <text wx:if="{{item.done}}">✓</text>
         <text wx:else>{{item.order}}</text>
@@ -47,9 +46,16 @@
   </view>
 
   <view wx:if="{{nextLesson}}" class="track-foot">
-    <view class="btn btn-primary btn-block" bindtap="startNext">
+    <view class="btn btn-primary btn-block" bindtap="startNext" hover-class="tap-hover" aria-role="button">
       {{ctaText}}
     </view>
     <view class="track-note">每节课约 5 分钟，建议学完立刻做一次对应练习。</view>
   </view>
+</view>
+
+<view wx:else class="page state-fallback">
+  <view class="state-fallback-mark serif" aria-hidden="true">?</view>
+  <view class="state-fallback-title">内容暂时打不开</view>
+  <view class="state-fallback-desc">可能是从旧链接进入，或这条内容已被清理。回到首页继续练习吧。</view>
+  <view class="btn btn-primary btn-block" bindtap="goBack" hover-class="tap-hover" aria-label="返回首页" aria-role="button">返回</view>
 </view>

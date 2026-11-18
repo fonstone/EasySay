@@ -33,8 +33,7 @@
       wx:key="id"
       class="type-card fade-up"
       data-type="{{item.id}}"
-      bindtap="startType"
-    >
+      bindtap="startType" hover-class="tap-hover" aria-role="button">
       <view class="type-glyph serif" style="background: {{item.soft}}; color: {{item.color}};">{{item.glyph}}</view>
       <view class="type-name">{{item.name}}</view>
       <view class="type-desc">{{item.desc}}</view>
@@ -57,8 +56,7 @@
       wx:key="id"
       class="q-row fade-up"
       data-id="{{item.id}}"
-      bindtap="startQuestion"
-    >
+      bindtap="startQuestion" hover-class="tap-hover" aria-role="button">
       <view class="q-type" style="color: {{item.typeColor}}; background: {{item.typeSoft}};">{{item.typeShort}}</view>
       <view class="grow">
         <view class="q-stem ellipsis-2">{{item.stem}}</view>

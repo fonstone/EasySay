@@ -5,8 +5,37 @@
     <view class="head-sub">练习里说得最好的那些瞬间。一周后回来翻，会看见自己的变化。</view>
   </view>
 
-  <view wx:if="{{quotes.length}}" class="quote-count fade-up">
-    <view class="count-num serif">{{quotes.length}}</view>
+  <view wx:if="{{total}}" class="list-tools fade-up">
+    <view class="list-search">
+      <input
+        class="list-search-input"
+        value="{{keyword}}"
+        placeholder="搜句子或题目"
+        placeholder-class="list-search-placeholder"
+        confirm-type="search"
+        bindinput="onInput"
+        aria-label="搜索金句"
+      />
+      <view wx:if="{{keyword}}" class="list-clear" catchtap="clearKeyword" hover-class="tap-hover" aria-label="清空搜索词" aria-role="button">×</view>
+    </view>
+    <scroll-view class="list-chips" scroll-x enable-flex>
+      <view class="list-chip-row">
+        <view
+          wx:for="{{sorts}}"
+          wx:key="key"
+          class="list-chip {{sort === item.key ? 'list-chip-on' : ''}}"
+          data-key="{{item.key}}"
+          bindtap="pickSort"
+          hover-class="tap-hover"
+          aria-label="按{{item.name}}排序"
+          aria-role="button"
+        >{{item.name}}</view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view wx:if="{{total}}" class="quote-count fade-up">
+    <view class="count-num serif">{{total}}</view>
     <view class="count-body">
       <view class="count-title">句话被你留下</view>
       <view class="count-desc">来自真实的练习录音 · 只存文字</view>
@@ -14,8 +43,10 @@
     <view class="count-mark serif">句</view>
   </view>
 
-  <view wx:if="{{quotes.length}}" class="quote-list">
-    <view wx:for="{{quotes}}" wx:key="id" class="quote-card fade-up">
+  <view wx:if="{{keyword && filtered.length}}" class="list-result-note">找到 {{filtered.length}} 句</view>
+
+  <view wx:if="{{filtered.length}}" class="quote-list">
+    <view wx:for="{{filtered}}" wx:key="id" class="quote-card fade-up">
       <view class="quote-index serif">{{item.label}}</view>
       <view class="quote-body serif">“{{item.text}}”</view>
       <view class="quote-meta">
@@ -26,19 +57,19 @@
         <text>{{item.score}} 分</text>
       </view>
       <view class="quote-actions">
-        <view class="quote-action" data-text="{{item.text}}" bindtap="copy">复制</view>
-        <view class="quote-action quote-remove" data-id="{{item.id}}" bindtap="remove">移除</view>
+        <view class="quote-action" data-text="{{item.text}}" bindtap="copy" hover-class="tap-hover" aria-role="button" aria-label="复制这句话">复制</view>
+        <view class="quote-action quote-remove" data-id="{{item.id}}" bindtap="remove" hover-class="tap-hover" aria-role="button" aria-label="移除这句话">移除</view>
       </view>
     </view>
   </view>
 
   <empty-state
-    wx:else
+    wx:if="{{!filtered.length}}"
     mark="句"
-    title="还没有金句"
-    desc="当一次练习超过 86 分，或者你主动收藏时，那句话会出现在这里。"
-    action="去练一次"
-    bind:action="goPractice"
+    title="{{emptyTitle}}"
+    desc="{{emptyDesc}}"
+    action="{{emptyAction}}"
+    bind:action="onEmptyAction"
   />
 
   <view class="quotes-note">

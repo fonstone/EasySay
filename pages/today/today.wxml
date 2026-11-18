@@ -6,14 +6,14 @@
         <view class="hello">{{greeting}}，<text class="serif">{{nickname}}</text></view>
         <view class="hello-sub">今天也只练一件事：把话说清楚。</view>
       </view>
-      <view class="streak-pill" bindtap="goMine">
+      <view class="streak-pill" bindtap="goMine" hover-class="tap-hover" aria-role="button">
         <view class="streak-num serif">{{streak}}</view>
         <view class="streak-label">连续天数</view>
       </view>
     </view>
   </view>
 
-  <view class="hero fade-up" bindtap="startToday">
+  <view class="hero fade-up" bindtap="startToday" hover-class="tap-hover" aria-role="button">
     <view class="hero-glow"></view>
     <view class="between hero-top">
       <view class="hero-badge">TODAY · {{question.categoryName}}</view>
@@ -46,7 +46,7 @@
     </view>
   </view>
 
-  <view class="quota-strip {{quota.freeLeft === 0 ? 'quota-out' : ''}}" wx:if="{{quota && !quota.member}}" bindtap="goMember">
+  <view class="quota-strip {{quota.freeLeft === 0 ? 'quota-out' : ''}}" wx:if="{{quota && !quota.member}}" bindtap="goMember" hover-class="tap-hover" aria-role="button">
     <view class="quota-dot"></view>
     <view class="grow">
       <text wx:if="{{quota.freeLeft > 0}}">{{quota.summary}}</text>
@@ -70,8 +70,7 @@
         wx:key="key"
         class="task-item {{item.done ? 'task-done' : ''}}"
         data-key="{{item.key}}"
-        bindtap="handleTask"
-      >
+        bindtap="handleTask" hover-class="tap-hover" aria-role="button">
         <view class="task-check {{item.done ? 'checked' : ''}}">{{item.done ? '✓' : ''}}</view>
         <view class="task-glyph serif">{{item.icon}}</view>
         <view class="grow">
@@ -99,13 +98,13 @@
   </view>
 
   <view class="quick-grid fade-up">
-    <view class="quick-card" bindtap="goScene">
+    <view class="quick-card" bindtap="goScene" hover-class="tap-hover" aria-role="button">
       <view class="quick-glyph serif">场</view>
       <view class="quick-title">3 分钟场景对练</view>
       <view class="quick-desc">把难说的话，提前练一遍</view>
       <view class="quick-arrow">→</view>
     </view>
-    <view class="quick-card quick-card-alt" bindtap="goThinking">
+    <view class="quick-card quick-card-alt" bindtap="goThinking" hover-class="tap-hover" aria-role="button">
       <view class="quick-glyph serif">思</view>
       <view class="quick-title">思维小题</view>
       <view class="quick-desc">事实、观点，还是猜测？</view>
@@ -113,7 +112,7 @@
     </view>
   </view>
 
-  <view class="coach-strip fade-up" bindtap="goCoach">
+  <view class="coach-strip fade-up" bindtap="goCoach" hover-class="tap-hover" aria-role="button">
     <view class="coach-mark serif">师</view>
     <view class="grow">
       <view class="coach-title">让私教替你排一周</view>
@@ -153,4 +152,12 @@
     </view>
     <text class="brand-text">清述 · 每天三分钟，练一次好好说话</text>
   </view>
+</view>
+
+<view wx:else class="page has-tabbar skeleton-page" aria-label="正在加载页面内容">
+  <view class="sk sk-title"></view>
+  <view class="sk sk-card"></view>
+  <view class="sk sk-strip"></view>
+  <view class="sk sk-card"></view>
+  <view class="sk sk-card sk-tall"></view>
 </view>

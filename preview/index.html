@@ -374,11 +374,11 @@ table.cmp td:first-child{color:var(--ink);white-space:nowrap}
 </head>
 <body>
 <div class="topbar">
-  <div class="brand"><b>清述</b><span>工程实现评审 · 高保真界面预览 · 本轮已修复 14 项全局问题</span></div>
+  <div class="brand"><b>清述</b><span>工程实现评审 · 高保真界面预览 · 两轮累计修复 P0 + P1</span></div>
   <div class="topstats">
-    <div class="ts"><b>23</b><small>页面</small></div>
+    <div class="ts"><b>24</b><small>页面</small></div>
     <div class="ts"><b>48</b><small>练习题</small></div>
-    <div class="ts"><b>7 / 7</b><small>测试套件通过</small></div>
+    <div class="ts"><b>8 / 8</b><small>测试套件通过</small></div>
     <div class="ts"><b>0</b><small>网络请求</small></div>
   </div>
   <label class="switch on" id="markSwitch"><input type="checkbox" checked /><span class="dot"></span><span>问题标注</span></label>
@@ -407,9 +407,9 @@ table.cmp td:first-child{color:var(--ink);white-space:nowrap}
     <div class="panel-box pb">
       <h4>工程速览</h4>
       <div class="factline"><span>技术栈</span><b>原生小程序 · 无云开发</b></div>
-      <div class="factline"><span>代码量</span><b>约 2.1 万行（含数据与测试）</b></div>
+      <div class="factline"><span>代码量</span><b>约 2.3 万行（含数据与测试）</b></div>
       <div class="factline"><span>AppID</span><b>touristappid</b></div>
-      <div class="factline"><span>存储</span><b>16 个 cs_* 本地 key（含 schema）</b></div>
+      <div class="factline"><span>存储</span><b>18 个 cs_* 本地 key（含 v3 找题索引）</b></div>
       <div class="factline"><span>提交</span><b>2 次（含本轮优化）</b></div>
       <div class="factline"><span>真机编译</span><b style="color:#e9bd7d">本机未装开发者工具</b></div>
     </div>
@@ -448,7 +448,7 @@ const ICONS = {
 const TABS=[['today','今日','home'],['discover','发现','discover'],['practice','练习','practice'],['course','课程','course'],['mine','我的','mine']];
 const NAV={
   main:[['today','今日 · 打卡首页'],['discover','发现 · 思维与纠音'],['practice','练习 · 六个抽屉'],['course','课程 · 三条学习线'],['mine','我的 · 数据与档案']],
-  flow:[['session','练习会话 · 构思/录音/分析'],['report','点评报告 · 评分结果']],
+  flow:[['search','找题 · 搜索/筛选/收藏'],['session','练习会话 · 构思/录音/分析'],['report','点评报告 · 评分结果']],
   other:[['member','会员中心 · 本地模拟'],['settings','设置 · 数据管理']]
 };
 const CATS=[
@@ -526,9 +526,22 @@ const ISSUES=[
    与源码逐项核对：下列编号对应的问题已在本次迭代中修复，
    预览里的绿框表示「已修复」，红框表示「仍待推进」。            */
 const FIXED={
+  t1:'全站 103 处可点元素补 hover-class="tap-hover"，按压反馈统一，主 CTA 与卡片不再「看不出能点」。',
+  t4:'105 处 aria-role + 重点入口手写 aria-label；图标按钮 ≥44px（tap-target），汉字图标 aria-hidden。',
+  t5:'--muted / --muted-2 提到 4.5:1 以上；全站 152 处小于 20rpx 的字号统一到 --fs-min；减少动效覆盖更多动画（暗色模式仍待做）。',
+  p1:'新增 pages/search 找题页：关键词 + 场景同义词、方向/关卡/收藏筛选、4 种排序、搜索历史与推荐词；练习页与我的页均有直达入口。',
+  p3:'深绿 / 纸黄渐变收敛为 --gradient-green / --gradient-paper 两个令牌，15 处不再各写一套。',
+  d2:'声母诊所显示总数并增加「查看全部」尾卡，横滑有明确终点。',
+  d3:'深卡描述文字统一到 20rpx 下限，与其余卡片的信息层级对齐。',
+  m1:'aggregateDimensions() 补齐 completion，能力图谱不再少一维；每个维度可点开看依据与改法。',
+  m2:'会员横幅不再承诺「解锁全部课程」（课程与私教本就不锁），改为「完整点评不限次」。',
+  r3:'报告页新增「这个分数怎么算」说明卡，明确 4 个声音维度与补稿后才有的 3 个内容维度；文案统一为规则引擎口径。',
+  r5:'score-ring 数字与圆环入场动画 + 点击说明；radar-chart 点击解释、去重绘制；报告页与我的页维度均可展开「依据 / 下次怎么练」。',
+  g2:'最小字号提到 20rpx、reduced-motion 覆盖更多动画与过渡；暗色模式仍待做。',
+  all5:'15 处渐变、152 处字号、63 处圆角令牌化；3 个组件全部改用 var()；两套进度条合并为全局 .metric-*；全局 .empty* 死代码删除。',
   t2:'新增 store.getDailyQuota()，首屏用一条文案同时说明「今日点评 N/5」与「本题可重录 N 次」，不再两套数字各说各话。',
   t3:'app.json 与 custom-tab-bar 的 list 同步重排为 今日/发现/练习/课程/我的，凸起按钮落在正中；标签字号 19→22rpx、颜色改用高对比令牌。',
-  t6:'report / session 增加骨架屏；写入失败在设置页显性提示，不再静默丢数据。',
+  t6:'report / session 骨架屏之外，5 个 tabbar 首屏页全部补骨架屏，4 个详情页补「内容打不开」兜底与返回；写入失败在设置页显性提示。',
   d1:'去掉「AI」字样，统一为「私教计划」，数据文件注明由本地确定性规则生成、不调用模型。',
   m3:'设置页新增「导出数据备份 / 从备份恢复」，store 提供 exportData / importData 全键往返。',
   r2:'文字稿与录音指纹（audioKey）绑定，页面 + 数据层双重锁定「每份报告只能补一次」，分数不再可反复刷。',
@@ -537,15 +550,27 @@ const FIXED={
   s4:'权限探测失败改为尝试 wx.authorize 并给出明确引导，不再直接放行。',
   g1:'设置页新增导出 / 导入，清空前已有二次确认。',
   all1:'三处存储统一以 report.id 为主键、报告与历史同留 40 条；淘汰时同步清理历史与音频，删除 wav 时清空 report.audioPath；启动时 repairData() 全量兜底。',
-  all2:'新增 SCHEMA_VERSION=2 + 幂等 migrate()；write() 失败记录到 getStorageHealth() 并在设置页提示；另有 exportData/importData 备份通道。',
+  all2:'SCHEMA_VERSION=3（新增收藏 / 最近练习 / 搜索历史三键并清洗失效题目 id）；migrate() 幂等、write() 失败上报、备份覆盖新键。',
   all3:'practiceAgain 改 redirectTo；util.goBack() 判断栈深并兜底 switchTab，session / report / lesson / thinking-quiz 的 navigateBack 全部替换。',
-  all4:'新增 tests/regression.test.js（13 项），覆盖迁移、淘汰一致性、锁稿、额度时机与退还、备份往返、写入失败、导航兜底。'
+  all4:'regression 13 项 + 本轮 ux 17 项（搜索 / 筛选 / 收藏 / 备份 / 维度解释 / 全局基线），共 8 套测试全绿。',
 };
 ISSUES.forEach(i=>{ if(FIXED[i.id]) i.fixed=FIXED[i.id]; });
 
 /* ===================== 改进建议 ===================== */
 const SUGGEST=[
-  {g:'本轮已落地',h:'已写入源码、经 7 套测试验证',items:[
+  {g:'本轮已落地 · P1',h:'找题、反馈、可解释性与全局一致性',items:[
+    ['P1','新增「找题」页','关键词 + 场景同义词、方向/关卡/收藏筛选、4 种排序、搜索历史与推荐词。','pages/search'],
+    ['P1','收藏与最近练习贯通','题目卡 / 分类详情 / 报告页可收藏；录音 onStart 记录最近练习；练习页与我的页直达。','store.js / practice / report / mine'],
+    ['P1','列表页搜索与排序','金句墙、复盘档案共用统一工具条，并新增「无结果」空态分支。','quotes / review-history / app.wxss'],
+    ['P1','骨架屏与兜底全覆盖','5 个首屏页骨架屏、4 个详情页数据兜底与返回方法；ready=false 不再白屏。','app.wxss / *.wxml'],
+    ['P1','按压反馈与无障碍','103 处 hover-class、105 处 aria-role，重点入口 aria-label，图标按钮 44px 起。','所有 wxml / app.wxss'],
+    ['P1','分数与维度可解释','分数环入场动画 + 点击说明；7 个维度展开「依据 / 怎么练」；雷达点击显示图谱说明。','components/* / report / mine'],
+    ['P1','令牌与可读性收敛','15 处渐变、152 处小字号、63 处圆角令牌化；两套进度条合并；组件色改变量。','app.wxss / *.wxss'],
+    ['P1','补齐能力图谱第 7 维','aggregateDimensions 不再漏 completion；会员横幅文案改为准确描述。','scoring.js / mine.wxml'],
+    ['P1','横滑有终点','声母诊所显示总数并加「查看全部」尾卡。','discover.*'],
+    ['P1','17 项易用性回归','新增 tests/ux.test.js，覆盖搜索 / 筛选 / 收藏 / 备份 / 维度解释 / 全局基线。','tests/ux.test.js']
+  ]},
+  {g:'上一轮已落地 · P0',h:'已写入源码、经 8 套测试验证',items:[
     ['P0','数据层统一与迁移','SCHEMA_VERSION=2、migrate()、repairData()、三处存储共用主键与淘汰策略、写入失败上报。','utils/store.js'],
     ['P0','扣次数时机与退还','麦克风 onStart 后才扣；未生成报告即失败/退出自动退还。','pages/session/session.js'],
     ['P0','补稿防刷分','audioKey 绑定录音 + 每份报告只补一次（页面与数据层双重拦截）。','scoring.js / report.js / store.js'],
@@ -599,7 +624,7 @@ const SUGGEST=[
 
 const ROADMAP=[
   ['a','P0 · 立刻修','评分可信度（ASR 或明确标注 4 维边界 + 禁止刷分）、失败退机会、三份数据一致性、存储版本与写失败提示、数据导出。这几项直接决定用户是否信任分数、数据是否安全。'],
-  ['b','P1 · 下个迭代','TabBar 重心与按压反馈、骨架屏与统一空态、无障碍、返回栈、找题路径、动态私教、课程测验、样式令牌化。目标是让每日使用顺滑且视觉统一。'],
+  ['b','P1 · 已落地 / 剩余','找题、收藏、骨架屏、无障碍、返回栈、令牌化与图表可解释性已落地；剩余：ASR 让 7 维当次生效、课程随堂测验、动态排题、暗色模式。'],
   ['c','P2 · 产品化阶段','云同步与微信登录、真实支付、订阅消息与埋点、跟读对比、暗色模式、真机声学标定、分享出图。这一步才把 Demo 变成可运营产品。']
 ];
 
@@ -730,8 +755,29 @@ function pageSettings(){
   '<div class="p-sec" '+M('g2')+'><div class="p-sec-head"><b>显示</b></div><div class="p-card"><div class="p-between"><span style="font-size:12.5px;color:#34433d">深色模式</span><span class="p-tiny">未适配</span></div><div class="p-line"></div><div class="p-between"><span style="font-size:12.5px;color:#34433d">跟随系统字体大小</span><span class="p-tiny">未适配</span></div></div></div>'+
   '<div class="p-foot"><div class="fl"></div>清述 · 本地演示版 v1.0</div>';
 }
-const PAGES={today:pageToday,practice:pagePractice,discover:pageDiscover,course:pageCourse,mine:pageMine,report:pageReport,session:pageSession,member:pageMember,settings:pageSettings};
-const TITLES={today:'',practice:'',discover:'',course:'',mine:'',report:'点评报告',session:'',member:'会员中心',settings:'设置'};
+function pageSearch(){
+  const chips=['全部方向','故事复述','场景对练','结构表达','随机话题'];
+  const sorts=['全部关卡','推荐','最近练过','时间最短','☆ 只看收藏'];
+  const words=['汇报','说服','讲故事','即兴'];
+  const rows=[
+    ['汇报本周项目进展','把进度、风险和下一步说清楚','场景对练 · 第 2 关 · 60–90 秒',true],
+    ['说服朋友去跑步','先接住对方的顾虑，再给理由','场景对练 · 第 2 关 · 60–90 秒',false],
+    ['司马光砸缸','合上材料，把故事讲给没听过的人','故事复述 · 第 1 关 · 45–75 秒',false],
+    ['先说结论，再给三个理由','用固定结构让人跟得住','结构表达 · 第 3 关 · 90–120 秒',true]
+  ];
+  return '<div style="padding:14px 14px 26px">'+
+   '<div style="display:inline-block;background:rgba(79,158,120,.15);color:#4f9e78;font-size:10px;padding:3px 9px;border-radius:9px;margin-bottom:10px">本轮新增 · P1 找题页</div>'+
+   '<div class="p-card" style="display:flex;align-items:center;gap:9px;padding:9px 13px;border-radius:24px;margin-bottom:10px"><span style="font-size:19px;color:#1b5a47;line-height:1">⌕</span><span style="flex:1;font-size:12px;color:#5c6b63">搜题目、场景或提示词</span><span style="font-size:11px;color:#1b5a47">取消</span></div>'+
+   '<div style="display:flex;gap:6px;overflow:hidden;white-space:nowrap;margin-bottom:9px">'+chips.map((c,i)=>'<span style="font-size:10px;padding:5px 11px;border-radius:14px;flex-shrink:0;'+(i===0?'background:#1b5a47;color:#fff':'background:#e4f0ea;color:#5c6b63')+'">'+c+'</span>').join('')+'</div>'+
+   '<div style="display:flex;gap:6px;overflow:hidden;white-space:nowrap;margin-bottom:16px">'+sorts.map((c,i)=>'<span style="font-size:10px;padding:5px 11px;border-radius:14px;flex-shrink:0;'+(i===1?'background:#1b5a47;color:#fff':'background:#f0f6f2;color:#5c6b63')+'">'+c+'</span>').join('')+'</div>'+
+   '<div class="p-card" style="margin-bottom:12px"><div class="p-between"><b style="font-size:12px;color:#16211d">试试这些词</b><span class="p-tiny">搜索只在本机</span></div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:9px">'+words.map(w=>'<span style="font-size:10.5px;color:#1b5a47;background:#f0f6f2;padding:4px 10px;border-radius:12px">'+w+'</span>').join('')+'</div><div style="display:flex;gap:8px;margin-top:12px">'+[['★','我的收藏','2 道题'],['近','最近练过','4 道题']].map(x=>'<div class="p-card" style="flex:1;margin:0;padding:9px 10px;display:flex;gap:7px;align-items:center"><span style="font-size:15px;color:#b68a4e">'+x[0]+'</span><div><div style="font-size:11px;font-weight:600;color:#16211d">'+x[1]+'</div><div class="p-tiny">'+x[2]+'</div></div></div>').join('')+'</div></div>'+
+   '<div class="p-between" style="margin:16px 0 9px"><b style="font-size:13px;color:#16211d">全部题目</b><span class="p-tiny">48 道</span></div>'+
+   rows.map(r=>'<div class="p-card tappable" style="margin-bottom:8px;display:flex;gap:9px;align-items:flex-start;padding:11px 12px"><div style="width:30px;height:30px;flex-shrink:0;border-radius:8px;background:#e4f0ea;color:#2f7b63;display:flex;align-items:center;justify-content:center;font-size:14px">题</div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:#16211d">'+r[0]+'</div><div class="p-tiny" style="margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+r[1]+'</div><div class="p-tiny" style="margin-top:5px;color:#236c55">'+r[2]+'</div></div><span style="font-size:16px;color:'+(r[3]?'#b68a4e':'#7b8982')+'" aria-hidden="true">'+(r[3]?'★':'☆')+'</span></div>').join('')+
+   '<div class="p-foot"><div class="fl"></div>搜索、收藏和最近练习都只保存在本机</div>'+
+  '</div>';
+}
+const PAGES={today:pageToday,practice:pagePractice,discover:pageDiscover,course:pageCourse,mine:pageMine,report:pageReport,session:pageSession,member:pageMember,settings:pageSettings,search:pageSearch};
+const TITLES={today:'',practice:'',discover:'',course:'',mine:'',report:'点评报告',session:'',member:'会员中心',settings:'设置',search:'找题'};
 const NOTES={
  today:'今日是唯一的「每日入口」：打卡、挑战、清单、周数据、快捷入口全压在一屏，信息密度最高。',
  practice:'练习按 6 个方向 × 4 个难度组织 48 道题，完成 1 题解锁下一关。',
@@ -741,7 +787,8 @@ const NOTES={
  report:'报告页是评分结果落点：分数环、维度条、教练点评、补文字稿、回听。',
  session:'核心流程状态机：intro → prepare → recording → analyzing → redirectTo 报告。',
  member:'会员与支付均为本地演示，价格硬编码在前端。',
- settings:'设置页只有清空/重置，没有导出与备份。'
+ settings:'设置页只有清空/重置，没有导出与备份。',
+ search:'本轮新增：48 道题可搜、可筛选、可排序、可收藏，另有搜索历史与最近练习直达。'
 };
 
 /* ===================== 渲染 ===================== */
@@ -766,7 +813,7 @@ function renderPhone(){
   let inner=nav+'<div class="'+pad+'"><div class="screen-inner">'+PAGES[CUR]()+'</div></div>';
   document.getElementById('screenInner').innerHTML=inner;
   document.getElementById('tbWrap').outerHTML=tabbar()||'<div class="tb-wrap" id="tbWrap" style="display:none"></div>';
-  document.getElementById('stageNote').innerHTML='<b>'+({today:'今日',practice:'练习',discover:'发现',course:'课程',mine:'我的',report:'点评报告',session:'练习会话',member:'会员中心',settings:'设置'}[CUR])+'</b> · '+NOTES[CUR]+' <span style="color:#5ec8a0">（1rpx ≈ 0.5px 还原，非真机编译截图）</span>';
+  document.getElementById('stageNote').innerHTML='<b>'+({today:'今日',practice:'练习',discover:'发现',course:'课程',mine:'我的',report:'点评报告',session:'练习会话',member:'会员中心',settings:'设置',search:'找题'}[CUR])+'</b> · '+NOTES[CUR]+' <span style="color:#5ec8a0">（1rpx ≈ 0.5px 还原，非真机编译截图）</span>';
   applyMarks();
 }
 function applyMarks(){
@@ -776,14 +823,14 @@ function renderIssues(){
   const list=ISSUES.filter(i=>i.page===CUR);
   const global=ISSUES.filter(i=>i.page==='*');
   const doneN=ISSUES.filter(i=>i.fixed).length;
-  let h='<p class="rintro">本轮已修复 <b style="color:#4f9e78">'+doneN+'</b> 项全局性问题；当前视图 '+list.length+' 个可定位问题，另列 '+global.length+' 个全局性问题。<b style="color:#4f9e78">绿框 = 已修复</b>，红框 = 仍待推进，编号均可点开。</p>';
+  let h='<p class="rintro">两轮累计已修复 <b style="color:#4f9e78">'+doneN+'</b> 项（含 P0 与 P1）；当前视图 '+list.length+' 个可定位问题，另列 '+global.length+' 个全局性问题。<b style="color:#4f9e78">绿框 = 已修复</b>，红框 = 仍待推进，编号均可点开。</p>';
   const card=i=>'<div class="issue'+(i.fixed?' fixed':'')+'" id="is-'+i.id+'"><div class="ih"><span class="lvl '+i.level.toLowerCase()+'">'+i.level+'</span><span class="icat">'+i.cat+'</span>'+(i.fixed?'<span class="lvl done">已修复</span>':'')+'<b>'+i.title+'</b></div><p>'+i.detail+'</p>'+(i.fixed?'<div class="done-note"><b>本轮已落地 · </b>'+i.fixed+'</div>':'')+'<div class="fix"><b>原建议 · </b>'+i.fix+'</div><div class="where">'+i.where+'</div></div>';
   h+=list.map(card).join('');
   h+='<div class="grp-h"><i></i>全局性问题 <small>不绑定具体页面</small></div>'+global.map(card).join('');
   return h;
 }
 function renderSuggest(){
-  let h='<p class="rintro">按功能易用性 / 美观性 / 功能全面性 / 工程质量分组，共 '+SUGGEST.reduce((a,g)=>a+g.items.length,0)+' 条（含本轮已落地 9 条）。</p>';
+  let h='<p class="rintro">按功能易用性 / 美观性 / 功能全面性 / 工程质量分组，共 '+SUGGEST.reduce((a,g)=>a+g.items.length,0)+' 条（含两轮已落地 '+SUGGEST.filter(g=>g.g.indexOf('已落地')>=0).reduce((a,g)=>a+g.items.length,0)+' 条）。</p>';
   SUGGEST.forEach(g=>{
     h+='<div class="grp-h"><i></i>'+g.g+' <small>'+g.items.length+' 条 · '+g.h+'</small></div>';
     g.items.forEach((it,i)=>{h+='<div class="sug"><div class="sh"><span class="num">'+(i+1).toString().padStart(2,'0')+'</span><div><span class="lvl '+it[0].toLowerCase()+'" style="display:inline-block;margin-bottom:5px">'+it[0]+'</span><b>'+it[1]+'</b><p>'+it[2]+'</p><span class="tag">→ '+it[3]+'</span></div></div></div>'});
@@ -792,15 +839,15 @@ function renderSuggest(){
   return h;
 }
 function renderOverview(){
-  return '<p class="rintro">依据源码逐文件核对：配置层、数据层、评分引擎、23 个页面、3 个组件与 6 套测试。</p>'+
+  return '<p class="rintro">依据源码逐文件核对：配置层、数据层、评分引擎、24 个页面、3 个组件与 8 套测试。</p>'+
   '<div class="ov-block"><h5>核心链路</h5><div class="flow">'+
-  [['1','app.js onLaunch → store.init()','16 个 cs_* 键；SCHEMA_VERSION=2 迁移 + 启动时一致性修复'],['2','session 真实录音','RecorderManager：16kHz / 单声道 / PCM，本地文件，不上传'],['3','scoring.analyzePcm()','真实的 RMS 能量 / VAD / 停顿分析（非语义评测）'],['4','buildReport({ transcript: \'\' })','<em>永远空文字稿 → 只出 4 维，内容三维是死代码</em>'],['5','store 三处冗余写入','报告 / 历史统一 40 条，音频 15 份；淘汰时自动同步清理'],['6','report 页补文字稿重算','<em>已绑定录音指纹并锁定一次，分数不可反复刷</em>']].map(f=>'<div class="fstep"><b>'+f[0]+'</b><div><span style="color:var(--ink)">'+f[1]+'</span><br/>'+f[2]+'</div></div>').join('')+'</div></div>'+
+  [['1','app.js onLaunch → store.init()','18 个 cs_* 键；SCHEMA_VERSION=3 迁移 + 启动时一致性修复'],['2','session 真实录音','RecorderManager：16kHz / 单声道 / PCM，本地文件，不上传'],['3','scoring.analyzePcm()','真实的 RMS 能量 / VAD / 停顿分析（非语义评测）'],['4','buildReport({ transcript: \'\' })','<em>永远空文字稿 → 只出 4 维，内容三维是死代码</em>'],['5','store 三处冗余写入','报告 / 历史统一 40 条，音频 15 份；淘汰时自动同步清理'],['6','report 页补文字稿重算','<em>已绑定录音指纹并锁定一次，分数不可反复刷</em>']].map(f=>'<div class="fstep"><b>'+f[0]+'</b><div><span style="color:var(--ink)">'+f[1]+'</span><br/>'+f[2]+'</div></div>').join('')+'</div></div>'+
   '<div class="ov-block"><h5>规模与验证</h5><div class="kv">'+
-  [['23','页面 / 3 个组件'],['48 + 12','练习题 / 课程'],['20 + 15','思维题 / 纠音练习'],['23','段合成示范音频'],['16','个本地存储 key'],['7 / 7','Node 测试套件通过'],['27 + 28','WXML / WXSS 静态检查'],['0','网络请求 / 云调用']].map(k=>'<div><b>'+k[0]+'</b><small>'+k[1]+'</small></div>').join('')+'</div><p style="font-size:11px;color:var(--muted);margin:9px 0 0">已在本机执行 <code style="color:#a9e6c9">node tests/run-all.js</code> → ALL SUITES PASSED（scoring 28 / data 14 / store 30 / <b>regression 13</b> / 23 页冒烟 / E2E 评分 79 分 4 维 / 27 个 WXML 无错）。</p></div>'+
+  [['24','页面 / 3 个组件'],['48 + 12','练习题 / 课程'],['20 + 15','思维题 / 纠音练习'],['23','段合成示范音频'],['18','个本地存储 key'],['8 / 8','Node 测试套件通过'],['28 + 29','WXML / WXSS 静态检查'],['0','网络请求 / 云调用']].map(k=>'<div><b>'+k[0]+'</b><small>'+k[1]+'</small></div>').join('')+'</div><p style="font-size:11px;color:var(--muted);margin:9px 0 0">已在本机执行 <code style="color:#a9e6c9">node tests/run-all.js</code> → ALL SUITES PASSED（scoring 28 / data 14 / store 30 / <b>regression 13 + ux 17</b> / 24 页冒烟 / E2E 评分 79 分 4 维 / 28 个 WXML 无错）。</p></div>'+
   '<div class="ov-block"><h5>真实能力 vs 伪实现</h5><table class="cmp"><tr><th>能力</th><th>实现</th><th>判断</th></tr>'+
   [['录音采集','真实 PCM 16kHz','<span class="ok">真实</span>'],['声学分析','RMS/VAD/停顿/波形','<span class="ok">真实（仅能量）</span>'],['语音识别 ASR','无，文字稿靠用户手写','<span class="no">缺失</span>'],['内容/结构/用词评分','关键词规则，仅补稿后生效','<span class="no">与音频脱钩</span>'],['教练点评','硬编码模板 + 事实填充','<span class="no">模板，非 AI</span>'],['分析进度动画','定时器推进 ≥1.6s','<span class="no">装饰性</span>'],['录音页波形','Math.sin 生成 + CSS 动画','<span class="no">假波形</span>'],['AI 私教','6 组写死的 7 天题单','<span class="no">固定课表</span>'],['会员 / 支付','本地字段直接改写','<span class="no">模拟</span>'],['数据同步','仅 wx.setStorageSync','<span class="no">卸载即丢</span>']].map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td></tr>').join('')+'</table></div>'+
-  '<div class="ov-block"><h5>本轮修复重点 · 仍待推进</h5><div class="flow">'+
-  [['①','评分与真实语音绑定','否则分数可被文字稿任意刷高，产品核心价值不成立'],['②','三份存储的一致性','>40 次练习必然出现悬空报告与失效录音'],['③','机会/额度扣减时机','一次麦克风故障就白扣一次仅有的 2 次机会'],['④','数据备份与迁移','纯本地 + 只有清空，没有导出/云同步'],['⑤','首屏加载与无障碍','白屏、对比度、点按区、aria 全缺失']].map(f=>'<div class="fstep"><b>'+f[0]+'</b><div><span style="color:var(--ink)">'+f[1]+'</span><br/>'+f[2]+'</div></div>').join('')+'</div></div>';
+  '<div class="ov-block"><h5>两轮修复重点 · 仍待推进</h5><div class="flow">'+
+  [['①','已修 · 数据一致性与备份','40 条统一淘汰、v3 迁移、导出 / 恢复，悬空报告与静默丢数据已消除'],['②','已修 · 找题与反馈闭环','48 题可搜可筛可收藏，骨架屏 / 按压 / 无障碍全覆盖'],['③','已修 · 分数可解释','维度展开依据与改法，分数环动画与说明卡上线'],['④','仍待推进 · ASR 接入','练习当次仍只有 4 维，内容三维依赖事后补稿'],['⑤','仍待推进 · 云同步与真实支付','纯本地 + 模拟会员，卸载即丢，商业化能力未接']].map(f=>'<div class="fstep"><b>'+f[0]+'</b><div><span style="color:var(--ink)">'+f[1]+'</span><br/>'+f[2]+'</div></div>').join('')+'</div></div>';
 }
 function renderRight(){
   document.querySelectorAll('.rtab').forEach(b=>b.classList.toggle('active',b.dataset.rtab===RTAB));

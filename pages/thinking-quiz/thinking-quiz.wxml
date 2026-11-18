@@ -14,8 +14,7 @@
       wx:key="key"
       class="option {{item.state}}"
       data-index="{{index}}"
-      bindtap="choose"
-    >
+      bindtap="choose" hover-class="tap-hover" aria-role="button">
       <view class="option-key">{{item.key}}</view>
       <view class="option-text">{{item.text}}</view>
       <view wx:if="{{item.state === 'correct'}}" class="option-icon">✓</view>
@@ -39,8 +38,15 @@
   </view>
 
   <view class="quiz-foot">
-    <view wx:if="{{answered}}" class="btn btn-primary btn-block" bindtap="next">下一题 →</view>
+    <view wx:if="{{answered}}" class="btn btn-primary btn-block" bindtap="next" hover-class="tap-hover" aria-role="button">下一题 →</view>
     <view wx:else class="quiz-hint">选一个你认为最准确的答案</view>
-    <view class="quiz-back" bindtap="back">返回题目列表</view>
+    <view class="quiz-back" bindtap="back" hover-class="tap-hover" aria-role="button">返回题目列表</view>
   </view>
+</view>
+
+<view wx:else class="page state-fallback">
+  <view class="state-fallback-mark serif" aria-hidden="true">?</view>
+  <view class="state-fallback-title">内容暂时打不开</view>
+  <view class="state-fallback-desc">可能是从旧链接进入，或这条内容已被清理。回到首页继续练习吧。</view>
+  <view class="btn btn-primary btn-block" bindtap="goBack" hover-class="tap-hover" aria-label="返回首页" aria-role="button">返回</view>
 </view>

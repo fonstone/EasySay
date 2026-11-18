@@ -12,8 +12,7 @@
         wx:key="id"
         class="goal-card {{selectedId === item.id ? 'goal-on' : ''}}"
         data-id="{{item.id}}"
-        bindtap="selectGoal"
-      >
+        bindtap="selectGoal" hover-class="tap-hover" aria-role="button">
         <view class="goal-top">
           <view class="goal-glyph serif" style="background: {{item.soft}}; color: {{item.color}};">{{item.glyph}}</view>
           <view wx:if="{{selectedId === item.id}}" class="goal-check">✓</view>
@@ -35,7 +34,7 @@
           </view>
         </view>
       </view>
-      <view class="btn btn-primary btn-block mt-24" bindtap="createPlan">生成我的 7 天计划</view>
+      <view class="btn btn-primary btn-block mt-24" bindtap="createPlan" hover-class="tap-hover" aria-role="button">生成我的 7 天计划</view>
       <view class="preview-note">计划基于本地选题规则生成 · 不联网 · 可随时重排</view>
     </view>
   </view>
@@ -48,7 +47,7 @@
       </view>
       <view class="plan-title serif">{{planGoal.name}}</view>
       <view class="plan-intro">{{planGoal.intro}}</view>
-      <view wx:if="{{nextItem}}" class="today-card" bindtap="startNext">
+      <view wx:if="{{nextItem}}" class="today-card" bindtap="startNext" hover-class="tap-hover" aria-role="button">
         <view class="today-label">今天练这个</view>
         <view class="today-title">{{nextItem.title}}</view>
         <view class="today-meta">{{nextItem.categoryName}} · 约 {{nextItem.minutes}} 分钟</view>
@@ -72,8 +71,7 @@
         wx:key="qid"
         class="timeline-item {{item.done ? 'done' : ''}} {{item.current ? 'current' : ''}}"
         data-index="{{index}}"
-        bindtap="openItem"
-      >
+        bindtap="openItem" hover-class="tap-hover" aria-role="button">
         <view class="timeline-left">
           <view class="timeline-dot">{{item.done ? '✓' : item.day}}</view>
           <view class="timeline-line"></view>
@@ -93,8 +91,8 @@
     </view>
 
     <view class="plan-actions">
-      <view wx:if="{{allDone}}" class="btn btn-primary btn-block" bindtap="resetPlan">重新排一周</view>
-      <view wx:else class="btn btn-ghost btn-block" bindtap="resetPlan">换一个目标</view>
+      <view wx:if="{{allDone}}" class="btn btn-primary btn-block" bindtap="resetPlan" hover-class="tap-hover" aria-role="button">重新排一周</view>
+      <view wx:else class="btn btn-ghost btn-block" bindtap="resetPlan" hover-class="tap-hover" aria-role="button">换一个目标</view>
     </view>
   </view>
 </view>
