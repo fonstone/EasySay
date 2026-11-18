@@ -11,6 +11,14 @@
         "value": "docs"
       },
       {
+        "type": "folder",
+        "value": "preview"
+      },
+      {
+        "type": "folder",
+        "value": ".workbuddy"
+      },
+      {
         "type": "file",
         "value": "README.md"
       }

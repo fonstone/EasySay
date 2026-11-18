@@ -16,8 +16,8 @@
 }
 
 .back-btn {
-  width: 68rpx;
-  height: 68rpx;
+  width: 88rpx;
+  height: 88rpx;
   border-radius: 50%;
   background: var(--card);
   border: 1rpx solid var(--line);

@@ -526,8 +526,8 @@
 }
 
 .play-btn {
-  width: 86rpx;
-  height: 86rpx;
+  width: 88rpx;
+  height: 88rpx;
   border-radius: 50%;
   background: var(--green-800);
   display: flex;

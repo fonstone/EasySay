@@ -107,8 +107,10 @@
           <view class="card-label">文字稿</view>
           <view class="transcript-title">{{report.text ? '内容维度已计入' : '补上文字，拿到完整点评'}}</view>
         </view>
-        <view wx:if="{{report.text}}" class="material-toggle" bindtap="toggleTranscript">{{transcriptOpen ? '收起' : '展开'}}</view>
+        <view wx:if="{{report.text}}" class="material-toggle" bindtap="toggleTranscript" aria-label="展开或收起文字稿">{{transcriptOpen ? '收起' : '展开'}}</view>
       </view>
+
+      <view wx:if="{{report.text && transcriptLocked}}" class="transcript-hint">文字稿已与这次录音绑定且只能补写一次，内容维度不会再被改写。</view>
 
       <view wx:if="{{report.text}}" class="text-stats">
         <view class="text-stat"><text class="text-stat-num serif">{{report.text.chars}}</text><text class="text-stat-label">字</text></view>
@@ -124,14 +126,16 @@
           class="field-textarea"
           value="{{transcriptInput}}"
           maxlength="2000"
+          disabled="{{transcriptLocked}}"
           placeholder="把刚才说的话记下来。可以用输入法的语音输入，边说边转文字。"
           placeholder-class="placeholder"
           bindinput="onTranscriptInput"
         ></textarea>
-        <view class="transcript-hint">文字稿只保存在本机，用来计算内容、结构和用词。</view>
-        <view class="btn btn-soft btn-block mt-16 {{submitting ? 'btn-loading' : ''}}" bindtap="submitTranscript">
+        <view class="transcript-hint">文字稿只保存在本机，用来计算内容、结构和用词。每份点评只能补写一次，提交后不可再改。</view>
+        <view wx:if="{{!transcriptLocked}}" class="btn btn-soft btn-block mt-16 {{submitting ? 'btn-loading' : ''}}" bindtap="submitTranscript" aria-label="生成完整点评">
           {{submitting ? '正在重算…' : '生成完整点评'}}
         </view>
+        <view wx:else class="transcript-hint">这份点评的文字稿已锁定。</view>
       </view>
     </view>
   </view>
@@ -147,7 +151,7 @@
         <view class="audio-time">{{currentClock}} / {{durationClock}}</view>
       </view>
       <view class="audio-main">
-        <view class="play-btn {{playing ? 'playing' : ''}}" bindtap="togglePlay">
+        <view class="play-btn {{playing ? 'playing' : ''}}" bindtap="togglePlay" aria-label="{{playing ? '暂停回听' : '播放回听'}}">
           <view wx:if="{{!playing}}" class="play-tri"></view>
           <view wx:else class="pause-icon"><view></view><view></view></view>
         </view>
@@ -160,7 +164,7 @@
           ></view>
         </view>
       </view>
-      <view wx:if="{{audioError}}" class="audio-error">本地录音文件已失效，可以回看文字点评。</view>
+      <view wx:if="{{audioError || audioExpired}}" class="audio-error">本地录音文件已失效或被清理，可以回看文字点评。</view>
       <view wx:else class="audio-note">录音只保存在本机 · 可在「我的 - 录音档案」里删除</view>
     </view>
   </view>
@@ -190,7 +194,15 @@
   <view class="report-foot">
     <view class="foot-line"></view>
     <view class="foot-text">
-      分数由本地规则引擎计算，同一段录音永远得到同一个分。补充文字稿只增加内容维度，不改写声音事实。
+      分数由本地规则引擎计算，同一段录音永远得到同一个分。补写文字稿只增加内容维度，且每份报告仅限一次，不会改写声音事实。
     </view>
   </view>
+</view>
+
+<view wx:else class="page report skeleton-page" aria-label="正在加载点评">
+  <view class="sk sk-title"></view>
+  <view class="sk sk-card"></view>
+  <view class="sk sk-strip"></view>
+  <view class="sk sk-card sk-tall"></view>
+  <view class="sk sk-card"></view>
 </view>

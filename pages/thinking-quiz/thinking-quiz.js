@@ -1,4 +1,5 @@
 const store = require('../../utils/store')
+const util = require('../../utils/util')
 const thinking = require('../../data/thinking')
 
 Page({
@@ -71,7 +72,7 @@ Page({
 
   next() {
     if (!this.data.nextId) {
-      wx.navigateBack()
+      util.goBack()
       return
     }
     wx.redirectTo({
@@ -80,7 +81,7 @@ Page({
   },
 
   back() {
-    wx.navigateBack()
+    util.goBack()
   },
 
   onShareAppMessage() {

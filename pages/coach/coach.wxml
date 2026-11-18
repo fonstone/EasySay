@@ -1,7 +1,7 @@
 <view class="page coach" wx:if="{{ready}}">
   <view wx:if="{{!plan}}" class="setup fade-up">
     <view class="head">
-      <text class="eyebrow">AI COACH</text>
+      <text class="eyebrow">COACH PLAN</text>
       <view class="coach-title serif">让私教<br />替你排一周。</view>
       <view class="head-sub">选一个目标。七天里，每天只练一道最该练的题，不用再纠结练什么。</view>
     </view>

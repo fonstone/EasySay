@@ -6,6 +6,7 @@ const files = [
   'tests/scoring.test.js',
   'tests/data.test.js',
   'tests/store.test.js',
+  'tests/regression.test.js',
   'tests/pages.smoke.js',
   'tests/session.flow.js',
   'tests/check-wxml.js'

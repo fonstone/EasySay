@@ -26,6 +26,8 @@ Page({
     activeBars: 0,
     transcriptInput: '',
     transcriptOpen: false,
+    transcriptLocked: false,
+    audioExpired: false,
     quoteSaved: false,
     locked: false,
     isDelivery: false,
@@ -51,10 +53,12 @@ Page({
     const report = id ? store.getReport(id) : null
     if (!report) {
       wx.showToast({ title: '点评不存在或已归档', icon: 'none' })
-      setTimeout(() => wx.navigateBack(), 700)
+      setTimeout(() => util.goBack(), 700)
       return
     }
     const locked = !!report.locked && !store.isMember()
+    const transcriptLocked = !!report.transcriptLocked
+    const audioExpired = !!report.audioExpired || !report.audioPath
     const isDelivery = report.question.mode === 'read' ||
       report.question.scoreProfile === 'delivery' ||
       report.question.categoryId === 'pronounce' ||
@@ -90,6 +94,8 @@ Page({
       dims,
       facts,
       locked,
+      transcriptLocked,
+      audioExpired,
       isDelivery,
       dateText: util.cnDate(report.date),
       sourceLabel: SOURCE_LABEL[report.source] || '练习',
@@ -175,6 +181,10 @@ Page({
       this.goMember()
       return
     }
+    if (this.data.transcriptLocked) {
+      wx.showToast({ title: '文字稿只能补充一次，避免分数被反复改写', icon: 'none' })
+      return
+    }
     if (this.data.submitting) return
     const text = (this.data.transcriptInput || '').trim()
     if (text.replace(/\s/g, '').length < 12) {
@@ -182,8 +192,18 @@ Page({
       return
     }
 
-    this.setData({ submitting: true })
     const report = this.data.report
+    // 声音事实必须与当次录音一致，防止用别的录音数据重算这份报告
+    if (report.audioKey && scoring.audioFingerprint(report.audio) !== report.audioKey) {
+      wx.showModal({
+        title: '录音数据已变化',
+        content: '这段点评对应的声音数据不完整，无法补写文字稿。可以再练一次生成新的点评。',
+        showCancel: false
+      })
+      return
+    }
+
+    this.setData({ submitting: true })
     const question = {
       id: report.question.id,
       title: report.question.title,
@@ -204,10 +224,16 @@ Page({
       transcript: text,
       source: report.source,
       date: report.date,
-      locked: false
+      locked: false,
+      transcriptLocked: true,
+      transcriptSubmittedAt: Date.now()
     })
+    // 保留原始身份与本地资源引用，重算只影响文字维度
+    rebuilt.createdAt = report.createdAt || rebuilt.createdAt
     rebuilt.audioPath = report.audioPath
     rebuilt.hasAudioFile = report.hasAudioFile
+    rebuilt.audioExpired = report.audioExpired
+    rebuilt.audioKey = report.audioKey || rebuilt.audioKey
     rebuilt.quotaSource = report.quotaSource
     rebuilt.quoteAdded = report.quoteAdded
 
@@ -240,6 +266,7 @@ Page({
       dims,
       transcriptOpen: true,
       transcriptInput: text,
+      transcriptLocked: true,
       quoteSaved: store.isQuoteSaved(rebuilt.quote),
       textCoverage: rebuilt.text && rebuilt.text.coverage !== null
         ? rebuilt.text.matchedPoints.length + '/' + (rebuilt.question.keyPoints ? rebuilt.question.keyPoints.length : 1)
@@ -280,15 +307,16 @@ Page({
     const report = this.data.report
     if (!report) return
     const qid = report.question.id
+    // 用替换而非压栈：否则「报告 → 再练一次 → 报告」会让页面栈线性增长
     if (qid.indexOf('pr_') === 0) {
-      wx.navigateTo({ url: '/pages/session/session?source=pronounce&drill=' + qid.slice(3) })
+      util.replacePage('/pages/session/session?source=pronounce&drill=' + qid.slice(3))
     } else {
-      wx.navigateTo({ url: '/pages/session/session?source=practice&qid=' + qid })
+      util.replacePage('/pages/session/session?source=practice&qid=' + qid)
     }
   },
 
   goToday() {
-    wx.switchTab({ url: '/pages/today/today' })
+    util.switchTabSafe('/pages/today/today')
   },
 
   goMember() {

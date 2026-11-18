@@ -26,7 +26,7 @@
       <text class="hero-dot">·</text>
       <text>准备 {{prepSeconds}} 秒</text>
       <text class="hero-dot">·</text>
-      <text>{{done ? '今日已完成' : '剩 ' + chancesLeft + ' 次机会'}}</text>
+      <text>{{done ? '今日已完成' : '本题可重录 ' + chancesLeft + ' 次'}}</text>
     </view>
 
     <view class="hero-divider"></view>
@@ -46,12 +46,12 @@
     </view>
   </view>
 
-  <view class="quota-strip" wx:if="{{quota && !quota.member && quota.freeLeft <= 1}}" bindtap="goMember">
+  <view class="quota-strip {{quota.freeLeft === 0 ? 'quota-out' : ''}}" wx:if="{{quota && !quota.member}}" bindtap="goMember">
     <view class="quota-dot"></view>
     <view class="grow">
-      <text wx:if="{{quota.freeLeft > 0}}">今日免费点评还剩 1 次</text>
-      <text wx:else>今日免费点评已用完</text>
-      <text class="quota-sub"> · 体验会员可无限点评</text>
+      <text wx:if="{{quota.freeLeft > 0}}">{{quota.summary}}</text>
+      <text wx:else>今日完整点评已用完，明天再来或解锁会员</text>
+      <text class="quota-sub"> · 会员不限次</text>
     </view>
     <view class="quota-arrow">→</view>
   </view>

@@ -69,7 +69,7 @@ Page({
 
     if (!question) {
       wx.showToast({ title: '题目不存在', icon: 'none' })
-      setTimeout(() => wx.navigateBack(), 600)
+      setTimeout(() => util.goBack(), 600)
       return
     }
 
@@ -85,7 +85,7 @@ Page({
         title: '今日机会已用完',
         content: '今天这道题的机会用完了。去练习区选一道别的题继续，或者明天再来。',
         showCancel: false,
-        success: () => wx.navigateBack()
+        success: () => util.goBack()
       })
       return
     }
@@ -145,6 +145,8 @@ Page({
   onUnload() {
     this.clearTimers()
     wx.setKeepScreenOn({ keepScreenOn: false })
+    // 页面被销毁但没有生成点评时，归还今日机会（故障 / 切后台 / 系统回收）
+    if (!this.reportSaved) this.refundAttemptIfUnused()
     if (this.demoCtx) {
       try { this.demoCtx.destroy() } catch (e) { /* ignore */ }
       this.demoCtx = null
@@ -273,8 +275,17 @@ Page({
     this.pauseDemo()
 
     this.ensurePermission(() => {
-      if (this.data.isToday && !this.consumeTodayChance()) return
+      // 只读预检：麦克风尚未启动，绝不在这里扣次数
+      if (this.data.isToday) {
+        const check = store.canUseTodayAttempt()
+        if (!check.ok) {
+          this.showNoChance()
+          return
+        }
+        this.setData({ chancesLeft: check.left < 0 ? 0 : check.left })
+      }
 
+      this.cancelled = false
       this.stopHandled = false
       this.recordStartedAt = 0
       this.setData({
@@ -305,25 +316,39 @@ Page({
     })
   },
 
+  /** 麦克风 onStart 之后才真正扣次数：启动失败、权限异常都不会白扣 */
   consumeTodayChance() {
-    const state = store.getTodayState()
-    if (state.done) return true
+    if (this.chanceConsumed || store.getTodayState().done) return true
     const attempt = store.useTodayAttempt()
     if (!attempt.ok) {
-      wx.showModal({
-        title: '今日机会已用完',
-        content: '这道题今天不能再录了。去练习区选一道别的题继续，或者明天再来。',
-        confirmText: '去练习',
-        showCancel: false,
-        success: () => {
-          this.leaving = true
-          wx.switchTab({ url: '/pages/practice/practice' })
-        }
-      })
+      this.showNoChance()
       return false
     }
+    this.chanceConsumed = true
     this.setData({ chancesLeft: attempt.left })
     return true
+  },
+
+  /** 没有生成点评就离开时归还次数，并同步刷新页面上的剩余次数 */
+  refundAttemptIfUnused() {
+    if (!this.chanceConsumed || this.reportSaved) return
+    this.chanceConsumed = false
+    store.refundTodayAttempt()
+    const left = store.canUseTodayAttempt().left
+    this.setData({ chancesLeft: left < 0 ? 0 : left })
+  },
+
+  showNoChance() {
+    wx.showModal({
+      title: '今日机会已用完',
+      content: '这道题今天不能再录了。去练习区选一道别的题继续，或者明天再来。',
+      confirmText: '去练习',
+      showCancel: false,
+      success: () => {
+        this.leaving = true
+        util.switchTabSafe('/pages/practice/practice')
+      }
+    })
   },
 
   ensurePermission(callback) {
@@ -371,7 +396,17 @@ Page({
           }
         })
       },
-      fail: () => callback()
+      // 探测失败不能当作「已授权」直接放行，否则 recorder.start 必然失败
+      fail: () => {
+        wx.authorize({
+          scope: 'scope.record',
+          success: () => callback(),
+          fail: () => {
+            wx.showToast({ title: '暂时无法确认麦克风权限，请稍后重试', icon: 'none' })
+            deny()
+          }
+        })
+      }
     })
   },
 
@@ -391,9 +426,17 @@ Page({
   },
 
   handleRecordStart() {
+    if (this.cancelled) return
     if (this.startTimeout) {
       clearTimeout(this.startTimeout)
       this.startTimeout = null
+    }
+    // 到这里麦克风才真的启动成功，此刻扣次数才有意义
+    if (this.data.isToday && !this.consumeTodayChance()) {
+      this.stopHandled = true
+      try { recorder.stop() } catch (e) { /* ignore */ }
+      this.resetToIntro()
+      return
     }
     this.recordStartedAt = Date.now()
     this.setData({ recordActive: true, phase: 'recording' })
@@ -499,7 +542,7 @@ Page({
   },
 
   handleStop(res) {
-    if (this.stopHandled) return
+    if (this.stopHandled || this.cancelled) return
     this.stopHandled = true
     this.stopping = false
     if (this.stopTimeout) {
@@ -534,6 +577,7 @@ Page({
   },
 
   failAnalysis(message) {
+    this.refundAttemptIfUnused()
     this.clearTimers()
     wx.setKeepScreenOn({ keepScreenOn: false })
     this.stopHandled = true
@@ -561,6 +605,7 @@ Page({
     fs.readFile({
       filePath,
       success: res => {
+        if (this.cancelled) return
         let audio = null
         try {
           audio = scoring.analyzePcm(res.data, 16000)
@@ -594,6 +639,9 @@ Page({
       console.warn('[session] save wav failed', e)
     }
 
+    // await 写文件期间用户可能已取消，这里再确认一次
+    if (this.cancelled) return
+
     const quota = this.isDeliveryQuestion(question)
       ? { ok: true, source: 'delivery' }
       : store.consumeReview()
@@ -610,6 +658,8 @@ Page({
     report.audioPath = wavPath || tempFilePath
     report.hasAudioFile = !!wavPath
     store.saveReport(report)
+    // 报告已落库，这次机会才算真正用掉
+    this.reportSaved = true
 
     store.recordSession(report, this.data.source)
     store.markQuestionDone(question.id, report.overall)
@@ -707,10 +757,28 @@ Page({
   },
 
   goBack() {
-    if (this.data.phase === 'recording' || this.data.phase === 'analyzing') {
+    if (this.data.phase === 'analyzing') {
+      wx.showModal({
+        title: '正在生成点评',
+        content: '现在离开会放弃这一次练习，今日机会不会消耗。确定退出吗？',
+        confirmText: '退出',
+        cancelText: '再等等',
+        success: res => {
+          if (!res.confirm) return
+          this.cancelled = true
+          this.stopHandled = true
+          this.clearTimers()
+          this.refundAttemptIfUnused()
+          this.resetToIntro()
+          wx.showToast({ title: '已取消，可以重新开始', icon: 'none' })
+        }
+      })
+      return
+    }
+    if (this.data.phase === 'recording') {
       wx.showModal({
         title: '正在录音',
-        content: '现在离开会放弃这次录音。确定要退出吗？',
+        content: '现在离开会放弃这次录音，今日机会不会消耗。确定要退出吗？',
         confirmText: '退出',
         cancelText: '继续练',
         success: res => {
@@ -718,8 +786,9 @@ Page({
             this.leaving = true
             this.stopHandled = true
             this.clearTimers()
+            this.refundAttemptIfUnused()
             try { recorder.stop() } catch (e) { /* ignore */ }
-            wx.navigateBack()
+            util.goBack()
           }
         }
       })
@@ -729,6 +798,6 @@ Page({
       this.cancelPrepare()
       return
     }
-    wx.navigateBack()
+    util.goBack()
   }
 })

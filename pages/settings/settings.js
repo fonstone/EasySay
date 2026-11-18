@@ -36,6 +36,11 @@ Page({
     } catch (e) {
       storageText = '—'
     }
+    // 写入失败不再静默：直接告诉用户先备份、再清理空间
+    const health = store.getStorageHealth()
+    if (health.lastWriteError) {
+      storageText += ' · 检测到写入失败，建议先导出备份'
+    }
     this.setData({
       ready: true,
       nickname: profile.nickname || '练习者',
@@ -108,6 +113,56 @@ Page({
       haptic: this.data.haptic
     })
     wx.showToast({ title: '设置已保存', icon: 'success' })
+  },
+
+  /** 纯本地小程序没有云端，导出是唯一的数据保全手段 */
+  exportBackup() {
+    let json = ''
+    try {
+      json = JSON.stringify(store.exportData())
+    } catch (e) {
+      wx.showToast({ title: '生成备份失败', icon: 'none' })
+      return
+    }
+    wx.setClipboardData({
+      data: json,
+      success: () => {
+        wx.showModal({
+          title: '备份已复制',
+          content: '请立刻粘贴到备忘录或发给自己保存。约 ' + Math.max(1, Math.round(json.length / 1024)) + ' KB，包含资料、练习记录与点评；录音文件不导出。',
+          showCancel: false,
+          confirmText: '知道了'
+        })
+      },
+      fail: () => wx.showToast({ title: '复制失败，请稍后重试', icon: 'none' })
+    })
+  },
+
+  importBackup() {
+    wx.showModal({
+      title: '从剪贴板恢复？',
+      content: '会用剪贴板里的备份覆盖同名数据，当前记录可能被替换。建议先导出一次现有数据。',
+      confirmText: '开始恢复',
+      success: res => {
+        if (!res.confirm) return
+        wx.getClipboardData({
+          success: r => {
+            try {
+              const result = store.importData(r.data)
+              this.onShow()
+              wx.showToast({ title: '已恢复 ' + result.restored + ' 项数据', icon: 'none' })
+            } catch (e) {
+              wx.showModal({
+                title: '恢复失败',
+                content: '剪贴板里不是有效的清述备份。' + (e && e.message ? e.message : ''),
+                showCancel: false
+              })
+            }
+          },
+          fail: () => wx.showToast({ title: '读取剪贴板失败', icon: 'none' })
+        })
+      }
+    })
   },
 
   clearPractice() {

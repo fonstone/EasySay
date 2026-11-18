@@ -1,4 +1,5 @@
 const store = require('../../utils/store')
+const util = require('../../utils/util')
 const courses = require('../../data/courses')
 const questionData = require('../../data/questions')
 
@@ -56,7 +57,7 @@ Page({
 
   openNext() {
     if (!this.data.nextLesson) {
-      wx.navigateBack()
+      util.goBack()
       return
     }
     wx.redirectTo({ url: '/pages/lesson/lesson?id=' + this.data.nextLesson.id })

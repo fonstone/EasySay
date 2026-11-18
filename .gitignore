@@ -4,3 +4,7 @@ project.private.config.json
 .DS_Store
 Thumbs.db
 *.log
+
+# 本地评审/设计预览只保留在仓库，不参与小程序上传包
+.workbuddy/
+.codegraph/

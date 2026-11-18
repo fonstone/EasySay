@@ -52,7 +52,7 @@
     <view class="plan-mark serif">师</view>
     <view class="grow">
       <view class="plan-title">还没有私教计划</view>
-      <view class="plan-desc">选一个目标，让 AI 私教排一周</view>
+      <view class="plan-desc">选一个目标，按规则排好 7 天练习</view>
     </view>
     <view class="plan-arrow">→</view>
   </view>

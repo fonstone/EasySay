@@ -9,17 +9,17 @@ Component({
         activeIcon: '/assets/tab/home-active.png'
       },
       {
+        pagePath: 'pages/discover/discover',
+        text: '发现',
+        icon: '/assets/tab/discover.png',
+        activeIcon: '/assets/tab/discover-active.png'
+      },
+      {
         pagePath: 'pages/practice/practice',
         text: '练习',
         icon: '/assets/tab/practice.png',
         activeIcon: '/assets/tab/practice-active.png',
         center: true
-      },
-      {
-        pagePath: 'pages/discover/discover',
-        text: '发现',
-        icon: '/assets/tab/discover.png',
-        activeIcon: '/assets/tab/discover-active.png'
       },
       {
         pagePath: 'pages/course/course',

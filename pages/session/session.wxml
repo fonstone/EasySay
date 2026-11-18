@@ -2,9 +2,9 @@
   <!-- ================= 题目介绍 ================= -->
   <view wx:if="{{phase === 'intro'}}" class="intro fade-up">
     <view class="phase-bar">
-      <view class="back-btn" bindtap="goBack">←</view>
+      <view class="back-btn tap-target" bindtap="goBack" hover-class="tap-hover" aria-role="button" aria-label="返回">←</view>
       <view class="phase-source">{{sourceLabel}}<text wx:if="{{levelName}}"> · {{levelName}}</text></view>
-      <view wx:if="{{isToday}}" class="phase-quota">{{chancesLeft < 0 ? '已打卡' : '剩 ' + chancesLeft + ' 次'}}</view>
+      <view wx:if="{{isToday}}" class="phase-quota">{{chancesLeft < 0 ? '已打卡' : '可重录 ' + chancesLeft + ' 次'}}</view>
       <view wx:else class="phase-quota phase-quota-ghost">练习</view>
     </view>
 
@@ -206,4 +206,11 @@
 
     <view class="analyzing-note">通常只需要几秒。你会拿到分数、原话证据和一个下次能改的动作。</view>
   </view>
+</view>
+
+<view wx:else class="page skeleton-page" aria-label="正在加载练习">
+  <view class="sk sk-title"></view>
+  <view class="sk sk-card sk-tall"></view>
+  <view class="sk sk-strip"></view>
+  <view class="sk sk-card"></view>
 </view>

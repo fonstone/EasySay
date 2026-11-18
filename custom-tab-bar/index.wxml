@@ -6,6 +6,11 @@
       class="tab-item {{selected === index ? 'active' : ''}} {{item.center ? 'center' : ''}}"
       data-index="{{index}}"
       data-path="{{item.pagePath}}"
+      hover-class="tap-hover"
+      hover-stay-time="80"
+      aria-role="tab"
+      aria-label="{{item.text}}"
+      aria-selected="{{selected === index}}"
       bindtap="switchTab"
     >
       <view wx:if="{{item.center}}" class="center-btn {{selected === index ? 'center-btn-active' : ''}}">

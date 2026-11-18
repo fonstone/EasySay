@@ -9,8 +9,9 @@ page {
   --card: #ffffff;
   --ink: #16211d;
   --ink-2: #34433d;
-  --muted: #74827c;
-  --muted-2: #9aa6a1;
+  /* 弱文字对比度统一提到 4.5:1 以上（#f4f7f5 背景），原先 #9aa6a1 只有约 2.5:1 */
+  --muted: #5c6b63;
+  --muted-2: #7b8982;
   --line: #e4ebe7;
   --line-strong: #d5dfda;
   --green-900: #0e2e26;
@@ -29,6 +30,9 @@ page {
   --shadow-soft: 0 8rpx 28rpx rgba(14, 46, 38, 0.05);
   --radius: 28rpx;
   --radius-lg: 40rpx;
+  /* 全局最小点按区，图标按钮统一引用 */
+  --tap-min: 88rpx;
+  --focus: #b68a4e;
 
   background: var(--bg);
   color: var(--ink);
@@ -88,8 +92,8 @@ image {
 
 .eyebrow {
   display: block;
-  font-size: 20rpx;
-  letter-spacing: 5rpx;
+  font-size: 22rpx;
+  letter-spacing: 4rpx;
   text-transform: uppercase;
   color: var(--muted-2);
   font-weight: 600;
@@ -702,4 +706,87 @@ image {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
+}
+
+/* ==========================================================
+   全局体验基线
+   骨架屏、点按反馈、最小点按区、减少动效统一在这里实现，
+   各页面只引用类名，避免每个页面各写一套。
+   ========================================================== */
+
+.skeleton-page {
+  padding-top: 96rpx;
+}
+
+.sk {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-deep);
+  border-radius: var(--radius);
+  margin-bottom: 28rpx;
+}
+
+.sk::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.72), transparent);
+  animation: sk-shimmer 1.4s infinite;
+}
+
+.sk-title {
+  width: 46%;
+  height: 44rpx;
+  border-radius: 12rpx;
+}
+
+.sk-card {
+  height: 220rpx;
+}
+
+.sk-strip {
+  height: 108rpx;
+}
+
+.sk-tall {
+  height: 380rpx;
+}
+
+@keyframes sk-shimmer {
+  from { left: -100%; }
+  to { left: 140%; }
+}
+
+/* 所有可点元素统一挂 hover-class="tap-hover" / "row-hover" */
+.tap-hover,
+.row-hover {
+  opacity: 0.74;
+  transform: scale(0.995);
+}
+
+/* 图标按钮不得小于 44px，否则拇指很难点中 */
+.tap-target {
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 额度耗尽时提前用颜色提示，而不是等用户点了才发现 */
+.quota-out {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+/* 系统开启「减少动态效果」时关闭装饰动画 */
+@media (prefers-reduced-motion: reduce) {
+  .fade-up,
+  .sk::after {
+    animation: none !important;
+    transform: none !important;
+  }
 }

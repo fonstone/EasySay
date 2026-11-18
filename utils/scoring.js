@@ -852,6 +852,13 @@ function buildReport(input) {
       confidence: audio.confidence
     },
     transcript: transcript,
+    // 文字稿只能补一次；audioKey 把文字稿与当次录音绑定
+    // 直接带文字稿生成的报告同样视为已锁定，避免绕过页面校验反复重算
+    transcriptLocked: typeof input.transcriptLocked === 'boolean'
+      ? input.transcriptLocked
+      : !!transcript,
+    transcriptSubmittedAt: input.transcriptSubmittedAt || (transcript ? Date.now() : 0),
+    audioKey: audioFingerprint(audio),
     text: text.present ? {
       chars: text.chars,
       pace: text.pace,
@@ -872,8 +879,24 @@ function buildReport(input) {
     coach,
     quote,
     locked: !!input.locked,
-    version: '1.0'
+    version: '2.0'
   }
+}
+
+/**
+ * 录音指纹：把声音事实压成短签名。
+ * 补写文字稿时必须校验签名一致，避免用另一段录音的数据重算本次报告。
+ */
+function audioFingerprint(audio) {
+  const a = audio || {}
+  return [
+    Number(a.duration || 0).toFixed(2),
+    Number(a.speechRatio || 0).toFixed(3),
+    Number(a.pauseCount || 0),
+    Number(a.longestPause || 0).toFixed(2),
+    Number(a.volumeMean || 0).toFixed(4),
+    Number(a.energyCV || 0).toFixed(4)
+  ].join('|')
 }
 
 function aggregateDimensions(reports) {
@@ -902,6 +925,7 @@ module.exports = {
   pcmToWav,
   analyzeText,
   buildReport,
+  audioFingerprint,
   aggregateDimensions,
   extractQuote,
   scoreFluency,

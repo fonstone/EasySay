@@ -22,11 +22,23 @@ const KEYS = {
   COACH: 'cs_coach',
   THINKING: 'cs_thinking',
   PRONOUNCE: 'cs_pronounce',
-  TODAY: 'cs_today'
+  TODAY: 'cs_today',
+  SCHEMA: 'cs_schema'
 }
+
+/**
+ * 报告、练习记录、录音档案必须共用同一批 id。
+ * 早期版本 HISTORY 保留 150 条 / REPORTS 保留 40 份，第 41 次练习开始
+ * 就会出现点不开的悬空记录；这里统一为同一上限。
+ */
+const MAX_REPORTS = 40
+/** 音频文件体积大，单独设更小的上限，淘汰时同步清理报告里的引用 */
+const MAX_AUDIO_FILES = 15
+const SCHEMA_VERSION = 2
 
 const MEMORY = {}
 const hasWx = typeof wx !== 'undefined' && typeof wx.getStorageSync === 'function'
+const health = { lastWriteError: null, writeFailures: 0 }
 
 function read(key, fallback) {
   let value
@@ -52,6 +64,12 @@ function write(key, value) {
       return true
     } catch (e) {
       console.warn('[store] setStorageSync failed', key, e)
+      health.lastWriteError = {
+        key,
+        at: Date.now(),
+        message: String((e && (e.errMsg || e.message)) || e || 'unknown')
+      }
+      health.writeFailures++
       return false
     }
   }
@@ -153,9 +171,159 @@ function init() {
   if (!read(KEYS.ARCHIVE, null)) write(KEYS.ARCHIVE, [])
   if (!read(KEYS.QUOTES, null)) write(KEYS.QUOTES, [])
   if (!read(KEYS.REVIEWS, null)) write(KEYS.REVIEWS, [])
-  if (!read(KEYS.THINKING, null)) write(KEYS.THINKING, [])
+  if (KEYS.THINKING && !read(KEYS.THINKING, null)) write(KEYS.THINKING, [])
+  migrate()
+  repairData()
   getMembership()
   getTodayState()
+}
+
+/**
+ * 数据结构升级。所有迁移必须幂等，且能处理旧版本缺失字段。
+ * v1 -> v2：补报告锁稿字段、补历史/档案的 reportId 外键、补音频有效性标记。
+ */
+function migrate() {
+  const current = Number(read(KEYS.SCHEMA, 0)) || 0
+  if (current >= SCHEMA_VERSION) return { from: current, to: current, migrated: false }
+
+  const reports = read(KEYS.REPORTS, {})
+  if (reports && typeof reports === 'object') {
+    Object.keys(reports).forEach(id => {
+      const r = reports[id]
+      if (!r || typeof r !== 'object') {
+        delete reports[id]
+        return
+      }
+      if (!r.createdAt) r.createdAt = Date.now()
+      if (!r.version) r.version = '1.0'
+      // 老报告已有文字稿的，视为已锁定，避免升级后继续被反复重算
+      if (typeof r.transcriptLocked !== 'boolean') {
+        r.transcriptLocked = !!(r.transcript && r.text)
+      }
+      if (typeof r.transcriptSubmittedAt !== 'number') {
+        r.transcriptSubmittedAt = r.transcriptLocked ? r.createdAt : 0
+      }
+      if (typeof r.hasAudioFile !== 'boolean') r.hasAudioFile = !!r.audioPath
+    })
+    write(KEYS.REPORTS, reports)
+  }
+
+  const history = read(KEYS.HISTORY, [])
+  if (Array.isArray(history)) {
+    history.forEach(h => { if (h && !h.reportId) h.reportId = h.id || '' })
+    write(KEYS.HISTORY, history)
+  }
+  const archive = read(KEYS.ARCHIVE, [])
+  if (Array.isArray(archive)) {
+    archive.forEach(a => { if (a && !a.reportId) a.reportId = a.id || '' })
+    write(KEYS.ARCHIVE, archive)
+  }
+
+  write(KEYS.SCHEMA, SCHEMA_VERSION)
+  return { from: current, to: SCHEMA_VERSION, migrated: true }
+}
+
+/**
+ * 启动时做一次一致性修复：三处存储以 REPORTS 的 id 集合为准。
+ * 解决「历史点开是空白报告」「报告回听指向已被删除的 wav」两类历史遗留问题。
+ */
+function repairData() {
+  const reports = read(KEYS.REPORTS, {})
+  const all = reports && typeof reports === 'object' ? reports : {}
+  const entries = Object.keys(all)
+    .map(id => ({ id, at: (all[id] && all[id].createdAt) || 0 }))
+    .sort((a, b) => b.at - a.at)
+  const removed = entries.slice(MAX_REPORTS).map(e => e.id)
+  removed.forEach(id => { delete all[id] })
+
+  const keepSet = {}
+  Object.keys(all).forEach(id => { keepSet[id] = true })
+
+  // 悬空历史：报告已不在的记录不再展示
+  const rawHistory = read(KEYS.HISTORY, [])
+  const seenHistory = {}
+  const history = (Array.isArray(rawHistory) ? rawHistory : []).filter(h => {
+    const id = (h && (h.reportId || h.id)) || ''
+    if (!id || !keepSet[id] || seenHistory[id]) return false
+    seenHistory[id] = true
+    return true
+  }).slice(0, MAX_REPORTS)
+  if (!Array.isArray(rawHistory) || history.length !== rawHistory.length) {
+    write(KEYS.HISTORY, history)
+  }
+
+  // 录音档案：去重、删除孤儿、淘汰超出上限的文件
+  const rawArchive = read(KEYS.ARCHIVE, [])
+  const seenAudio = {}
+  const archive = (Array.isArray(rawArchive) ? rawArchive : []).filter(a => {
+    const id = (a && a.reportId) || ''
+    if (!id || !keepSet[id] || seenAudio[id]) return false
+    seenAudio[id] = true
+    return true
+  })
+  const kept = new Set(archive.slice(0, MAX_AUDIO_FILES))
+  archive.forEach(a => { if (!kept.has(a)) removeAudioFile(a.path) })
+  if (!Array.isArray(rawArchive) || kept.size !== rawArchive.length) {
+    write(KEYS.ARCHIVE, Array.from(kept))
+  }
+
+  // 报告的 audioPath 必须仍指向一份存在的档案，否则回听必然报错
+  const livePaths = {}
+  Array.from(kept).forEach(a => { livePaths[a.reportId] = a.path || '' })
+  let changed = removed.length > 0
+  Object.keys(all).forEach(id => {
+    const r = all[id]
+    if (!r || !r.audioPath) return
+    if (livePaths[id] !== r.audioPath) {
+      r.audioPath = ''
+      r.hasAudioFile = false
+      r.audioExpired = true
+      changed = true
+    }
+  })
+  if (changed) write(KEYS.REPORTS, all)
+
+  if (removed.length) pruneOrphans(removed)
+  return {
+    reports: Object.keys(all).length,
+    history: history.length,
+    audio: kept.size,
+    removedReports: removed.length
+  }
+}
+
+/** 报告被淘汰时，同步清掉历史记录与录音文件，避免悬空引用 */
+function pruneOrphans(removedIds) {
+  const gone = {}
+  ;(removedIds || []).forEach(id => { gone[id] = true })
+  const history = read(KEYS.HISTORY, [])
+  if (Array.isArray(history)) {
+    write(KEYS.HISTORY, history.filter(x => !gone[(x && (x.reportId || x.id)) || '']))
+  }
+  const archive = read(KEYS.ARCHIVE, [])
+  if (Array.isArray(archive)) {
+    const dropped = archive.filter(x => gone[(x && x.reportId) || ''])
+    dropped.forEach(x => removeAudioFile(x.path))
+    if (dropped.length) {
+      write(KEYS.ARCHIVE, archive.filter(x => !gone[(x && x.reportId) || '']))
+    }
+  }
+}
+
+/** 存储写入失败不再静默：页面可据此提示用户先清理空间 */
+function getStorageHealth() {
+  let info = null
+  if (hasWx) {
+    try { info = wx.getStorageInfoSync() } catch (e) { /* ignore */ }
+  }
+  return {
+    lastWriteError: health.lastWriteError,
+    writeFailures: health.writeFailures,
+    currentSize: info ? info.currentSize : null,
+    limitSize: info ? info.limitSize : null,
+    schema: Number(read(KEYS.SCHEMA, 0)) || 0,
+    schemaVersion: SCHEMA_VERSION
+  }
 }
 
 /* ==========================================================
@@ -376,6 +544,15 @@ function saveTodayState(patch) {
   return state
 }
 
+/** 只读预检，用于「开始录音」前判断，不消耗次数 */
+function canUseTodayAttempt() {
+  const state = getTodayState()
+  if (state.done) return { ok: true, left: -1, chances: getSettings().chances, free: true }
+  const chances = getSettings().chances
+  const left = Math.max(0, chances - (state.attempts || 0))
+  return { ok: left > 0, left, chances, free: false }
+}
+
 function useTodayAttempt() {
   const state = getTodayState()
   const chances = getSettings().chances
@@ -388,6 +565,15 @@ function useTodayAttempt() {
   state.attempts += 1
   write(KEYS.TODAY, state)
   return { ok: true, left: Math.max(0, chances - state.attempts), chances }
+}
+
+/** 录音失败 / 中途退出时归还次数：没有生成点评就不该扣用户的机会 */
+function refundTodayAttempt() {
+  const state = getTodayState()
+  if (state.done) return state
+  state.attempts = Math.max(0, (state.attempts || 0) - 1)
+  write(KEYS.TODAY, state)
+  return state
 }
 
 function markTodayDone(reportId) {
@@ -403,13 +589,22 @@ function markTodayDone(reportId) {
    ========================================================== */
 
 function addHistory(record) {
-  const list = read(KEYS.HISTORY, [])
-  list.unshift(record)
-  write(KEYS.HISTORY, list.slice(0, 150))
+  const raw = read(KEYS.HISTORY, [])
+  const list = Array.isArray(raw) ? raw : []
+  const id = (record && (record.reportId || record.id)) || ''
+  // 同一份报告只保留一条记录，避免重复练习记录把列表挤掉
+  const next = [record].concat(list.filter(x => ((x && (x.reportId || x.id)) || '') !== id))
+  write(KEYS.HISTORY, next.slice(0, MAX_REPORTS))
 }
 
 function getHistory(limit) {
-  const list = read(KEYS.HISTORY, [])
+  const reports = read(KEYS.REPORTS, {})
+  const raw = read(KEYS.HISTORY, [])
+  // 防御性过滤：即使迁移尚未运行，也不把悬空记录交给页面渲染
+  const list = (Array.isArray(raw) ? raw : []).filter(x => {
+    const id = (x && (x.reportId || x.id)) || ''
+    return !!id && !!(reports && reports[id])
+  })
   return limit ? list.slice(0, limit) : list
 }
 
@@ -418,10 +613,12 @@ function saveReport(report) {
   const reports = read(KEYS.REPORTS, {})
   reports[report.id] = report
   const entries = Object.keys(reports)
-    .map(id => ({ id, at: reports[id].createdAt || 0 }))
+    .map(id => ({ id, at: (reports[id] && reports[id].createdAt) || 0 }))
     .sort((a, b) => b.at - a.at)
-  entries.slice(40).forEach(e => { delete reports[e.id] })
+  const removed = entries.slice(MAX_REPORTS).map(e => e.id)
+  removed.forEach(id => { delete reports[id] })
   write(KEYS.REPORTS, reports)
+  if (removed.length) pruneOrphans(removed)
   return report
 }
 
@@ -433,12 +630,20 @@ function getReport(id) {
 function updateReport(report) {
   if (!report || !report.id) return null
   const previous = getReport(report.id)
+  // 文字稿提交后锁死：阻止反复改写内容维度把总分刷高。
+  // 这是数据层的最后一道防线，页面层的拦截可被绕过。
+  if (previous && previous.transcriptLocked &&
+      (report.transcript || '') !== (previous.transcript || '')) {
+    console.warn('[store] transcript already locked', report.id)
+    return previous
+  }
   saveReport(report)
-  if (previous && typeof previous.overall === 'number' && previous.overall !== report.overall) {
+  if (previous && typeof previous.overall === 'number' &&
+      typeof report.overall === 'number' && previous.overall !== report.overall) {
     const stats = getStats()
     const day = ensureDay(stats, report.date || today())
     if (day.scoreCount > 0) {
-      day.scoreSum += (report.overall || 0) - previous.overall
+      day.scoreSum = Math.max(0, (day.scoreSum || 0) + report.overall - previous.overall)
       saveStats(stats)
     }
   }
@@ -603,20 +808,40 @@ function getArchive() {
   return read(KEYS.ARCHIVE, [])
 }
 
+/** 音频被删除后，报告里的 audioPath 必须一并失效，否则回听会指向不存在的文件 */
+function clearAudioReference(reportId, path) {
+  if (!reportId) return
+  const reports = read(KEYS.REPORTS, {})
+  const r = reports[reportId]
+  if (!r || !r.audioPath) return
+  if (path && r.audioPath !== path) return
+  r.audioPath = ''
+  r.hasAudioFile = false
+  r.audioExpired = true
+  write(KEYS.REPORTS, reports)
+}
+
 function addArchive(item) {
-  const list = read(KEYS.ARCHIVE, [])
-  list.unshift(item)
-  const removed = list.splice(15)
-  removed.forEach(r => removeAudioFile(r.path))
-  write(KEYS.ARCHIVE, list)
-  return list
+  const raw = read(KEYS.ARCHIVE, [])
+  const list = Array.isArray(raw) ? raw : []
+  const next = [item].concat(list.filter(x => !x || x.reportId !== item.reportId))
+  const removed = next.splice(MAX_AUDIO_FILES)
+  removed.forEach(r => {
+    removeAudioFile(r.path)
+    clearAudioReference(r.reportId, r.path)
+  })
+  write(KEYS.ARCHIVE, next)
+  return next
 }
 
 function removeArchive(id) {
   const list = read(KEYS.ARCHIVE, [])
-  const target = list.find(x => x.id === id)
-  if (target) removeAudioFile(target.path)
-  const next = list.filter(x => x.id !== id)
+  const target = (list || []).find(x => x.id === id)
+  if (target) {
+    removeAudioFile(target.path)
+    clearAudioReference(target.reportId, target.path)
+  }
+  const next = (list || []).filter(x => x.id !== id)
   write(KEYS.ARCHIVE, next)
   return next
 }
@@ -714,6 +939,35 @@ function getReviewQuota() {
     freeTotal: FREE_DAILY_REVIEWS,
     points: m.points || 0,
     canReview: member || freeLeft > 0 || (m.points || 0) > 0
+  }
+}
+
+/**
+ * 统一额度视图。
+ * 「今日挑战机会」是同一道题的重录次数，「点评次数」是当天能生成几份完整点评，
+ * 过去两套数字在首屏并列出现容易互相打架，这里给页面一个一致的口径。
+ */
+function getDailyQuota() {
+  const review = getReviewQuota()
+  const attempt = canUseTodayAttempt()
+  return {
+    member: review.member,
+    type: review.type,
+    points: review.points,
+    reviewTotal: review.freeTotal,
+    reviewLeft: review.freeLeft,
+    // 兼容既有页面里 quota.freeLeft 的写法
+    freeLeft: review.freeLeft,
+    freeTotal: review.freeTotal,
+    reviewLabel: review.member ? '会员 · 点评不限次' : ('今日可生成 ' + review.freeLeft + ' 份完整点评'),
+    chances: attempt.chances,
+    chancesLeft: attempt.left,
+    chancesLabel: attempt.free ? '今日已完成，可自由加练' : ('这道题还可重录 ' + attempt.left + ' 次'),
+    canPractice: attempt.ok && review.canReview,
+    canReview: review.canReview,
+    summary: review.member
+      ? '会员 · 不限次练习'
+      : ('今日点评 ' + review.freeLeft + '/' + review.freeTotal + ' · 本题可重录 ' + (attempt.left < 0 ? '不限' : attempt.left) + ' 次')
   }
 }
 
@@ -893,6 +1147,43 @@ function getOverview() {
 }
 
 /* ==========================================================
+   备份 / 恢复
+   纯本地小程序没有云端，卸载或清缓存就会丢全部练习记录。
+   导出为 JSON 文本（录音文件本身不导出，仅导出记录与报告）。
+   ========================================================== */
+
+function exportData() {
+  const data = {
+    app: 'clearsay',
+    version: SCHEMA_VERSION,
+    exportedAt: Date.now(),
+    keys: {}
+  }
+  Object.keys(KEYS).forEach(name => {
+    data.keys[KEYS[name]] = read(KEYS[name], null)
+  })
+  return data
+}
+
+function importData(input) {
+  let data = input
+  if (typeof input === 'string') data = JSON.parse(input)
+  if (!data || data.app !== 'clearsay' || !data.keys || typeof data.keys !== 'object') {
+    throw new Error('不是有效的清述备份')
+  }
+  let restored = 0
+  Object.keys(KEYS).forEach(name => {
+    const key = KEYS[name]
+    if (Object.prototype.hasOwnProperty.call(data.keys, key) && data.keys[key] !== null) {
+      if (write(key, data.keys[key])) restored++
+    }
+  })
+  write(KEYS.SCHEMA, SCHEMA_VERSION)
+  init()
+  return { ok: true, restored, exportedAt: data.exportedAt || 0 }
+}
+
+/* ==========================================================
    清空
    ========================================================== */
 
@@ -919,7 +1210,15 @@ module.exports = {
   KEYS,
   PLANS,
   FREE_DAILY_REVIEWS,
+  MAX_REPORTS,
+  MAX_AUDIO_FILES,
+  SCHEMA_VERSION,
   init,
+  migrate,
+  repairData,
+  getStorageHealth,
+  exportData,
+  importData,
   getProfile,
   saveProfile,
   isOnboarded,
@@ -936,7 +1235,9 @@ module.exports = {
   getTodayTasks,
   getTodayState,
   saveTodayState,
+  canUseTodayAttempt,
   useTodayAttempt,
+  refundTodayAttempt,
   markTodayDone,
   addHistory,
   getHistory,
@@ -961,6 +1262,7 @@ module.exports = {
   saveMembership,
   isMember,
   getReviewQuota,
+  getDailyQuota,
   consumeReview,
   addPoints,
   activateTrial,

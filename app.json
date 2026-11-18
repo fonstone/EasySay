@@ -44,12 +44,12 @@
         "text": "今日"
       },
       {
-        "pagePath": "pages/practice/practice",
-        "text": "练习"
-      },
-      {
         "pagePath": "pages/discover/discover",
         "text": "发现"
+      },
+      {
+        "pagePath": "pages/practice/practice",
+        "text": "练习"
       },
       {
         "pagePath": "pages/course/course",

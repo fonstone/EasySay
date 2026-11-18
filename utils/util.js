@@ -160,8 +160,52 @@ function indexLabel(i) {
   return i < 10 ? '0' + i : String(i)
 }
 
+/* ==========================================================
+   导航兜底（全局）
+   从分享卡片 / 扫码 / 订阅消息冷启动时页面栈只有 1 层，
+   wx.navigateBack() 会静默失败，用户看到「点了没反应」甚至白屏。
+   ========================================================== */
+
+const HOME_TAB = '/pages/today/today'
+
+function stackDepth() {
+  try {
+    if (typeof getCurrentPages !== 'function') return 0
+    const pages = getCurrentPages()
+    return pages && pages.length ? pages.length : 0
+  } catch (e) {
+    return 0
+  }
+}
+
+function goBack(fallbackUrl) {
+  if (typeof wx === 'undefined') return
+  const tab = fallbackUrl || HOME_TAB
+  if (stackDepth() > 1) {
+    wx.navigateBack({ fail: () => wx.switchTab({ url: tab }) })
+  } else {
+    wx.switchTab({ url: tab, fail: () => wx.reLaunch({ url: tab }) })
+  }
+}
+
+/** 替换当前页：避免「报告 → 再练一次 → 报告」让页面栈无限增长 */
+function replacePage(url) {
+  if (typeof wx === 'undefined') return
+  wx.redirectTo({ url, fail: () => wx.navigateTo({ url }) })
+}
+
+function switchTabSafe(url) {
+  if (typeof wx === 'undefined') return
+  wx.switchTab({ url, fail: () => wx.reLaunch({ url }) })
+}
+
 module.exports = {
   WEEK_CN,
+  HOME_TAB,
+  stackDepth,
+  goBack,
+  replacePage,
+  switchTabSafe,
   pad2,
   dateKey,
   parseDateKey,

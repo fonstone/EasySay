@@ -59,7 +59,7 @@ Page({
     const question = questionData.getQuestion(state.questionId) || questionData.getDailyQuestion(util.dateKey())
     const streak = store.getStreak()
     const tasks = store.getTodayTasks()
-    const quota = store.getReviewQuota()
+    const quota = store.getDailyQuota()
     const week = store.getWeekStrip(7)
 
     let weekSessions = 0
@@ -85,10 +85,10 @@ Page({
       primaryLabel = '查看今日点评'
       primarySub = doneReport ? '这次 ' + doneReport.overall + ' 分 · ' + doneReport.grade.label : '今天已经开口了'
     } else if (chancesLeft <= 0) {
-      primaryLabel = '今日机会已用完'
+      primaryLabel = '本题重录次数已用完'
       primarySub = '去练习区继续，或明天再来'
     } else {
-      primarySub = '还剩 ' + chancesLeft + ' 次机会 · 准备 ' + settings.prepSeconds + ' 秒'
+      primarySub = quota.chancesLabel + ' · 准备 ' + settings.prepSeconds + ' 秒'
     }
 
     this.setData({

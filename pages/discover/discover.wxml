@@ -38,7 +38,7 @@
     </view>
     <view class="grid-card grid-card-green" bindtap="goCoach">
       <view class="grid-glyph serif">师</view>
-      <view class="grid-name">AI 私教</view>
+      <view class="grid-name">私教计划</view>
       <view class="grid-desc">按目标排一周，只练该练的</view>
       <view class="grid-stat">{{planStat}}</view>
     </view>
