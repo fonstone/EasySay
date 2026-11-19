@@ -24,6 +24,20 @@
     <view wx:for="{{scoreGuide.lines}}" wx:key="*this" class="score-guide-line">{{item}}</view>
   </view>
 
+  <view class="source-card fade-up">
+    <view class="between">
+      <view class="card-label">这份点评的数据来源</view>
+      <view class="source-engine">{{engineLabel}}</view>
+    </view>
+    <view wx:for="{{sourceRows}}" wx:key="label" class="source-row">
+      <text class="source-key">{{item.label}}</text>
+      <text class="source-value">{{item.value}}</text>
+    </view>
+    <view wx:if="{{alignmentNote}}" class="source-warn">{{alignmentNote}} · 内容 / 结构 / 用词三维仅供参考</view>
+    <view wx:elif="{{transcriptSourceLabel !== '未提供文字稿'}}" class="source-ok">自述稿已与本次录音指纹绑定，声音维度不会被文字改写。</view>
+    <view wx:else class="source-hint">还没补自述稿：内容、结构、用词三维不会出现，避免把「没听懂内容」算成低分。</view>
+  </view>
+
   <view class="fact-strip fade-up">
     <view wx:for="{{facts}}" wx:key="label" class="fact">
       <view class="fact-value serif">{{item.value}}<text class="fact-unit">{{item.unit}}</text></view>
@@ -68,7 +82,7 @@
           <view class="coach-dot"></view>
           <text>教练点评</text>
         </view>
-        <view class="coach-engine">本地确定性分析</view>
+        <view class="coach-engine">{{engineLabel}}</view>
       </view>
 
       <view class="coach-reason">{{report.coach.reasoning}}</view>
@@ -101,19 +115,34 @@
         <view class="next-focus-text">{{report.coach.nextFocus}}</view>
         <view class="next-focus-arrow">→</view>
       </view>
+      <view wx:if="{{report.coach.nextFocusRule}}" class="next-focus-rule">{{report.coach.nextFocusRule}}</view>
+
+      <view wx:if="{{coachRules.length}}" class="rules-toggle" bindtap="toggleRules" hover-class="tap-hover" aria-role="button" aria-label="查看规则触发依据">
+        {{rulesOpen ? '收起规则依据' : '为什么这么说 · 展开 ' + coachRules.length + ' 条触发规则'}}
+      </view>
+      <view wx:if="{{rulesOpen}}" class="rules-list">
+        <view wx:for="{{coachRules}}" wx:key="id" class="rule-item {{item.shown ? 'shown' : ''}}">
+          <view class="rule-head">
+            <text class="rule-kind {{item.kind}}">{{item.kind === 'strength' ? '做得好' : '下次改'}}</text>
+            <text class="rule-id">{{item.id}}</text>
+          </view>
+          <view class="rule-text">{{item.text}}</view>
+          <view class="rule-meta">触发条件 {{item.rule}} · 实测 {{item.metric}} · 阈值 {{item.threshold}}</view>
+        </view>
+      </view>
     </view>
   </view>
 
   <view wx:else class="section fade-up">
     <view class="locked-card">
       <view class="locked-mark serif">锁</view>
-      <view class="locked-title">这一次的教练点评已锁定</view>
-      <view class="locked-desc">今日免费点评已用完。体验会员可解锁完整点评、无限练习和全部课程。</view>
+      <view class="locked-title">这一次的完整点评已锁定</view>
+      <view class="locked-desc">今日 5 份免费点评已用完。这是纯本地演示规则，不产生真实支付；明天会自动恢复次数。</view>
       <view class="locked-benefits">
-        <view class="locked-benefit">· 7 天体验会员，送 3 次额外点评</view>
-        <view class="locked-benefit">· 年卡 38 元，平均每天一毛钱</view>
+        <view class="locked-benefit">· 声音维度与分数仍可查看，不锁数据</view>
+        <view class="locked-benefit">· 本版本的会员开关只影响本机额度，不扣款</view>
       </view>
-      <view class="btn btn-primary btn-block mt-24" bindtap="goMember" hover-class="tap-hover" aria-role="button">解锁完整点评</view>
+      <view class="btn btn-primary btn-block mt-24" bindtap="goMember" hover-class="tap-hover" aria-role="button">查看演示设置</view>
     </view>
   </view>
 
@@ -127,7 +156,9 @@
         <view wx:if="{{report.text}}" class="material-toggle" bindtap="toggleTranscript" aria-label="展开或收起文字稿" hover-class="tap-hover" aria-role="button">{{transcriptOpen ? '收起' : '展开'}}</view>
       </view>
 
-      <view wx:if="{{report.text && transcriptLocked}}" class="transcript-hint">文字稿已与这次录音绑定且只能补写一次，内容维度不会再被改写。</view>
+      <view class="transcript-source">{{transcriptSourceLabel}}</view>
+      <view wx:if="{{preparedPoints.length}}" class="prepared-line">开口前标记了 {{preparedPoints.length}} 个要点：<text wx:for="{{preparedPoints}}" wx:key="*this">{{item}}<text wx:if="{{index < preparedPoints.length - 1}}">、</text></text></view>
+      <view wx:if="{{report.text && transcriptLocked}}" class="transcript-hint">自述稿已与这次录音绑定且只能补写一次，内容维度不会再被改写。</view>
 
       <view wx:if="{{report.text}}" class="text-stats">
         <view class="text-stat"><text class="text-stat-num serif">{{report.text.chars}}</text><text class="text-stat-label">字</text></view>
@@ -144,11 +175,11 @@
           value="{{transcriptInput}}"
           maxlength="2000"
           disabled="{{transcriptLocked}}"
-          placeholder="把刚才说的话记下来。可以用输入法的语音输入，边说边转文字。"
+          placeholder="把刚才说的话凭记忆记下来。可以用输入法的语音输入，但这是你手动写下的自述稿，不是本程序识别的结果。"
           placeholder-class="placeholder"
           bindinput="onTranscriptInput"
         ></textarea>
-        <view class="transcript-hint">文字稿只保存在本机，用来计算内容、结构和用词。每份点评只能补写一次，提交后不可再改。</view>
+        <view class="transcript-hint">本版本没有语音识别：这三项只分析你写下的文字，程序并没有「听懂」录音内容。自述稿只保存在本机，每份点评只能补写一次，提交后不可再改。</view>
         <view wx:if="{{!transcriptLocked}}" class="btn btn-soft btn-block mt-16 {{submitting ? 'btn-loading' : ''}}" bindtap="submitTranscript" aria-label="生成完整点评" hover-class="tap-hover" aria-role="button">
           {{submitting ? '正在重算…' : '生成完整点评'}}
         </view>
@@ -220,7 +251,7 @@
   <view class="report-foot">
     <view class="foot-line"></view>
     <view class="foot-text">
-      分数由本地规则引擎计算，同一段录音永远得到同一个分。补写文字稿只增加内容维度，且每份报告仅限一次，不会改写声音事实。
+      声音维度来自真实录音的 PCM 能量分析；内容、结构、用词来自你手动补写的自述稿，本版本没有语音识别，也没有 AI 生成点评。所有判断由本地可解释规则完成，同一段录音永远得到同一个分，不联网、不上传。
     </view>
   </view>
 </view>

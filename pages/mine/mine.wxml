@@ -17,8 +17,8 @@
   <view class="member-banner fade-up" bindtap="goMember" hover-class="tap-hover" aria-role="button">
     <view class="member-mark serif">{{membership.type === 'free' ? '试' : '会'}}</view>
     <view class="grow">
-      <view class="member-title">{{membership.type === 'free' ? '7 天体验会员，送 3 次点评' : memberLabel + ' 生效中'}}</view>
-      <view class="member-desc">{{membership.type === 'free' ? '完整点评不限次，先试七天' : memberExpire + ' · 无限点评'}}</view>
+      <view class="member-title">{{membership.type === 'free' ? '本地演示 · 每日 5 份完整点评' : memberLabel + ' · 本机体验中'}}</view>
+      <view class="member-desc">{{membership.type === 'free' ? '可开启不限次体验，不扣款' : memberExpire + ' · 本地开关，非真实支付'}}</view>
     </view>
     <view class="member-arrow">→</view>
   </view>

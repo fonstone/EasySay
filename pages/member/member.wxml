@@ -1,4 +1,9 @@
 <view class="page member" wx:if="{{ready}}">
+  <view class="demo-banner fade-up">
+    <view class="demo-badge">本地演示</view>
+    <view class="demo-banner-text">{{demoNotice}}</view>
+  </view>
+
   <view class="member-hero fade-up">
     <view class="between">
       <view class="hero-eyebrow">CLEARSAY MEMBER</view>
@@ -30,15 +35,15 @@
   <view wx:if="{{!isMember && !trialUsed}}" class="trial-card fade-up" bindtap="startTrial" hover-class="tap-hover" aria-role="button">
     <view class="trial-mark serif">试</view>
     <view class="grow">
-      <view class="trial-title">先领 7 天体验会员</view>
-      <view class="trial-desc">无限点评 + 3 次额外点数，不花钱</view>
+      <view class="trial-title">开启 7 天本地体验</view>
+      <view class="trial-desc">本机不限次 + 3 次点数 · 不扣款</view>
     </view>
     <view class="trial-btn">领取</view>
   </view>
 
   <view class="section fade-up">
     <view class="section-head">
-      <view class="section-title">会员包含什么</view>
+      <view class="section-title">本版本的开关影响什么</view>
     </view>
     <view class="benefit-list">
       <view wx:for="{{benefits}}" wx:key="title" class="benefit-item">
@@ -53,8 +58,8 @@
 
   <view class="section fade-up">
     <view class="section-head">
-      <view class="section-title">选择方案</view>
-      <view class="section-more">演示版 · 不发起真实支付</view>
+      <view class="section-title">正式版价格示意</view>
+      <view class="section-more">仅展示 · 本版本不收款</view>
     </view>
     <view class="plan-row">
       <view
@@ -74,25 +79,25 @@
     <view class="selected-summary">
       <view class="summary-left">
         <view class="summary-name">{{selectedPlan.name}}</view>
-        <view class="summary-desc">{{isMember ? '续费后有效期顺延' : '一次开通，立即生效'}}</view>
+        <view class="summary-desc">本地演示开关 · 不产生订单</view>
       </view>
       <view class="summary-price serif">¥{{selectedPlan.price}}</view>
     </view>
 
     <view class="btn btn-primary btn-block mt-24" bindtap="buyPlan" hover-class="tap-hover" aria-role="button">
-      {{membership.type === 'lifetime' ? '你已是永久会员' : '模拟开通 ' + selectedPlan.name}}
+      {{membership.type === 'lifetime' ? '本地永久体验已开启' : '开启本地体验 · ' + selectedPlan.name}}
     </view>
-    <view class="pay-note">本地演示：不会调用微信支付，不会产生任何扣款。</view>
+    <view class="pay-note">纯本地演示：不调用微信支付、不生成订单、不扣款；价格只是正式版示意。</view>
   </view>
 
   <view class="section fade-up">
     <view class="section-head">
-      <view class="section-title">为什么不是免费</view>
+      <view class="section-title">关于这个演示版本</view>
     </view>
     <view class="why-card">
-      <view class="why-p">免费层保留每天 5 次点评和全部思维题，足够验证「你愿不愿意每天开口」。</view>
-      <view class="why-p">会员费用覆盖持续的内容制作、题库更新和后续开发。把价格定低，是为了让更多人先练起来。</view>
-      <view class="why-p">不承诺提分，不承诺 30 天蜕变。我们只提供一个具体的反馈入口。</view>
+      <view class="why-p">本版本所有记录只存在本机，没有服务端订单、没有支付凭证、没有退款流程。</view>
+      <view class="why-p">上面的价格是正式版的产品示意；正式上线需要接入微信支付 / 虚拟支付，并由服务端校验订单后再发放权益。</view>
+      <view class="why-p">免费层每天 5 份完整点评、课程与题库全部开放，足够验证「你愿不愿意每天开口」。不承诺提分，也不承诺 30 天蜕变。</view>
     </view>
   </view>
 

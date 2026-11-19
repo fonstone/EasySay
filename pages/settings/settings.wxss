@@ -73,6 +73,9 @@
   font-size: 25rpx;
   color: var(--muted);
   height: 52rpx;
+  border: none;
+  outline: none;
+  background: transparent;
 }
 
 .chip-grid {
@@ -158,4 +161,47 @@
   font-size: var(--fs-min);
   color: var(--muted-2);
   letter-spacing: 1rpx;
+}
+
+.backup-status {
+  margin: 20rpx 0;
+  padding: 20rpx 24rpx;
+  border: 1rpx solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+}
+
+.backup-status.urgent {
+  border-color: #e6cda6;
+  background: #fbf3e5;
+}
+
+.backup-status-title {
+  font-size: 23rpx;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.backup-status-line {
+  margin-top: 6rpx;
+  font-size: var(--fs-min);
+  color: var(--ink-2);
+}
+
+.backup-status-hint {
+  margin-top: 6rpx;
+  font-size: var(--fs-min);
+  color: var(--green-700);
+  line-height: 1.6;
+}
+
+.backup-status.urgent .backup-status-hint {
+  color: #8a5a35;
+}
+
+.backup-status-note {
+  margin-top: 10rpx;
+  font-size: var(--fs-min);
+  line-height: 1.65;
+  color: var(--muted);
 }

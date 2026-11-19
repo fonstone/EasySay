@@ -1,12 +1,15 @@
 /**
- * 清述确定性评分引擎
+ * 清述确定性评分引擎（v3.0）
  * -------------------------------------------------
  * 设计原则：
  * 1. 分数由可复现的代码计算，同一段音频/文字永远得到同一个分；
  * 2. 语音质量（流畅/节奏/声音/完成度）来自真实 PCM 分析；
- * 3. 内容/结构/用词来自可选文字稿的确定性文本分析；
- * 4. 教练点评只引用检测到的事实，不编造用户没说过的话；
- * 5. 无文字稿时不假装能给内容打分，只用 4 个可测维度。
+ * 3. 内容/结构/用词来自「自述稿」的确定性文本分析，不是语音识别结果；
+ * 4. 每个维度带 source / basis，报告页可核对它到底来自录音还是文字；
+ * 5. 教练点评是可解释规则引擎：每条建议都带触发条件、实测值与阈值；
+ * 6. 无文字稿时不假装能给内容打分，只用 4 个可测维度；
+ * 7. analyzePcm / buildReport 支持传入 analysis.createRun()，把真实计算
+ *    阶段与耗时暴露给 UI，替代过去的定时器假进度。
  *
  * 本文件不依赖 wx API，可直接在 Node 中测试。
  */
@@ -94,15 +97,52 @@ const VERDICT = {
    一、PCM 声学分析
    ========================================================== */
 
+/** 维度数据来源：voice = 只来自录音；text = 只来自自述稿；mixed = 两者都用 */
+const DIM_SOURCE = {
+  content: 'text',
+  structure: 'text',
+  vocabulary: 'text',
+  fluency: 'voice',
+  energy: 'voice',
+  completion: 'voice',
+  rhythm: 'mixed'
+}
+
+const SOURCE_LABEL = {
+  voice: '来自录音',
+  text: '来自自述稿',
+  mixed: '录音 + 自述稿'
+}
+
+const TRANSCRIPT_SOURCE_LABEL = {
+  none: '未提供文字稿',
+  manual: '自述稿（手动输入，非语音识别）',
+  asr: '语音识别结果'
+}
+
+const DIM_BASIS = {
+  content: '自述稿中题目要点的关键词覆盖率',
+  structure: '自述稿中开场句、分点词、转折词与收尾句',
+  vocabulary: '自述稿的词汇丰富度与口头禅密度',
+  fluency: 'PCM 能量的有效发声比例与长停顿次数',
+  rhythm: 'PCM 停顿分布 + 自述稿推算的语速',
+  energy: 'PCM 音量均值与能量变异系数',
+  completion: 'PCM 时长与题目目标时长之比'
+}
+
 /**
  * @param {ArrayBuffer} buffer 16kHz / 16bit / 单声道 PCM
  * @param {number} sampleRate
+ * @param {object} [run] analysis.createRun() 返回的真实阶段记录器
  */
-function analyzePcm(buffer, sampleRate) {
+function analyzePcm(buffer, sampleRate, run) {
   const sr = sampleRate || 16000
   const byteLength = buffer && buffer.byteLength ? buffer.byteLength : 0
   const totalSamples = Math.floor(byteLength / 2)
   const duration = totalSamples / sr
+  const begin = id => { if (run && run.begin) run.begin(id) }
+  const end = id => { if (run && run.end) run.end(id) }
+  const skip = id => { if (run && run.skip) run.skip(id) }
 
   const empty = {
     duration: util.round(duration, 2),
@@ -122,12 +162,18 @@ function analyzePcm(buffer, sampleRate) {
     confidence: 0
   }
 
-  if (!buffer || duration < 0.2) return empty
+  begin('energy')
+  const finishEmpty = (skipVad) => {
+    end('energy')
+    if (skipVad) { skip('vad'); skip('pause') }
+    return empty
+  }
+  if (!buffer || duration < 0.2) return finishEmpty(true)
 
   const view = new DataView(buffer)
   const frameSamples = Math.max(80, Math.round(sr * 0.02))
   const frameCount = Math.floor(totalSamples / frameSamples)
-  if (frameCount < 2) return empty
+  if (frameCount < 2) return finishEmpty(true)
 
   const rms = new Float32Array(frameCount)
   let peak = 0
@@ -143,6 +189,9 @@ function analyzePcm(buffer, sampleRate) {
     }
     rms[f] = Math.sqrt(sum / frameSamples)
   }
+
+  end('energy')
+  begin('vad')
 
   // 噪声底：取 15 分位
   const sorted = Array.from(rms).sort((a, b) => a - b)
@@ -193,7 +242,13 @@ function analyzePcm(buffer, sampleRate) {
   }
 
   const speechSegments = merged.filter(s => s.end - s.start >= 0.1)
-  if (!speechSegments.length) return empty
+  if (!speechSegments.length) {
+    end('vad')
+    skip('pause')
+    return empty
+  }
+  end('vad')
+  begin('pause')
 
   let speechSeconds = 0
   const energyList = []
@@ -258,6 +313,7 @@ function analyzePcm(buffer, sampleRate) {
     waveform.push(util.clamp(v / Math.max(0.03, peak * 0.8), 0.05, 1))
   }
 
+  end('pause')
   return {
     duration: util.round(duration, 2),
     hasVoice: speechSeconds >= 0.5,
@@ -352,10 +408,11 @@ function splitSentences(text) {
 
 /**
  * @param {string} transcript
- * @param {number} duration 秒
+ * @param {number} duration 秒（录音总时长）
  * @param {object} question
+ * @param {number} [speechSeconds] VAD 得到的有效发声秒数，用于跨模态一致性校验
  */
-function analyzeText(transcript, duration, question) {
+function analyzeText(transcript, duration, question, speechSeconds) {
   const raw = String(transcript || '').trim()
   const text = raw.replace(/\s+/g, '')
   const chars = countChinese(text) || text.length
@@ -379,6 +436,9 @@ function analyzeText(transcript, duration, question) {
     : pointScores.reduce((sum, p) => sum + p.score, 0) / pointScores.length
 
   const pace = duration > 0 ? chars / (duration / 60) : 0
+  // 真实语速：按「有效发声时长」而不是包含静音的总时长计算
+  const effective = Number(speechSeconds) > 0 ? Number(speechSeconds) : 0
+  const paceBySpeech = effective > 0 ? chars / (effective / 60) : 0
   const fillerPer100 = chars > 0 ? fillerCount / chars * 100 : 0
   const avgSentence = sentences.length ? chars / sentences.length : chars
 
@@ -408,7 +468,41 @@ function analyzeText(transcript, duration, question) {
     missedPoints,
     coverage: coverage === null ? null : util.round(coverage, 3),
     pace: util.round(pace, 0),
+    paceBySpeech: util.round(paceBySpeech, 0),
+    speechSeconds: util.round(effective, 2),
     deliveryOnly: !!deliveryOnly
+  }
+}
+
+/**
+ * 音频 × 自述稿一致性校验。
+ * 没有 ASR 时文字稿由人补写，它可能漏记、也可能写出没说出口的内容。
+ * 用 VAD 得到的真实发声秒数与常见中文语速（约 230 字/分）做一次量级核对，
+ * 不吻合时明确告诉用户「内容维度仅供参考」，而不是假装两者天然一致。
+ */
+function checkAlignment(audio, text) {
+  if (!text || !text.present) return null
+  const speech = Math.max(0.5, Number(audio.speechSeconds || text.speechSeconds) || 0)
+  const expected = speech * (230 / 60)
+  const ratio = expected > 0 ? text.chars / expected : 0
+  let status = 'consistent'
+  let label = '自述稿长度与有效发声时长基本吻合'
+  if (ratio < 0.45) {
+    status = 'short'
+    label = '自述稿明显短于实际发声量，可能漏记了说出口的内容'
+  } else if (ratio > 2.2) {
+    status = 'long'
+    label = '自述稿明显长于实际发声量，可能补写了没说出口的内容'
+  }
+  return {
+    status,
+    label,
+    trusted: status === 'consistent',
+    speechSeconds: util.round(speech, 2),
+    chars: text.chars,
+    expectedChars: Math.round(expected),
+    ratio: util.round(ratio, 2),
+    paceBySpeech: text.paceBySpeech || 0
   }
 }
 
@@ -596,7 +690,16 @@ function buildDimensions(audio, text, question) {
     detail: util.round(audio.duration, 0) + ' 秒 / 目标 ' + ((question && question.minSeconds) || 45) + ' 秒'
   })
 
-  return dims
+  return dims.map(d => {
+    const sourceKey = d.key === 'rhythm'
+      ? (hasText ? 'mixed' : 'voice')
+      : (DIM_SOURCE[d.key] || 'voice')
+    return Object.assign(d, {
+      source: sourceKey,
+      sourceLabel: SOURCE_LABEL[sourceKey] || SOURCE_LABEL.voice,
+      basis: DIM_BASIS[d.key] || '本地规则引擎根据当次练习计算'
+    })
+  })
 }
 
 function overallScore(dims, text) {
@@ -648,26 +751,36 @@ function stripEnd(text) {
   return String(text || '').replace(/[。！？!?；;，,、\s]+$/, '')
 }
 
+/**
+ * 可解释规则点评引擎。
+ * 每条「做得好 / 下次改」都记录 ruleId、触发条件、实测值、阈值，
+ * 报告页可展开「为什么这么说」，用户能自己核对，而不是面对一段像 AI 生成的模板。
+ */
 function buildCoach(audio, text, dims, question) {
-  const rand = util.mulberry32(util.hashString(
-    (question && question.id || 'q') + '|' + Math.round(audio.duration) + '|' + (text ? text.chars : 0)
-  ))
-  const pick = arr => arr[Math.floor(rand() * arr.length)]
-
   const hasText = !!(text && text.present && !text.deliveryOnly)
   const dimMap = {}
   dims.forEach(d => { dimMap[d.key] = d.score })
   const lowest = dims
     .filter(d => d.weight > 0)
     .slice()
-    .sort((a, b) => a.score - b.score)[0] || { key: 'completion' }
+    .sort((a, b) => a.score - b.score)[0] || { key: 'completion', score: 0 }
 
   const strengths = []
   const weaknesses = []
+  const rules = []
   const evidence = []
 
+  const add = (kind, id, condition, metric, threshold, sentence) => {
+    rules.push({ id, kind, rule: condition, metric, threshold, text: sentence })
+    ;(kind === 'strength' ? strengths : weaknesses).push(sentence)
+  }
+  const S = (id, condition, metric, threshold, sentence) =>
+    add('strength', id, condition, metric, threshold, sentence)
+  const W = (id, condition, metric, threshold, sentence) =>
+    add('weakness', id, condition, metric, threshold, sentence)
+
   const quote = hasText ? extractQuote(text.raw) : ''
-  if (quote) evidence.push({ type: 'text', label: '你的原话', text: quote })
+  if (quote) evidence.push({ type: 'text', label: '自述稿原话', text: quote })
   if (audio.longestPause >= 1.5) {
     const p = audio.pauses[0]
     evidence.push({
@@ -691,64 +804,84 @@ function buildCoach(audio, text, dims, question) {
     })
   }
 
+  const minSeconds = (question && question.minSeconds) || 45
   if (dimMap.completion >= 86) {
-    strengths.push('完整说满了 ' + Math.round(audio.duration) + ' 秒，没有中途放弃。')
+    S('completion_high', '完成度 ≥ 86', '完成度 ' + dimMap.completion + ' 分', '≥ 86',
+      '完整说满了 ' + Math.round(audio.duration) + ' 秒，没有中途放弃。')
   }
   if (dimMap.fluency >= 85) {
-    strengths.push('有效发声占 ' + util.pct(audio.speechRatio) + '%，整体是连贯的。')
+    S('fluency_high', '流畅 ≥ 85', '有效发声 ' + util.pct(audio.speechRatio) + '%', '≥ 85 分',
+      '有效发声占 ' + util.pct(audio.speechRatio) + '%，整体是连贯的。')
   }
   if (dimMap.structure >= 78 && hasText && text.hasOpening) {
-    strengths.push('开头用了「' + text.openingWord + '」，听众一下就抓到方向。')
+    S('opening_signal', '结构 ≥ 78 且检测到开场句', '「' + text.openingWord + '」', '需出现开场信号词',
+      '开头用了「' + text.openingWord + '」，听众一下就抓到方向。')
   }
   if (hasText && text.coverage !== null && text.coverage >= 0.7 && text.matchedPoints.length) {
-    strengths.push('「' + text.matchedPoints[0].label + '」讲到了，内容没有跑题。')
+    S('coverage_high', '要点覆盖率 ≥ 70%', '覆盖 ' + text.matchedPoints.length + '/' + text.pointScores.length, '≥ 0.7',
+      '「' + text.matchedPoints[0].label + '」讲到了，内容没有跑题。')
   }
   if (hasText && text.fillerPer100 <= 1 && text.chars > 40) {
-    strengths.push('全段几乎听不到口头禅，语言很干净。')
+    S('filler_low', '口头禅 ≤ 1 次/百字', text.fillerPer100 + ' 次/百字', '≤ 1',
+      '全段几乎听不到口头禅，语言很干净。')
   }
   if (hasText && text.pace >= 200 && text.pace <= 300) {
-    strengths.push('语速 ' + text.pace + ' 字/分钟，落在让人跟得上的区间。')
+    S('pace_ok', '语速落在 200–300 字/分', text.pace + ' 字/分', '200–300',
+      '语速 ' + text.pace + ' 字/分钟，落在让人跟得上的区间。')
   }
   if (dimMap.energy >= 85) {
-    strengths.push('重点句有明显音量起伏，不是平着念完。')
+    S('energy_high', '声音维度 ≥ 85', '起伏系数 ' + audio.energyCV, '≥ 85 分',
+      '重点句有明显音量起伏，不是平着念完。')
   }
   if (audio.longPauseCount === 0 && audio.hasVoice) {
-    strengths.push('没有超过 1.5 秒的长停顿，节奏没有断。')
+    S('no_long_pause', '无 ≥1.5s 长停顿', '长停顿 ' + audio.longPauseCount + ' 次', '= 0',
+      '没有超过 1.5 秒的长停顿，节奏没有断。')
   }
   if (!strengths.length) {
-    strengths.push('这次你确实开口了 ' + Math.round(audio.duration) + ' 秒，先完成，再完美。')
+    S('did_speak', '兜底：至少完成一次开口', Math.round(audio.duration) + ' 秒', '> 0 秒',
+      '这次你确实开口了 ' + Math.round(audio.duration) + ' 秒，先完成，再完美。')
   }
 
   if (!audio.hasVoice) {
-    weaknesses.push('几乎没有检测到有效人声，先确认麦克风距离和录音环境。')
+    W('no_voice', 'VAD 未检测到有效人声', '有效发声 ' + util.pct(audio.speechRatio) + '%', '≥ 0.5 秒发声',
+      '几乎没有检测到有效人声，先确认麦克风距离和录音环境。')
   }
   if (audio.longestPause >= 1.5) {
     const p = audio.pauses[0]
-    weaknesses.push('最长一次停顿 ' + p.seconds + ' 秒，发生在 ' + util.clock(p.start) + '，听众会以为你说完了。')
+    W('long_pause', '最长停顿 ≥ 1.5s', p.seconds + ' 秒 @ ' + util.clock(p.start), '≥ 1.5 秒',
+      '最长一次停顿 ' + p.seconds + ' 秒，发生在 ' + util.clock(p.start) + '，听众会以为你说完了。')
   }
   if (audio.hasVoice && audio.speechRatio < 0.7) {
-    weaknesses.push('有效发声只占 ' + util.pct(audio.speechRatio) + '%，停顿吃掉了 ' + Math.round(audio.pauseSeconds) + ' 秒。')
+    W('speech_ratio_low', '有效发声 < 70%', util.pct(audio.speechRatio) + '%', '≥ 70%',
+      '有效发声只占 ' + util.pct(audio.speechRatio) + '%，停顿吃掉了 ' + Math.round(audio.pauseSeconds) + ' 秒。')
   }
-  if (audio.hasVoice && audio.duration < ((question && question.minSeconds) || 45) * 0.78) {
-    weaknesses.push('只讲了 ' + Math.round(audio.duration) + ' 秒，离 ' + ((question && question.minSeconds) || 45) + ' 秒的目标还差一截，观点没展开。')
+  if (audio.hasVoice && audio.duration < minSeconds * 0.78) {
+    W('too_short', '时长 < 目标 × 0.78', Math.round(audio.duration) + ' 秒', '≥ ' + Math.round(minSeconds * 0.78) + ' 秒',
+      '只讲了 ' + Math.round(audio.duration) + ' 秒，离 ' + minSeconds + ' 秒的目标还差一截，观点没展开。')
   }
   if (hasText && text.fillerPer100 > 3) {
-    weaknesses.push('「' + text.fillerWords[0] + '」这类口头禅平均每 100 字 ' + text.fillerPer100 + ' 次，会稀释重点。')
+    W('filler_high', '口头禅 > 3 次/百字', text.fillerPer100 + ' 次/百字', '≤ 3',
+      '「' + text.fillerWords[0] + '」这类口头禅平均每 100 字 ' + text.fillerPer100 + ' 次，会稀释重点。')
   }
   if (hasText && !text.hasClosing) {
-    weaknesses.push('结尾没有收束句，最后一句停在半空。')
+    W('no_closing', '未检测到收尾句', '收尾信号 0 个', '≥ 1 个',
+      '结尾没有收束句，最后一句停在半空。')
   }
   if (hasText && text.coverage !== null && text.coverage < 0.5 && text.missedPoints.length) {
-    weaknesses.push('「' + text.missedPoints[0].label + '」这个要点没有讲到。')
+    W('coverage_low', '要点覆盖率 < 50%', '覆盖 ' + text.matchedPoints.length + '/' + text.pointScores.length, '≥ 0.5',
+      '「' + text.missedPoints[0].label + '」这个要点没有讲到。')
   }
   if (hasText && (text.pace < 165 || text.pace > 340)) {
-    weaknesses.push('语速 ' + text.pace + ' 字/分钟，' + (text.pace < 165 ? '偏慢，句子之间容易散' : '偏快，听众需要费力跟') + '。')
+    W('pace_off', '语速 < 165 或 > 340 字/分', text.pace + ' 字/分', '165–340',
+      '语速 ' + text.pace + ' 字/分钟，' + (text.pace < 165 ? '偏慢，句子之间容易散' : '偏快，听众需要费力跟') + '。')
   }
   if (dimMap.energy < 65 && audio.hasVoice) {
-    weaknesses.push('音量几乎是平的，重点句没有被抬起来。')
+    W('energy_flat', '声音维度 < 65', '起伏系数 ' + audio.energyCV, '≥ 65 分',
+      '音量几乎是平的，重点句没有被抬起来。')
   }
   if (!weaknesses.length) {
-    weaknesses.push('这遍没有明显硬伤，下一步是提高信息密度，而不是继续加长。')
+    W('no_hard_issue', '兜底：无规则被触发', '未命中任何扣分项', '0 项',
+      '这遍没有明显硬伤，下一步是提高信息密度，而不是继续加长。')
   }
 
   let nextFocus = NEXT_FOCUS[lowest.key] || NEXT_FOCUS.completion
@@ -763,24 +896,35 @@ function buildCoach(audio, text, dims, question) {
     reasoningParts.push('最长停顿 ' + audio.pauses[0].seconds + ' 秒出现在 ' + util.clock(audio.pauses[0].start))
   }
   if (quote) {
-    reasoningParts.push('你说「' + util.truncate(stripEnd(quote), 26) + '」')
+    reasoningParts.push('自述稿里写「' + util.truncate(stripEnd(quote), 26) + '」')
   }
   reasoningParts.push('综合看，' + verdict)
 
-  const shared = []
   const uniq = arr => arr.filter((v, i) => arr.indexOf(v) === i)
   const finalStrengths = uniq(strengths).slice(0, 2)
   const finalWeaknesses = uniq(weaknesses).slice(0, 2)
-  shared.push(pick(['先看事实：', '先把事实摆出来：']))
+  rules.forEach(r => {
+    r.shown = (r.kind === 'strength' ? finalStrengths : finalWeaknesses).indexOf(r.text) >= 0
+  })
 
   return {
-    reasoning: shared[0] + reasoningParts.join('；') + '。',
+    reasoning: '先看这次测到的事实：' + reasoningParts.join('；') + '。',
     strengths: finalStrengths,
     weaknesses: finalWeaknesses,
     nextFocus,
+    nextFocusRule: '取本次得分最低的维度「' + (DIM_META[lowest.key] || {}).name +
+      '」(' + lowest.score + ' 分) 作为下唯一动作',
     evidence,
     primaryIssue: lowest.key,
-    quote
+    quote,
+    rules,
+    engine: {
+      name: 'local-rules',
+      version: '3.0',
+      deterministic: true,
+      isAI: false,
+      label: '本地可解释规则引擎（非 AI 生成）'
+    }
   }
 }
 
@@ -805,19 +949,30 @@ function gradeOf(overall) {
  * @param {string} [input.id]
  * @param {string} [input.date]
  * @param {boolean} [input.locked]
+ * @param {string} [input.transcriptSource] manual | asr | none
+ * @param {object} [input.asrCapability] asr.getCapability() 的结果
+ * @param {Array}  [input.preparedPoints] 开口前标记的要点 label
+ * @param {object} [input.run] analysis.createRun() 真实阶段记录器
  */
 function buildReport(input) {
+  if (input.run && input.run.begin) input.run.begin('report')
   const question = input.question || {}
   const audio = input.audio || analyzePcm(new ArrayBuffer(0))
   const transcript = input.transcript || ''
-  const text = analyzeText(transcript, audio.duration, question)
+  const text = analyzeText(transcript, audio.duration, question, audio.speechSeconds)
   const dims = buildDimensions(audio, text, question)
   const overall = overallScore(dims, text)
   const grade = gradeOf(overall)
   const coach = buildCoach(audio, text, dims, question)
   const quote = text.present ? extractQuote(transcript) : ''
+  const transcriptSource = input.transcriptSource ||
+    (transcript ? 'manual' : 'none')
+  const asrCapability = input.asrCapability || {
+    available: false, mode: 'none', provider: 'none', label: '未接入语音识别'
+  }
+  const alignment = checkAlignment(audio, text)
 
-  return {
+  const report = {
     id: input.id || util.uid('rep'),
     createdAt: Date.now(),
     date: input.date || util.dateKey(),
@@ -862,6 +1017,7 @@ function buildReport(input) {
     text: text.present ? {
       chars: text.chars,
       pace: text.pace,
+      paceBySpeech: text.paceBySpeech,
       fillerCount: text.fillerCount,
       fillerPer100: text.fillerPer100,
       fillerWords: text.fillerWords,
@@ -879,8 +1035,31 @@ function buildReport(input) {
     coach,
     quote,
     locked: !!input.locked,
-    version: '2.0'
+    transcriptSource,
+    transcriptSourceLabel: TRANSCRIPT_SOURCE_LABEL[transcriptSource] || TRANSCRIPT_SOURCE_LABEL.none,
+    preparedPoints: Array.isArray(input.preparedPoints) ? input.preparedPoints : [],
+    provenance: {
+      audio: 'pcm-16000-mono',
+      audioFacts: ['时长', '有效发声比例', '停顿次数', '最长停顿', '音量能量变异'],
+      transcript: transcriptSource,
+      asr: {
+        available: !!asrCapability.available,
+        mode: asrCapability.mode || 'none',
+        provider: asrCapability.provider || 'none',
+        label: asrCapability.label || '未接入语音识别',
+        reason: asrCapability.reason || ''
+      },
+      engine: 'local-rules',
+      engineVersion: '3.0',
+      alignment,
+      note: text.present
+        ? '声音维度来自真实录音；内容 / 结构 / 用词来自你补写的自述稿，不是程序听懂了内容。'
+        : '本次只有 4 个来自真实录音的声音维度；内容相关维度需要补写自述稿才会出现。'
+    },
+    version: '3.0'
   }
+  if (input.run && input.run.end) input.run.end('report')
+  return report
 }
 
 /**
@@ -921,10 +1100,15 @@ function aggregateDimensions(reports) {
 
 module.exports = {
   DIM_META,
+  DIM_SOURCE,
+  SOURCE_LABEL,
+  TRANSCRIPT_SOURCE_LABEL,
   analyzePcm,
   pcmToWav,
   analyzeText,
+  checkAlignment,
   buildReport,
+  buildCoach,
   audioFingerprint,
   aggregateDimensions,
   extractQuote,

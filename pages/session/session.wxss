@@ -433,6 +433,68 @@
   font-weight: 600;
 }
 
+.prepare-check {
+  margin-top: 30rpx;
+  padding: 22rpx 24rpx;
+  border: 1rpx solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  text-align: left;
+}
+
+.prepare-check-title {
+  font-size: 23rpx;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.prepare-check-sub {
+  margin-top: 6rpx;
+  font-size: var(--fs-min);
+  color: var(--muted);
+}
+
+.prepare-check-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 18rpx;
+}
+
+.prepare-check-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 10rpx;
+  min-height: 56rpx;
+  padding: 8rpx 18rpx;
+  border: 1rpx solid var(--line);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-min);
+  color: var(--muted);
+}
+
+.prepare-check-item.checked {
+  border-color: var(--green-600);
+  background: var(--green-50);
+  color: var(--green-700);
+}
+
+.prepare-check-box {
+  width: 28rpx;
+  height: 28rpx;
+  line-height: 28rpx;
+  text-align: center;
+  border: 1rpx solid var(--line);
+  border-radius: 8rpx;
+  font-size: var(--fs-min);
+}
+
+.prepare-check-item.checked .prepare-check-box {
+  border-color: var(--green-600);
+  background: var(--green-600);
+  color: #ffffff;
+}
+
 .prepare-foot {
   padding: 30rpx 40rpx calc(30rpx + env(safe-area-inset-bottom));
 }
@@ -541,20 +603,25 @@
   margin-top: 24rpx;
 }
 
+/* 真实波形：高度来自 onFrameRecorded 的 RMS，不再用 CSS 动画伪装 */
 .wave-bar {
   width: 7rpx;
+  min-height: 6rpx;
   border-radius: var(--radius-pill);
-  background: linear-gradient(180deg, #b7e3d0, #5fa88d);
-  animation-name: wavePulse;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
+  background: rgba(183, 227, 208, 0.22);
   transform-origin: center;
-  opacity: 0.85;
+  transition: height 0.09s linear, background 0.2s linear;
+}
+.wave-bar.on {
+  background: linear-gradient(180deg, #b7e3d0, #5fa88d);
+  opacity: 0.95;
 }
 
-@keyframes wavePulse {
-  0%, 100% { transform: scaleY(0.42); opacity: 0.55; }
-  50% { transform: scaleY(1); opacity: 1; }
+.wave-note {
+  margin-top: 10rpx;
+  font-size: var(--fs-min);
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.5rpx;
 }
 
 .record-progress {
@@ -717,6 +784,34 @@
 .analyzing-bar {
   width: 420rpx;
   margin-top: 40rpx;
+}
+
+.analyzing-percent {
+  margin-top: 10rpx;
+  font-size: var(--fs-min);
+  color: var(--muted-2);
+  letter-spacing: 0.5rpx;
+}
+
+.stage-ms {
+  font-size: var(--fs-min);
+  color: var(--green-600);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.analyzing-cancel {
+  margin-top: 30rpx;
+  padding: 16rpx 40rpx;
+  min-height: 64rpx;
+  line-height: 32rpx;
+  font-size: var(--fs-min);
+  color: var(--muted);
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wave-bar { transition: none; }
 }
 
 .stage-list {

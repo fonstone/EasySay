@@ -3,6 +3,34 @@
   padding-bottom: calc(50rpx + env(safe-area-inset-bottom));
 }
 
+.demo-banner {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+  padding: 18rpx 22rpx;
+  border: 1rpx solid #e6cda6;
+  border-radius: var(--radius-lg);
+  background: #fbf3e5;
+}
+
+.demo-badge {
+  flex-shrink: 0;
+  padding: 6rpx 14rpx;
+  border-radius: var(--radius-pill);
+  background: #8a5a35;
+  color: #fff;
+  font-size: var(--fs-min);
+}
+
+.demo-banner-text {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-min);
+  line-height: 1.6;
+  color: #6d4a2c;
+}
+
 .member-hero {
   position: relative;
   overflow: hidden;

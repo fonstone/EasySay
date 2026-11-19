@@ -18,14 +18,16 @@ Page({
     isMember: false,
     trialUsed: false,
     quota: null,
+    entitlement: null,
+    demoNotice: '纯本地演示：不会发起微信支付，不产生订单，也不扣款。',
     plans: [],
     selected: 'year',
     selectedPlan: null,
     benefits: [
-      { title: '不限次完整点评', desc: '每天练几次都可以，声音、节奏、内容等维度完整呈现' },
-      { title: '全部课程与私教计划', desc: '三条学习线、七天训练计划、全部场景题库（演示版全部开放）' },
-      { title: '录音档案与金句墙', desc: '回听每一次开口，收藏说得很好的瞬间' },
-      { title: '后续新增内容', desc: '新题库、新课程、新场景，不再单独收费' }
+      { title: '不限次完整点评', desc: '本地演示：开启后不再受每天 5 份点评的限制' },
+      { title: '课程与私教计划', desc: '本版本对所有用户开放，会员开关不会额外解锁内容' },
+      { title: '录音档案与金句墙', desc: '回听与收藏对所有用户开放，不是付费门槛' },
+      { title: '价格仅为正式版示意', desc: '本版本不接微信支付、不生成订单、不扣款，无任何真实交易' }
     ]
   },
 
@@ -54,6 +56,7 @@ Page({
       isMember,
       trialUsed: !!membership.trialUsed,
       quota,
+      entitlement: store.getEntitlement(),
       plans,
       selected,
       selectedPlan: plans.find(p => p.id === selected)
@@ -76,14 +79,14 @@ Page({
       return
     }
     wx.showModal({
-      title: '模拟开通「' + plan.name + '」',
-      content: '这是纯本地演示版，不会发起真实支付，也不会扣款。确认后将直接激活会员，方便体验完整功能。',
-      confirmText: '模拟开通',
+      title: '开启本地体验 · ' + plan.name,
+      content: '纯本地演示：这里只是把本机的额度开关打开，不会调用微信支付、不生成订单、不扣款。页面上的价格是正式版示意，与本版本无关。',
+      confirmText: '直接开启',
       confirmColor: '#1B5A47',
       success: res => {
         if (!res.confirm) return
         store.activatePlan(plan.id)
-        wx.showToast({ title: '已模拟开通', icon: 'success' })
+        wx.showToast({ title: '已开启本地不限次体验', icon: 'success' })
         this.onShow()
       }
     })
@@ -95,15 +98,15 @@ Page({
       return
     }
     wx.showModal({
-      title: '领取 7 天体验会员',
-      content: '立即获得 7 天无限点评，并额外赠送 3 次点评点数。演示版直接激活。',
-      confirmText: '立即领取',
+      title: '开启 7 天本地体验',
+      content: '纯本地演示：直接打开本机不限次开关并加 3 次点数，不扣款、不产生订单，也不代表正式版权益。',
+      confirmText: '直接开启',
       confirmColor: '#1B5A47',
       success: res => {
         if (!res.confirm) return
         const result = store.activateTrial()
         if (result.ok) {
-          wx.showToast({ title: '体验会员已激活', icon: 'success' })
+          wx.showToast({ title: '本地体验已开启', icon: 'success' })
           this.onShow()
         } else {
           wx.showToast({ title: '已经领取过了', icon: 'none' })

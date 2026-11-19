@@ -8,6 +8,7 @@ const files = [
   'tests/store.test.js',
   'tests/regression.test.js',
   'tests/ux.test.js',
+  'tests/honesty.test.js',
   'tests/pages.smoke.js',
   'tests/session.flow.js',
   'tests/check-wxml.js'

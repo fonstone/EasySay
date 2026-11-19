@@ -25,17 +25,19 @@
     <view wx:if="{{selectedGoal}}" class="preview-card">
       <view class="preview-eyebrow">私教判断</view>
       <view class="preview-intro">{{selectedGoal.intro}}</view>
+      <view class="preview-focus">{{previewFocus}}</view>
       <view class="preview-days">
         <view wx:for="{{previewItems}}" wx:key="qid" class="preview-day">
           <view class="preview-day-num serif">D{{item.day}}</view>
           <view class="preview-day-body">
             <view class="preview-day-title">{{item.title}}</view>
             <view class="preview-day-cat">{{item.categoryName}}</view>
+            <view class="preview-day-reason">{{item.reason}}</view>
           </view>
         </view>
       </view>
       <view class="btn btn-primary btn-block mt-24" bindtap="createPlan" hover-class="tap-hover" aria-role="button">生成我的 7 天计划</view>
-      <view class="preview-note">计划基于本地选题规则生成 · 不联网 · 可随时重排</view>
+      <view class="preview-note">{{previewNote}}</view>
     </view>
   </view>
 
@@ -46,7 +48,8 @@
         <view class="plan-day">{{planDayLabel}}</view>
       </view>
       <view class="plan-title serif">{{planGoal.name}}</view>
-      <view class="plan-intro">{{planGoal.intro}}</view>
+      <view class="plan-intro">{{planFocusText}}</view>
+      <view class="plan-engine">{{planEngineLabel}} · {{basisText}}</view>
       <view wx:if="{{nextItem}}" class="today-card" bindtap="startNext" hover-class="tap-hover" aria-role="button">
         <view class="today-label">今天练这个</view>
         <view class="today-title">{{nextItem.title}}</view>
@@ -85,14 +88,15 @@
           </view>
           <view class="timeline-title">{{item.title}}</view>
           <view class="timeline-sub">{{item.subtitle}}</view>
-          <view class="timeline-meta">{{item.categoryName}} · 约 {{item.minutes}} 分钟</view>
+          <view class="timeline-reason">{{item.reason}}</view>
+          <view class="timeline-meta">{{item.categoryName}} · 约 {{item.minutes}} 分钟 · 主练{{item.focus}}</view>
         </view>
       </view>
     </view>
 
     <view class="plan-actions">
-      <view wx:if="{{allDone}}" class="btn btn-primary btn-block" bindtap="resetPlan" hover-class="tap-hover" aria-role="button">重新排一周</view>
-      <view wx:else class="btn btn-ghost btn-block" bindtap="resetPlan" hover-class="tap-hover" aria-role="button">换一个目标</view>
+      <view class="btn btn-primary btn-block" bindtap="rebuildPlan" hover-class="tap-hover" aria-role="button">按最新练习数据重排</view>
+      <view class="btn btn-ghost btn-block mt-16" bindtap="resetPlan" hover-class="tap-hover" aria-role="button">换一个目标</view>
     </view>
   </view>
 </view>

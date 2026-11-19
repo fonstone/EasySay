@@ -76,6 +76,13 @@ button::after {
   border: none;
 }
 
+input,
+textarea {
+  border: none;
+  outline: none;
+  background: transparent;
+}
+
 image {
   display: block;
 }

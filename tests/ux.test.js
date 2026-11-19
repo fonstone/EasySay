@@ -62,9 +62,9 @@ store.init()
 
 /* ---------------- 数据层：找题能力 ---------------- */
 
-test('初始化补齐收藏 / 最近练习 / 搜索历史三个键，并升级到 schema v3', () => {
-  assert.strictEqual(store.SCHEMA_VERSION, 3)
-  assert.strictEqual(store.getStorageHealth().schema, 3)
+test('初始化补齐收藏 / 最近练习 / 搜索历史三个键，并升级到 schema v4', () => {
+  assert.strictEqual(store.SCHEMA_VERSION, 4)
+  assert.strictEqual(store.getStorageHealth().schema, 4)
   assert.ok(Array.isArray(storage[store.KEYS.FAVORITES]))
   assert.ok(Array.isArray(storage[store.KEYS.RECENT_QUESTIONS]))
   assert.ok(Array.isArray(storage[store.KEYS.SEARCH_HISTORY]))

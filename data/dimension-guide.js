@@ -55,12 +55,20 @@ const DIMENSION_GUIDE = {
 
 const FROM_LABEL = { voice: '来自录音', text: '需补文字稿' }
 
+/** 与 scoring.js 的 DIM_SOURCE 对应：更精确地区分「录音 / 自述稿 / 两者都用」 */
+const SOURCE_LABEL = {
+  voice: '来自录音',
+  text: '来自自述稿',
+  mixed: '录音 + 自述稿'
+}
+
 const SCORE_GUIDE = {
   title: '这个分数怎么来的',
   lines: [
     '本机规则引擎根据录音的能量、停顿、时长和语速计算，同一段录音永远得到同一个分，不联网、不上传。',
-    '没补文字稿时只有 4 个声音维度；补上文字稿后才加入内容、结构、用词，且每份报告只能补一次。',
-    '点下面的任意维度，可以看它依据什么、下一次具体怎么练。'
+    '本版本没有语音识别：没补文字稿时只有 4 个声音维度；内容、结构、用词来自你手动补写的自述稿，不是程序听懂了内容。',
+    '补稿只能提交一次，并与本次录音指纹绑定；声音维度不会被文字改写。',
+    '每份报告都标注了数据来源，点开任意维度可以看它依据什么、下一次具体怎么练。'
   ]
 }
 
@@ -77,10 +85,16 @@ function fromLabel(key) {
   return FROM_LABEL[(DIMENSION_GUIDE[key] || {}).from] || FROM_LABEL.voice
 }
 
+function sourceLabel(source) {
+  return SOURCE_LABEL[source] || SOURCE_LABEL.voice
+}
+
 module.exports = {
   DIMENSION_GUIDE,
   SCORE_GUIDE,
   FROM_LABEL,
+  SOURCE_LABEL,
   getDimensionGuide,
-  fromLabel
+  fromLabel,
+  sourceLabel
 }

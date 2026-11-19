@@ -6,6 +6,7 @@
  */
 
 const util = require('./util')
+const backup = require('./backup')
 const questionData = require('../data/questions')
 
 const KEYS = {
@@ -26,7 +27,8 @@ const KEYS = {
   SCHEMA: 'cs_schema',
   FAVORITES: 'cs_favorites',
   RECENT_QUESTIONS: 'cs_recent_questions',
-  SEARCH_HISTORY: 'cs_search_history'
+  SEARCH_HISTORY: 'cs_search_history',
+  BACKUP: 'cs_backup_meta'
 }
 
 /**
@@ -37,7 +39,7 @@ const KEYS = {
 const MAX_REPORTS = 40
 /** 音频文件体积大，单独设更小的上限，淘汰时同步清理报告里的引用 */
 const MAX_AUDIO_FILES = 15
-const SCHEMA_VERSION = 3
+const SCHEMA_VERSION = 4
 const MAX_FAVORITES = 60
 const MAX_RECENT_QUESTIONS = 12
 const MAX_SEARCH_HISTORY = 10
@@ -166,6 +168,15 @@ function defaultProgress() {
   }
 }
 
+function defaultBackupMeta() {
+  return {
+    lastBackupAt: 0,
+    count: 0,
+    channel: '',
+    reportsAtBackup: 0
+  }
+}
+
 function init() {
   if (!read(KEYS.PROFILE, null)) write(KEYS.PROFILE, defaultProfile())
   if (!read(KEYS.SETTINGS, null)) write(KEYS.SETTINGS, defaultSettings())
@@ -181,6 +192,7 @@ function init() {
   if (!Array.isArray(read(KEYS.FAVORITES, null))) write(KEYS.FAVORITES, [])
   if (!Array.isArray(read(KEYS.RECENT_QUESTIONS, null))) write(KEYS.RECENT_QUESTIONS, [])
   if (!Array.isArray(read(KEYS.SEARCH_HISTORY, null))) write(KEYS.SEARCH_HISTORY, [])
+  if (!read(KEYS.BACKUP, null)) write(KEYS.BACKUP, defaultBackupMeta())
   migrate()
   repairData()
   getMembership()
@@ -191,6 +203,7 @@ function init() {
  * 数据结构升级。所有迁移必须幂等，且能处理旧版本缺失字段。
  * v1 -> v2：补报告锁稿字段、补历史/档案的 reportId 外键、补音频有效性标记。
  * v2 -> v3：新增题目收藏、最近练习、搜索历史三个键，并清洗失效题目 id。
+ * v3 -> v4：新增备份元数据；旧版固定题单标记为 legacy，交给 utils/plan 归一化。
  */
 function migrate() {
   const current = Number(read(KEYS.SCHEMA, 0)) || 0
@@ -248,6 +261,14 @@ function migrate() {
   normalizeIds(KEYS.RECENT_QUESTIONS, MAX_RECENT_QUESTIONS)
   const historyWords = read(KEYS.SEARCH_HISTORY, [])
   if (!Array.isArray(historyWords)) write(KEYS.SEARCH_HISTORY, [])
+
+  // v4：备份元数据与旧计划的兼容标记
+  if (!read(KEYS.BACKUP, null)) write(KEYS.BACKUP, defaultBackupMeta())
+  const oldPlan = read(KEYS.COACH, null)
+  if (oldPlan && oldPlan.goalId && !Array.isArray(oldPlan.days)) {
+    oldPlan.engine = 'legacy-fixed-v0'
+    write(KEYS.COACH, oldPlan)
+  }
 
   write(KEYS.SCHEMA, SCHEMA_VERSION)
   return { from: current, to: SCHEMA_VERSION, migrated: true }
@@ -1001,6 +1022,22 @@ function getDailyQuota() {
   }
 }
 
+/**
+ * 权益单一真源。
+ * 本版本没有任何支付、订单或服务端校验，会员状态只是本地演示开关。
+ * 页面所有「是否会员 / 还有几次」都必须从这里取，避免又出现两套口径，
+ * 也避免把本地开关包装成真实交易。
+ */
+function getEntitlement() {
+  const quota = getDailyQuota()
+  return Object.assign({}, quota, {
+    source: 'local-demo',
+    isRealPayment: false,
+    demoNotice: '纯本地演示：不会发起微信支付，不产生订单，也不扣款。',
+    memberSource: quota.member ? '本地演示开关' : '未开启'
+  })
+}
+
 /** 生成报告时消耗一次额度。会员不消耗。 */
 function consumeReview() {
   const m = getMembership()
@@ -1033,6 +1070,8 @@ function activateTrial() {
   m.type = 'trial'
   m.trialUsed = true
   m.activatedAt = Date.now()
+  m.source = 'local-demo'
+  m.isRealPayment = false
   m.expireAt = Date.now() + 7 * 86400000
   m.points = (m.points || 0) + 3
   write(KEYS.MEMBERSHIP, m)
@@ -1052,6 +1091,8 @@ function activatePlan(planId) {
   m.type = planId
   m.activatedAt = Date.now()
   m.expireAt = planId === 'lifetime' ? null : Date.now() + plan.days * 86400000
+  m.source = 'local-demo'
+  m.isRealPayment = false
   write(KEYS.MEMBERSHIP, m)
   return { ok: true, membership: m }
 }
@@ -1261,6 +1302,39 @@ function clearSearchHistory() {
    导出为 JSON 文本（录音文件本身不导出，仅导出记录与报告）。
    ========================================================== */
 
+function getBackupMeta() {
+  return Object.assign(defaultBackupMeta(), read(KEYS.BACKUP, {}))
+}
+
+/** 导出成功后记录时间，用于「多久没备份」提醒 */
+function markBackupDone(channel) {
+  const meta = getBackupMeta()
+  meta.lastBackupAt = Date.now()
+  meta.count = (meta.count || 0) + 1
+  meta.channel = channel || ''
+  meta.reportsAtBackup = Object.keys(read(KEYS.REPORTS, {})).length
+  write(KEYS.BACKUP, meta)
+  return meta
+}
+
+function getBackupStatus(now) {
+  const meta = getBackupMeta()
+  const reportsNow = Object.keys(read(KEYS.REPORTS, {})).length
+  const since = Math.max(0, reportsNow - (meta.reportsAtBackup || 0))
+  const reminder = backup.getBackupReminder({
+    lastBackupAt: meta.lastBackupAt,
+    reportsSinceBackup: since,
+    now: now || Date.now()
+  })
+  return {
+    lastBackupAt: meta.lastBackupAt,
+    count: meta.count || 0,
+    channel: meta.channel || '',
+    reportsSinceBackup: since,
+    reminder
+  }
+}
+
 function exportData() {
   const data = {
     app: 'clearsay',
@@ -1299,7 +1373,7 @@ function importData(input) {
 const RESET_KEYS = [
   KEYS.STATS, KEYS.PROGRESS, KEYS.HISTORY, KEYS.REPORTS, KEYS.ARCHIVE,
   KEYS.QUOTES, KEYS.REVIEWS, KEYS.COACH, KEYS.THINKING, KEYS.PRONOUNCE, KEYS.TODAY,
-  KEYS.RECENT_QUESTIONS, KEYS.SEARCH_HISTORY
+  KEYS.RECENT_QUESTIONS, KEYS.SEARCH_HISTORY, KEYS.BACKUP
 ]
 
 function clearPractice() {
@@ -1327,6 +1401,9 @@ module.exports = {
   migrate,
   repairData,
   getStorageHealth,
+  getBackupMeta,
+  markBackupDone,
+  getBackupStatus,
   exportData,
   importData,
   getProfile,
@@ -1382,6 +1459,7 @@ module.exports = {
   isMember,
   getReviewQuota,
   getDailyQuota,
+  getEntitlement,
   consumeReview,
   addPoints,
   activateTrial,

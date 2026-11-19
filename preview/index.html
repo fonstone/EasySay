@@ -358,7 +358,8 @@ table.cmp{width:100%;border-collapse:collapse;font-size:11px}
 table.cmp th,table.cmp td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink2)}
 table.cmp th{color:var(--muted);font-weight:600;font-size:10px}
 table.cmp td:first-child{color:var(--ink);white-space:nowrap}
-.ok{color:#7fd7ae}.no{color:#f0a596}
+.ok{color:#7fd7ae}.no{color:#f0a596}.declared{color:#e2c08a}
+table.cmp tr.governed td{background:rgba(127,215,174,.06)}
 .roadmap{display:flex;flex-direction:column;gap:8px;margin-top:10px}
 .rm{display:flex;gap:9px;align-items:flex-start;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:10px}
 .rm .rp{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:5px;flex:none;margin-top:1px}
@@ -374,11 +375,11 @@ table.cmp td:first-child{color:var(--ink);white-space:nowrap}
 </head>
 <body>
 <div class="topbar">
-  <div class="brand"><b>清述</b><span>工程实现评审 · 高保真界面预览 · 两轮累计修复 P0 + P1</span></div>
+  <div class="brand"><b>清述</b><span>工程实现评审 · 高保真界面预览 · 三轮治理 P0 / P1 / 真实能力</span></div>
   <div class="topstats">
     <div class="ts"><b>24</b><small>页面</small></div>
     <div class="ts"><b>48</b><small>练习题</small></div>
-    <div class="ts"><b>8 / 8</b><small>测试套件通过</small></div>
+    <div class="ts"><b>9 / 9</b><small>测试套件通过</small></div>
     <div class="ts"><b>0</b><small>网络请求</small></div>
   </div>
   <label class="switch on" id="markSwitch"><input type="checkbox" checked /><span class="dot"></span><span>问题标注</span></label>
@@ -402,15 +403,15 @@ table.cmp td:first-child{color:var(--ink);white-space:nowrap}
         <div class="lg"><i style="background:#e9bd7d"></i><span>P1 · 影响核心体验</span></div>
         <div class="lg"><i style="background:#8fc6e0"></i><span>P2 · 打磨与一致性</span></div>
       </div>
-      <p style="font-size:11px;color:var(--muted);margin:11px 0 0;line-height:1.6">点击预览中带红框的元素，可定位到右侧对应问题。</p>
+      <p style="font-size:11px;color:var(--muted);margin:11px 0 0;line-height:1.6">绿框 = 已修复，红框 = 仍需服务端能力；点击带框元素可定位右侧问题。黄字 = 已诚实标注。</p>
     </div>
     <div class="panel-box pb">
       <h4>工程速览</h4>
       <div class="factline"><span>技术栈</span><b>原生小程序 · 无云开发</b></div>
-      <div class="factline"><span>代码量</span><b>约 2.3 万行（含数据与测试）</b></div>
+      <div class="factline"><span>代码量</span><b>约 2.6 万行（含数据与测试）</b></div>
       <div class="factline"><span>AppID</span><b>touristappid</b></div>
-      <div class="factline"><span>存储</span><b>18 个 cs_* 本地 key（含 v3 找题索引）</b></div>
-      <div class="factline"><span>提交</span><b>2 次（含本轮优化）</b></div>
+      <div class="factline"><span>存储</span><b>19 个 cs_* 本地 key（v4 迁移 + 备份元数据）</b></div>
+      <div class="factline"><span>提交</span><b>3 次（含本轮真实能力治理）</b></div>
       <div class="factline"><span>真机编译</span><b style="color:#e9bd7d">本机未装开发者工具</b></div>
     </div>
   </aside>
@@ -552,13 +553,33 @@ const FIXED={
   all1:'三处存储统一以 report.id 为主键、报告与历史同留 40 条；淘汰时同步清理历史与音频，删除 wav 时清空 report.audioPath；启动时 repairData() 全量兜底。',
   all2:'SCHEMA_VERSION=3（新增收藏 / 最近练习 / 搜索历史三键并清洗失效题目 id）；migrate() 幂等、write() 失败上报、备份覆盖新键。',
   all3:'practiceAgain 改 redirectTo；util.goBack() 判断栈深并兜底 switchTab，session / report / lesson / thinking-quiz 的 navigateBack 全部替换。',
-  all4:'regression 13 项 + 本轮 ux 17 项（搜索 / 筛选 / 收藏 / 备份 / 维度解释 / 全局基线），共 8 套测试全绿。',
+  all4:'regression 13 项 + ux 17 项 + 本轮 honesty 30 项（真实波形 / 真实进度 / ASR 能力 / 音文对齐 / 规则点评 / 动态计划 / 备份提醒 / 权益口径），共 9 套测试全绿。',
+  r3:'报告页新增「这个分数怎么来的」说明卡；教练点评改为可解释规则引擎，每条建议可展开 ruleId / 触发条件 / 实测值 / 阈值，全站不再使用 AI 字样。',
+  m2:'会员横幅与权益文案准确描述本地开关；新增 store.getEntitlement() 单一真源，标记 source=local-demo、isRealPayment=false。',
+  r1:'练习当次仍是 4 维，但边界已诚实化：新增 utils/asr.js 能力探测 + 文件转写可插拔接口（配置后 7 维当次生效）；报告页「数据来源」卡明确自述稿不是识别结果，并用 VAD 有效发声时长做音文一致性校验。',
+  r4:'删除 480ms 定时器与 ≥1.6s 强制等待；新增 utils/analysis.js 把进度绑定到读取 / 分帧 / VAD / 停顿 / 组装 / 落库 6 个真实阶段，页面直接展示各阶段本机实测毫秒数。',
+  s1:'recorder.js 注册 onFrameRecorded + frameSize；新增 utils/live-waveform.js 从真实 PCM 帧算 RMS 驱动 24 柱；无帧时保持静音柱并提示「等待音频帧」，Math.sin 假波形与 CSS 动画全部删除。',
+  d1:'新增 utils/plan.js：按最近报告最弱维度、目标方向、练习量、收藏 / 最近 / 已练题目动态排 7 天，每题带「为什么排它」；旧固定课表由 normalizePlan 兼容，支持按最新数据重排。',
+  m3:'备份升级为真实 .json 文件（USER_DATA_PATH）+ wx.shareFile + 剪贴板三通道；新增 cs_backup_meta 记录上次备份时间与新增报告数，超过 7 天或新增 3 份即提醒。',
+  g1:'设置页显示备份状态与提醒，导出写文件并调起分享；恢复仍走剪贴板，并明确「卸载即丢」。',
+  v2:'会员页顶部固定「本地演示 · 不收款」横幅；价格改为正式版示意，按钮改为「开启本地体验」，弹窗与页脚明确不生成订单、不扣款。',
 };
 ISSUES.forEach(i=>{ if(FIXED[i.id]) i.fixed=FIXED[i.id]; });
 
 /* ===================== 改进建议 ===================== */
 const SUGGEST=[
-  {g:'本轮已落地 · P1',h:'找题、反馈、可解释性与全局一致性',items:[
+  {g:'本轮已落地 · 真实能力治理',h:'把截图里 8 项「伪实现」逐项落到实处',items:[
+    ['P0','录音波形改成真实数据','onFrameRecorded + frameSize 拿到真实 PCM 帧，utils/live-waveform.js 计算 RMS 归一化；无帧保持静音，不再画 Math.sin。','utils/recorder.js / live-waveform.js / session.*'],
+    ['P0','分析进度改成真实阶段','utils/analysis.js 记录 6 个真实计算阶段与本机毫秒耗时；480ms 定时器与 1.6s 假等待全部删除。','utils/analysis.js / scoring.js / session.*'],
+    ['P0','ASR 不伪装 + 可插拔','utils/asr.js 明确返回未接入；注入 file 转写提供者后 session 自动带文字稿生成 7 维；报告页把「文字稿」正名为「自述稿」。','utils/asr.js / session.js / report.*'],
+    ['P0','内容维度标注来源并做音文对齐','每个维度带 source/basis；用 VAD 有效发声秒数推算预期字数，自述稿明显偏长或偏短时提示内容分仅供参考。','utils/scoring.js / data/dimension-guide.js'],
+    ['P1','教练点评改成可解释规则','每条「做得好 / 下次改」带 ruleId、触发条件、实测值、阈值，报告页可展开逐条核对；不再叫 AI。','utils/scoring.js / report.*'],
+    ['P1','私教计划随数据变化','utils/plan.js 按最弱维度、目标、练习量、收藏与已练题目动态排 7 天，每题带理由，可随时按最新数据重排。','utils/plan.js / data/coach.js / pages/coach'],
+    ['P1','会员与支付去误导','顶部固定「本地演示 · 不收款」，价格标注为正式版示意，按钮改「开启本地体验」；getEntitlement 单一口径。','pages/member / mine / report / utils/store.js'],
+    ['P1','备份从剪贴板升级到文件','导出真实 .json 文件 + 分享 + 剪贴板三通道，记录备份时间并在 7 天 / 3 份新报告后提醒；明确卸载即丢。','utils/backup.js / settings.* / store.js v4'],
+    ['P1','30 项诚实化回归','新增 tests/honesty.test.js，锁死「无 sin 假波形、无定时器假进度、ASR 不可用必须拒绝、计划随数据变化」。','tests/honesty.test.js / run-all.js']
+  ]},
+  {g:'上一轮已落地 · P1',h:'找题、反馈、可解释性与全局一致性',items:[
     ['P1','新增「找题」页','关键词 + 场景同义词、方向/关卡/收藏筛选、4 种排序、搜索历史与推荐词。','pages/search'],
     ['P1','收藏与最近练习贯通','题目卡 / 分类详情 / 报告页可收藏；录音 onStart 记录最近练习；练习页与我的页直达。','store.js / practice / report / mine'],
     ['P1','列表页搜索与排序','金句墙、复盘档案共用统一工具条，并新增「无结果」空态分支。','quotes / review-history / app.wxss'],
@@ -570,7 +591,7 @@ const SUGGEST=[
     ['P1','横滑有终点','声母诊所显示总数并加「查看全部」尾卡。','discover.*'],
     ['P1','17 项易用性回归','新增 tests/ux.test.js，覆盖搜索 / 筛选 / 收藏 / 备份 / 维度解释 / 全局基线。','tests/ux.test.js']
   ]},
-  {g:'上一轮已落地 · P0',h:'已写入源码、经 8 套测试验证',items:[
+  {g:'上一轮已落地 · P0',h:'已写入源码、经全量测试验证',items:[
     ['P0','数据层统一与迁移','SCHEMA_VERSION=2、migrate()、repairData()、三处存储共用主键与淘汰策略、写入失败上报。','utils/store.js'],
     ['P0','扣次数时机与退还','麦克风 onStart 后才扣；未生成报告即失败/退出自动退还。','pages/session/session.js'],
     ['P0','补稿防刷分','audioKey 绑定录音 + 每份报告只补一次（页面与数据层双重拦截）。','scoring.js / report.js / store.js'],
@@ -623,9 +644,9 @@ const SUGGEST=[
 ];
 
 const ROADMAP=[
-  ['a','P0 · 立刻修','评分可信度（ASR 或明确标注 4 维边界 + 禁止刷分）、失败退机会、三份数据一致性、存储版本与写失败提示、数据导出。这几项直接决定用户是否信任分数、数据是否安全。'],
-  ['b','P1 · 已落地 / 剩余','找题、收藏、骨架屏、无障碍、返回栈、令牌化与图表可解释性已落地；剩余：ASR 让 7 维当次生效、课程随堂测验、动态排题、暗色模式。'],
-  ['c','P2 · 产品化阶段','云同步与微信登录、真实支付、订阅消息与埋点、跟读对比、暗色模式、真机声学标定、分享出图。这一步才把 Demo 变成可运营产品。']
+  ['a','P0 · 已落地','评分可信度（4 维边界明示 + 禁止刷分）、失败退机会、三份数据一致性、存储版本与写失败提示、数据导出，以及本轮的真实波形 / 真实进度 / 音文对齐。'],
+  ['b','P1 · 已落地 / 剩余','找题、收藏、骨架屏、无障碍、返回栈、令牌化、图表可解释性、动态排题、可解释规则点评、会员诚实化与文件备份已落地；剩余：课程随堂测验、暗色模式、全站 aria-label。'],
+  ['c','P2 · 产品化阶段','仍需服务端能力：真实 ASR 转写（让 7 维当次生效）、微信支付 + 服务端订单校验、云同步与微信登录、订阅消息与埋点、跟读对比、真机声学标定。这一步才把 Demo 变成可运营产品。']
 ];
 
 /* ===================== 状态 ===================== */
@@ -728,30 +749,34 @@ function pageReport(){
   return '<div style="margin-top:22px"><div class="p-eyebrow">11月17日 周二 · 今日挑战</div><div class="p-serif" style="font-size:26px;color:#16211d;margin-top:6px">这次说得稳</div><div class="p-sub">结构在，声音也跟着稳了下来。</div></div>'+
   '<div class="scorecard" style="margin-top:16px" '+M('r5')+'><div class="sring"><div><b>'+(TRANSCRIPT?'77':'79')+'</b><small>良好</small></div></div><div style="flex:1"><div class="p-tiny">结构表达</div><div class="p-serif" style="font-size:18px;color:#16211d;margin:4px 0">拒绝同事临时甩锅</div><div class="p-sub" style="font-size:11px">这次的声音与表达事实</div><div style="display:flex;gap:6px;margin-top:9px"><span class="p-chip">01:08</span><span class="p-chip" '+M('r1')+'>'+dims.length+' 个维度</span></div></div></div>'+
   '<div class="facts"><div><b>68</b><small>秒</small></div><div><b>82</b><small>发声占比 %</small></div><div><b>2</b><small>长停顿</small></div><div><b>186</b><small>字/分</small></div></div>'+
+  '<div class="p-card" style="margin-top:12px;padding:12px 14px"><div class="p-between"><b style="font-size:11.5px;color:#16211d">这份点评的数据来源</b><span style="font-size:9.5px;color:#236c55;background:#e4f0ea;padding:3px 8px;border-radius:9px">本地可解释规则</span></div>'+
+  [['声音数据','真实录音 · PCM 16kHz'],['文字来源',TRANSCRIPT?'自述稿（手动输入，非语音识别）':'未提供文字稿'],['语音识别','未接入 · 内容维度需手动补写自述稿'],['点评引擎','本地可解释规则引擎（非 AI 生成）']].map(r=>'<div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid #f0f4f1;font-size:10.5px"><span style="width:58px;flex-shrink:0;color:#9aa6a1">'+r[0]+'</span><span style="flex:1;color:#34433d">'+r[1]+'</span></div>').join('')+
+  '<div class="p-tiny" style="margin-top:8px;line-height:1.6;color:#236c55">'+(TRANSCRIPT?'自述稿已与本次录音指纹绑定，声音维度不会被文字改写。':'还没补自述稿：内容、结构、用词三维不会出现，避免把「没听懂内容」算成低分。')+'</div></div>'+
   '<div class="p-sec"><div class="p-sec-head"><b>'+(TRANSCRIPT?'这次的能力切面':'这次的声音表现')+'</b><span>同段录音，结果可复现</span></div><div class="p-card dim" style="padding:6px 14px">'+dims.map(v=>'<div class="dimrow"><div class="p-between" style="font-size:12px;color:#34433d"><span>'+v[0]+'</span><b style="color:'+(v[1]>=80?'#1b5a47':v[1]>=70?'#b68a4e':'#b25a48')+'">'+v[1]+'</b></div><div class="p-bar" style="margin:6px 0 5px"><i style="width:'+v[1]+'%"></i></div><div class="p-tiny">'+(v[0]==='流畅'?'有效发声比例高，长停顿 2 次':v[0]==='内容'?'要点覆盖 3/3，结构信号完整':'表现稳定，继续保持')+'</div></div>').join('')+'</div></div>'+
-  '<div class="coach" '+M('r3')+'><div class="p-between"><span class="badge"><i></i>教练点评</span><span class="eng">本地确定性分析</span></div><div class="reason">先看事实：这段 68 秒里有效发声占 82%，只出现 2 次超过 1.5 秒的停顿。'+(TRANSCRIPT?'文字稿覆盖了 3 个要点，开场与收尾都有明确信号。':'没有文字稿，所以这次不评价内容与结构。')+'</div><div class="grp">这次做得好的</div><div class="it"><i class="g">+</i><span>停顿主要落在句子之间，没有把句子切碎。</span></div><div class="grp">下一次可以改的</div><div class="it"><i class="b">!</i><span>第 42 秒有一次 1.8 秒的停顿，可以用「所以」接住。</span></div><div class="nextf"><small>下次只练这一件事</small><b>稳在每分钟 240 字左右，把长停顿换成短过渡</b></div></div>'+
+  '<div class="coach" '+M('r3')+'><div class="p-between"><span class="badge"><i></i>教练点评</span><span class="eng">本地可解释规则引擎（非 AI）</span></div><div class="reason">先看事实：这段 68 秒里有效发声占 82%，只出现 2 次超过 1.5 秒的停顿。'+(TRANSCRIPT?'文字稿覆盖了 3 个要点，开场与收尾都有明确信号。':'没有文字稿，所以这次不评价内容与结构。')+'</div><div class="grp">这次做得好的</div><div class="it"><i class="g">+</i><span>停顿主要落在句子之间，没有把句子切碎。</span></div><div class="grp">下一次可以改的</div><div class="it"><i class="b">!</i><span>第 42 秒有一次 1.8 秒的停顿，可以用「所以」接住。</span></div><div class="nextf"><small>下次只练这一件事</small><b>稳在每分钟 240 字左右，把长停顿换成短过渡</b></div></div>'+
   '<div class="trans" '+M('r2')+'><div class="p-between"><div><div class="p-tiny" style="letter-spacing:1px">文字稿</div><div style="font-size:13px;color:#16211d;margin-top:3px">'+(TRANSCRIPT?'内容维度已计入':'补上文字，拿到完整点评')+'</div></div>'+(TRANSCRIPT?'<span class="p-tiny">收起</span>':'')+'</div>'+
   (TRANSCRIPT?'<div style="display:flex;gap:14px;margin-top:12px">'+[['196','字'],['173','字/分'],['2','口头禅'],['3/3','要点']].map(v=>'<div style="flex:1;text-align:center"><b class="p-serif" style="font-size:17px;color:#16211d">'+v[0]+'</b><small style="display:block;font-size:9.5px;color:#9aa6a1">'+v[1]+'</small></div>').join('')+'</div><div style="font-size:11px;color:#74827c;line-height:1.7;margin-top:10px">我知道你现在赶着交付，但是我今天手上有两个必须在下班前完成的任务……</div>':'<textarea class="ta" placeholder="把刚才说的话记下来。可以用输入法的语音输入，边说边转文字。"></textarea><div class="p-tiny" style="margin:7px 0 10px">文字稿只保存在本机，用来计算内容、结构和用词。</div><div class="p-btn soft small">生成完整点评</div>')+'</div>'+
   '<div class="audio"><div class="p-between"><span class="p-tiny" style="letter-spacing:1px">回听这一遍</span><span class="p-tiny">00:12 / 01:08</span></div><div class="p-between" style="gap:12px;margin-top:12px"><div class="play"></div><div class="wave">'+Array.from({length:28},(_,i)=>'<i class="'+(i<9?'on':'')+'" style="height:'+(8+((i*13)%26))+'px"></i>').join('')+'</div></div><div class="p-tiny" style="margin-top:10px">录音只保存在本机 · 可在「我的 - 录音档案」里删除</div></div>'+
   '<div class="acts"><div class="p-btn ghost">再练一次</div><div class="p-btn" data-go="today">回到今日</div></div><div style="text-align:center;font-size:11.5px;color:#236c55;margin-top:14px">把这次进步分享出去 →</div>'+
-  '<div class="p-foot"><div class="fl"></div>分数由本地规则引擎计算，同一段录音永远得到同一个分。补充文字稿只增加内容维度，不改写声音事实。</div>';
+  '<div class="p-foot"><div class="fl"></div>声音维度来自真实录音的 PCM 能量分析；内容三维来自手动补写的自述稿，本版本没有语音识别，也没有 AI 生成点评。</div>';
 }
 function pageSession(){
-  if(PHASE==='recording') return '<div class="record" style="margin:0 -16px;padding-left:16px;padding-right:16px" '+M('s1')+'><div class="rtop"><span>今日挑战 · 结构表达</span><span>取消</span></div><div class="rclock">00:38</div><div class="rrange">目标 55–95 秒</div><div class="rwave">'+Array.from({length:32},(_,i)=>'<i style="height:'+(14+((i*17)%46))+'px;animation-delay:'+(i%7*0.13).toFixed(2)+'s"></i>').join('')+'</div><div class="p-bar" style="background:rgba(255,255,255,.16);margin-top:8px"><i style="width:40%;background:#d8b36c"></i></div><div class="rrange" style="margin-top:9px">还剩 57 秒</div><div style="margin-top:26px;background:rgba(255,255,255,.07);border-radius:12px;padding:12px;text-align:left"><div style="font-size:9.5px;color:#d8b36c">提示</div><div style="font-size:11.5px;color:rgba(255,255,255,.8);margin-top:4px">边界要说具体的：我今天能做什么、不能做什么</div></div><div class="rstop"><i></i>说完了</div><div style="font-size:10px;color:rgba(255,255,255,.45);margin-top:12px">说完停 1 秒再点，句尾会更完整</div></div>';
-  if(PHASE==='analyzing') return '<div class="analyze" style="margin:0 -16px" '+M('r4')+'><div class="orbit"><div class="o1"></div><div class="o2"></div><div class="core">清</div></div><div class="anz-title">正在把这段声音<br/>拆成可改的动作。</div><div class="p-sub" style="text-align:center;margin-top:8px">本地确定性分析 · 不联网 · 不上传</div><div class="p-bar" style="margin:22px 0"><i style="width:68%"></i></div><div class="stage-list" '+M('s3')+'>'+['读取本地录音','切分语音与停顿','计算四个声音维度','整理可执行的建议'].map((s,i)=>'<div class="strow '+(i<2?'done':i===2?'cur':'')+'"><i>'+(i<2?'✓':i+1)+'</i>'+s+'</div>').join('')+'</div><div class="p-tiny" style="margin-top:22px;line-height:1.7">通常只需要几秒。你会拿到分数、原话证据和一个下次能改的动作。</div></div>';
+  if(PHASE==='recording') return '<div class="record" style="margin:0 -16px;padding-left:16px;padding-right:16px" '+M('s1')+'><div class="rtop"><span>今日挑战 · 结构表达</span><span>取消</span></div><div class="rclock">00:38</div><div class="rrange">目标 55–95 秒</div><div class="rwave">'+Array.from({length:24},(_,i)=>'<i style="height:'+(8+((i*11)%38))+'px"></i>').join('')+'</div><div class="p-tiny" style="text-align:center;margin-top:6px;color:rgba(255,255,255,.5)">真实音频帧 · 18 帧 RMS 振幅</div><div class="p-bar" style="background:rgba(255,255,255,.16);margin-top:8px"><i style="width:40%;background:#d8b36c"></i></div><div class="rrange" style="margin-top:9px">还剩 57 秒</div><div style="margin-top:26px;background:rgba(255,255,255,.07);border-radius:12px;padding:12px;text-align:left"><div style="font-size:9.5px;color:#d8b36c">提示</div><div style="font-size:11.5px;color:rgba(255,255,255,.8);margin-top:4px">边界要说具体的：我今天能做什么、不能做什么</div></div><div class="rstop"><i></i>说完了</div><div style="font-size:10px;color:rgba(255,255,255,.45);margin-top:12px">说完停 1 秒再点，句尾会更完整</div></div>';
+  if(PHASE==='analyzing') return '<div class="analyze" style="margin:0 -16px" '+M('r4')+'><div class="orbit"><div class="o1"></div><div class="o2"></div><div class="core">清</div></div><div class="anz-title">正在把这段声音<br/>拆成可改的动作。</div><div class="p-sub" style="text-align:center;margin-top:8px">本地规则引擎 · 不联网 · 不上传</div><div class="p-bar" style="margin:22px 0 8px"><i style="width:76%"></i></div><div class="p-tiny" style="text-align:center;color:rgba(255,255,255,.5)">76% · 每一步对应真实计算</div><div class="stage-list" '+M('s3')+'>'+[['读取录音数据','2ms',1],['分帧计算音量','6ms',1],['区分发声与停顿','3ms',1],['统计停顿与声音起伏','2ms',2],['生成维度与规则点评','—',3],['保存到本机','—',3]].map((s)=>'<div class="strow '+(s[2]===1?'done':s[2]===2?'cur':'')+'"><i>'+(s[2]===1?'✓':'')+'</i>'+s[0]+'<span style="margin-left:auto;font-size:10px;opacity:.6">'+(s[2]===1?s[1]:'')+'</span></div>').join('')+'</div><div class="p-tiny" style="margin-top:22px;line-height:1.7">右侧是本机实测耗时；取消分析会退还今日机会。</div></div>';
   if(PHASE==='prepare') return '<div style="margin-top:14px"><div class="p-between"><div class="bk" style="width:34px;height:34px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 9px rgba(14,46,38,.06)">←</div><span class="sq">构思时间</span><span class="sbadge">别写稿</span></div><div style="text-align:center;margin-top:52px"><div class="p-eyebrow">THINK FIRST</div><div class="p-serif" style="font-size:26px;color:#16211d;margin:10px 0 6px">先想三个关键词。</div><div class="p-sub">不写完整稿，只记骨架。时间一到自动开始录音。</div><div style="width:150px;height:150px;border-radius:50%;border:1px dashed #cfe3da;margin:34px auto 0;display:flex;flex-direction:column;align-items:center;justify-content:center"><b class="p-serif" style="font-size:68px;line-height:1;color:#16211d">24</b><span class="p-tiny">秒</span></div><div class="p-bar" style="margin:24px 0"><i style="width:80%"></i></div><div style="text-align:left;background:#fff;border-radius:14px;padding:14px"><div class="p-tiny">你要说</div><div style="font-size:14px;color:#16211d;margin:4px 0 12px">拒绝同事临时甩锅</div>'+[['1','理解对方难处'],['2','明确边界'],['3','替代方案']].map(k=>'<div style="display:flex;gap:9px;align-items:center;font-size:11.5px;color:#34433d;padding:5px 0"><span style="color:#b68a4e">'+k[0]+'</span>'+k[1]+'</div>').join('')+'</div></div><div style="margin-top:22px"><div class="p-btn small ghost" style="text-align:center;margin-bottom:9px">返回题目</div><div class="p-btn small">跳过构思，直接开录</div></div></div>';
   return '<div class="session-intro"><div class="sbar"><div class="bk">←</div><span class="sq">今日挑战 · 进阶</span><span class="sbadge">剩 '+d().chances+' 次</span></div><div class="p-eyebrow" style="margin-top:22px">结构表达</div><div class="sintro-title">拒绝同事临时甩锅</div><div class="p-sub">理解—边界—替代方案</div><div class="meta-chips"><span>55–95 秒</span><span>构思 30 秒</span><span>'+d().chances+' 次机会</span></div><div class="prompt"><div class="lbl">题目</div><div class="txt">同事临下班把一个本不属于你的任务推给你。用「理解—边界—替代方案」拒绝，但不撕破脸。</div></div><div class="keypoints"><div class="lbl" style="font-size:10px;color:#9aa6a1;letter-spacing:1px">这一题看这几点</div>'+[['1','理解对方难处'],['2','明确边界'],['3','替代方案']].map(k=>'<div class="kp"><i>'+k[0]+'</i>'+k[1]+'</div>').join('')+'<div style="border-top:1px solid #f0f4f1;margin-top:9px;padding-top:9px"><div class="p-tiny">教练提示</div><div style="font-size:11px;color:#74827c;line-height:1.7;margin-top:5px">· 边界要说具体的：我今天能做什么、不能做什么</div></div></div><div class="req3"><div><b>30</b><small>秒构思</small></div><div><b>55</b><small>秒起步</small></div><div><b>95</b><small>秒上限</small></div></div><div style="text-align:center;font-size:10px;color:#9aa6a1;margin-top:14px">录音只保存在本机 · 不上传 · 可随时删除</div><div class="cta-fixed" '+M('s5')+'><div class="p-btn" data-phase="prepare">开始构思</div><div style="text-align:center;font-size:10px;color:#9aa6a1;margin-top:8px">开口前先想三个关键词，不要写完整稿</div></div></div>';
 }
 function pageMember(){
-  return '<div style="margin-top:24px"><div class="p-eyebrow">MEMBERSHIP</div><div class="p-h1" style="font-size:27px">把「无限次」<br/>留给想练的人。</div><div class="p-sub">免费版每天 5 次内容点评，思维题、朗读、跟读不占额度。</div></div>'+
-  '<div class="p-green" style="margin-top:18px"><div class="hero-badge">7 天体验</div><div class="p-serif" style="font-size:22px;margin:12px 0 6px">先试七天，再决定</div><div style="font-size:11.5px;color:rgba(255,255,255,.65)">送 3 次额外点评 · 每位用户仅一次</div><div class="hero-btn" style="margin-top:18px">领取 7 天体验</div></div>'+
+  return '<div style="display:flex;gap:8px;align-items:center;margin:14px 0 16px;padding:10px 12px;background:#fbf3e5;border:1px solid #e6cda6;border-radius:10px"><span style="font-size:10px;background:#8a5a35;color:#fff;padding:3px 8px;border-radius:9px;flex-shrink:0">本地演示</span><span style="font-size:10.5px;color:#6d4a2c;line-height:1.5">不调用微信支付 · 不生成订单 · 不扣款</span></div>'+
+  '<div style="margin-top:8px"><div class="p-eyebrow">MEMBERSHIP</div><div class="p-h1" style="font-size:27px">把「无限次」<br/>留给想练的人。</div><div class="p-sub">免费版每天 5 次内容点评，价格仅为正式版示意。</div></div>'+
+  '<div class="p-green" style="margin-top:18px"><div class="hero-badge">7 天本地体验</div><div class="p-serif" style="font-size:22px;margin:12px 0 6px">先试七天，再决定</div><div style="font-size:11.5px;color:rgba(255,255,255,.65)">本机不限次 + 3 次点数 · 不扣款</div><div class="hero-btn" style="margin-top:18px">开启本地体验</div></div>'+
   '<div class="p-sec" '+M('v1')+'>'+[['年卡','38','元 / 年','最常见'],['两年卡','48','元 / 两年','每天 7 分钱'],['永久卡','97','元 / 一次买断','一次买断']].map((p,i)=>'<div class="p-card" style="margin-bottom:10px;display:flex;align-items:center;gap:12px;'+(i===0?'border:1.5px solid #1b5a47':'')+'"><div style="flex:1"><div class="p-between"><b style="font-size:14px;color:#16211d">'+p[0]+'</b><span class="p-chip">'+p[3]+'</span></div><div class="p-tiny" style="margin-top:4px">无限点评 · 全部课程 · 录音档案</div></div><div style="text-align:right"><b class="p-serif" style="font-size:26px;color:#16211d">'+p[1]+'</b><div class="p-tiny">'+p[2]+'</div></div></div>').join('')+'</div>'+
   '<div style="text-align:center;font-size:10.5px;color:#9aa6a1;margin-top:8px;line-height:1.7" '+M('v2')+'>本地演示版 · 不会调用微信支付，也不会产生真实交易</div><div class="p-foot"><div class="fl"></div>会员状态仅保存在本机</div>';
 }
 function pageSettings(){
   return '<div style="margin-top:24px"><div class="p-eyebrow">SETTINGS</div><div class="p-h1" style="font-size:27px">把练习调成<br/>自己的节奏。</div></div>'+
   '<div class="p-sec" style="margin-top:20px"><div class="p-sec-head"><b>练习设置</b></div><div class="p-card" style="padding:0 14px">'+[['构思时间','30 秒'],['今日机会','2 次'],['每日目标','1 次'],['示范音频自动播放','开'],['提示音','开'],['震动反馈','开']].map(s=>'<div class="p-between" style="padding:12px 0;border-bottom:1px solid #f0f4f1"><span style="font-size:12.5px;color:#34433d">'+s[0]+'</span><span style="font-size:11.5px;color:#236c55">'+s[1]+' ›</span></div>').join('')+'</div></div>'+
-  '<div class="p-sec" '+M('g1')+'><div class="p-sec-head"><b>数据管理</b><span>都在本机</span></div><div class="p-card" style="padding:0 14px">'+[['清空练习数据','删除报告、录音与打卡记录'],['重置全部数据','恢复初始状态，包含设置与资料']].map(s=>'<div style="padding:12px 0;border-bottom:1px solid #f0f4f1"><div style="font-size:12.5px;color:#b25a48">'+s[0]+'</div><div class="p-tiny" style="margin-top:2px">'+s[1]+'</div></div>').join('')+'</div></div>'+
+  '<div class="p-sec" '+M('g1')+'><div class="p-sec-head"><b>数据管理</b><span>都在本机</span></div><div class="p-card" style="padding:12px 14px;margin-bottom:10px"><div style="font-size:11.5px;font-weight:600;color:#16211d">备份状态</div><div class="p-tiny" style="margin-top:4px">上次导出 11月18日 · 此后新增 2 份点评</div><div style="font-size:10.5px;color:#236c55;margin-top:5px;line-height:1.5">卸载或清缓存会丢掉全部记录，导出文件是唯一保全方式</div></div><div class="p-card" style="padding:0 14px">'+[['导出数据备份','生成 .json 文件 + 分享 + 剪贴板'],['从备份恢复','读取剪贴板里的备份文本'],['清空练习数据','删除报告、录音与打卡记录'],['重置全部数据','恢复初始状态，包含设置与资料']].map(s=>'<div style="padding:12px 0;border-bottom:1px solid #f0f4f1"><div style="font-size:12.5px;color:'+(s[0].indexOf('清空')>=0||s[0].indexOf('重置')>=0?'#b25a48':'#16211d')+'">'+s[0]+'</div><div class="p-tiny" style="margin-top:2px">'+s[1]+'</div></div>').join('')+'</div></div>'+
   '<div class="p-sec" '+M('g2')+'><div class="p-sec-head"><b>显示</b></div><div class="p-card"><div class="p-between"><span style="font-size:12.5px;color:#34433d">深色模式</span><span class="p-tiny">未适配</span></div><div class="p-line"></div><div class="p-between"><span style="font-size:12.5px;color:#34433d">跟随系统字体大小</span><span class="p-tiny">未适配</span></div></div></div>'+
   '<div class="p-foot"><div class="fl"></div>清述 · 本地演示版 v1.0</div>';
 }
@@ -784,10 +809,10 @@ const NOTES={
  discover:'发现页把思维题、纠音、复盘、私教四个支线功能收在一个 2×2 网格里。',
  course:'3 条学习线共 12 节课，全部是静态文本，学完跳转到对应练习。',
  mine:'我的页用 Canvas 雷达 + 8 周热力图呈现累计数据，另有档案、金句墙与设置入口。',
- report:'报告页是评分结果落点：分数环、维度条、教练点评、补文字稿、回听。',
- session:'核心流程状态机：intro → prepare → recording → analyzing → redirectTo 报告。',
- member:'会员与支付均为本地演示，价格硬编码在前端。',
- settings:'设置页只有清空/重置，没有导出与备份。',
+ report:'报告页是评分结果落点：数据来源卡、可展开规则依据、维度条、自述稿、回听。',
+ session:'核心流程状态机：intro → prepare → recording（真实帧波形）→ analyzing（真实阶段）→ 报告。',
+ member:'纯本地演示：顶部固定「不收款」横幅，价格仅为正式版示意。',
+ settings:'设置页有备份状态提醒、导出 .json 文件 / 剪贴板、从备份恢复与清空。',
  search:'本轮新增：48 道题可搜、可筛选、可排序、可收藏，另有搜索历史与最近练习直达。'
 };
 
@@ -823,14 +848,14 @@ function renderIssues(){
   const list=ISSUES.filter(i=>i.page===CUR);
   const global=ISSUES.filter(i=>i.page==='*');
   const doneN=ISSUES.filter(i=>i.fixed).length;
-  let h='<p class="rintro">两轮累计已修复 <b style="color:#4f9e78">'+doneN+'</b> 项（含 P0 与 P1）；当前视图 '+list.length+' 个可定位问题，另列 '+global.length+' 个全局性问题。<b style="color:#4f9e78">绿框 = 已修复</b>，红框 = 仍待推进，编号均可点开。</p>';
+  let h='<p class="rintro">三轮累计已治理 <b style="color:#4f9e78">'+doneN+'</b> 项（P0 / P1 / 真实能力治理）；当前视图 '+list.length+' 个可定位问题，另列 '+global.length+' 个全局性问题。<b style="color:#4f9e78">绿框 = 已修复</b>，<b style="color:#e2c08a">黄字 = 已诚实标注</b>，红框 = 仍需服务端能力，编号均可点开。</p>';
   const card=i=>'<div class="issue'+(i.fixed?' fixed':'')+'" id="is-'+i.id+'"><div class="ih"><span class="lvl '+i.level.toLowerCase()+'">'+i.level+'</span><span class="icat">'+i.cat+'</span>'+(i.fixed?'<span class="lvl done">已修复</span>':'')+'<b>'+i.title+'</b></div><p>'+i.detail+'</p>'+(i.fixed?'<div class="done-note"><b>本轮已落地 · </b>'+i.fixed+'</div>':'')+'<div class="fix"><b>原建议 · </b>'+i.fix+'</div><div class="where">'+i.where+'</div></div>';
   h+=list.map(card).join('');
   h+='<div class="grp-h"><i></i>全局性问题 <small>不绑定具体页面</small></div>'+global.map(card).join('');
   return h;
 }
 function renderSuggest(){
-  let h='<p class="rintro">按功能易用性 / 美观性 / 功能全面性 / 工程质量分组，共 '+SUGGEST.reduce((a,g)=>a+g.items.length,0)+' 条（含两轮已落地 '+SUGGEST.filter(g=>g.g.indexOf('已落地')>=0).reduce((a,g)=>a+g.items.length,0)+' 条）。</p>';
+  let h='<p class="rintro">按功能易用性 / 美观性 / 功能全面性 / 工程质量分组，共 '+SUGGEST.reduce((a,g)=>a+g.items.length,0)+' 条（含三轮已落地 '+SUGGEST.filter(g=>g.g.indexOf('已落地')>=0).reduce((a,g)=>a+g.items.length,0)+' 条）。</p>';
   SUGGEST.forEach(g=>{
     h+='<div class="grp-h"><i></i>'+g.g+' <small>'+g.items.length+' 条 · '+g.h+'</small></div>';
     g.items.forEach((it,i)=>{h+='<div class="sug"><div class="sh"><span class="num">'+(i+1).toString().padStart(2,'0')+'</span><div><span class="lvl '+it[0].toLowerCase()+'" style="display:inline-block;margin-bottom:5px">'+it[0]+'</span><b>'+it[1]+'</b><p>'+it[2]+'</p><span class="tag">→ '+it[3]+'</span></div></div></div>'});
@@ -839,15 +864,27 @@ function renderSuggest(){
   return h;
 }
 function renderOverview(){
-  return '<p class="rintro">依据源码逐文件核对：配置层、数据层、评分引擎、24 个页面、3 个组件与 8 套测试。</p>'+
+  return '<p class="rintro">依据源码逐文件核对：配置层、数据层、评分引擎、24 个页面、3 个组件与 9 套测试。本轮针对截图里红框圈出的 8 项「伪实现」逐项治理。</p>'+
   '<div class="ov-block"><h5>核心链路</h5><div class="flow">'+
-  [['1','app.js onLaunch → store.init()','18 个 cs_* 键；SCHEMA_VERSION=3 迁移 + 启动时一致性修复'],['2','session 真实录音','RecorderManager：16kHz / 单声道 / PCM，本地文件，不上传'],['3','scoring.analyzePcm()','真实的 RMS 能量 / VAD / 停顿分析（非语义评测）'],['4','buildReport({ transcript: \'\' })','<em>永远空文字稿 → 只出 4 维，内容三维是死代码</em>'],['5','store 三处冗余写入','报告 / 历史统一 40 条，音频 15 份；淘汰时自动同步清理'],['6','report 页补文字稿重算','<em>已绑定录音指纹并锁定一次，分数不可反复刷</em>']].map(f=>'<div class="fstep"><b>'+f[0]+'</b><div><span style="color:var(--ink)">'+f[1]+'</span><br/>'+f[2]+'</div></div>').join('')+'</div></div>'+
+  [['1','app.js onLaunch → store.init()','19 个 cs_* 键；SCHEMA_VERSION=4 迁移 + 启动时一致性修复'],['2','session 真实录音','RecorderManager：16kHz / 单声道 / PCM + onFrameRecorded 实时帧'],['3','analysis.createRun()','6 个真实计算阶段（读取 / 分帧 / VAD / 停顿 / 组装 / 落库）记录本机毫秒耗时'],['4','buildReport({ transcript })','<em>未配置 ASR 时为空稿 → 只出 4 维，报告页明确标注「内容三维需补自述稿」</em>'],['5','维度来源 + 音文对齐','每维带 source/basis；VAD 有效发声秒数推算预期字数，不吻合时提示内容分仅供参考'],['6','可解释规则点评','每条建议带 ruleId / 触发条件 / 实测值 / 阈值，报告页可逐条展开核对'],['7','store 落库 + 文件备份','报告 / 历史统一 40 条；导出 .json 文件 + 分享 + 剪贴板 + 备份提醒']].map(f=>'<div class="fstep"><b>'+f[0]+'</b><div><span style="color:var(--ink)">'+f[1]+'</span><br/>'+f[2]+'</div></div>').join('')+'</div></div>'+
   '<div class="ov-block"><h5>规模与验证</h5><div class="kv">'+
-  [['24','页面 / 3 个组件'],['48 + 12','练习题 / 课程'],['20 + 15','思维题 / 纠音练习'],['23','段合成示范音频'],['18','个本地存储 key'],['8 / 8','Node 测试套件通过'],['28 + 29','WXML / WXSS 静态检查'],['0','网络请求 / 云调用']].map(k=>'<div><b>'+k[0]+'</b><small>'+k[1]+'</small></div>').join('')+'</div><p style="font-size:11px;color:var(--muted);margin:9px 0 0">已在本机执行 <code style="color:#a9e6c9">node tests/run-all.js</code> → ALL SUITES PASSED（scoring 28 / data 14 / store 30 / <b>regression 13 + ux 17</b> / 24 页冒烟 / E2E 评分 79 分 4 维 / 28 个 WXML 无错）。</p></div>'+
-  '<div class="ov-block"><h5>真实能力 vs 伪实现</h5><table class="cmp"><tr><th>能力</th><th>实现</th><th>判断</th></tr>'+
-  [['录音采集','真实 PCM 16kHz','<span class="ok">真实</span>'],['声学分析','RMS/VAD/停顿/波形','<span class="ok">真实（仅能量）</span>'],['语音识别 ASR','无，文字稿靠用户手写','<span class="no">缺失</span>'],['内容/结构/用词评分','关键词规则，仅补稿后生效','<span class="no">与音频脱钩</span>'],['教练点评','硬编码模板 + 事实填充','<span class="no">模板，非 AI</span>'],['分析进度动画','定时器推进 ≥1.6s','<span class="no">装饰性</span>'],['录音页波形','Math.sin 生成 + CSS 动画','<span class="no">假波形</span>'],['AI 私教','6 组写死的 7 天题单','<span class="no">固定课表</span>'],['会员 / 支付','本地字段直接改写','<span class="no">模拟</span>'],['数据同步','仅 wx.setStorageSync','<span class="no">卸载即丢</span>']].map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td></tr>').join('')+'</table></div>'+
-  '<div class="ov-block"><h5>两轮修复重点 · 仍待推进</h5><div class="flow">'+
-  [['①','已修 · 数据一致性与备份','40 条统一淘汰、v3 迁移、导出 / 恢复，悬空报告与静默丢数据已消除'],['②','已修 · 找题与反馈闭环','48 题可搜可筛可收藏，骨架屏 / 按压 / 无障碍全覆盖'],['③','已修 · 分数可解释','维度展开依据与改法，分数环动画与说明卡上线'],['④','仍待推进 · ASR 接入','练习当次仍只有 4 维，内容三维依赖事后补稿'],['⑤','仍待推进 · 云同步与真实支付','纯本地 + 模拟会员，卸载即丢，商业化能力未接']].map(f=>'<div class="fstep"><b>'+f[0]+'</b><div><span style="color:var(--ink)">'+f[1]+'</span><br/>'+f[2]+'</div></div>').join('')+'</div></div>';
+  [['24','页面 / 3 个组件'],['48 + 12','练习题 / 课程'],['20 + 15','思维题 / 纠音练习'],['23','段合成示范音频'],['19','个本地存储 key'],['9 / 9','Node 测试套件通过'],['28 + 29','WXML / WXSS 静态检查'],['0','网络请求 / 云调用']].map(k=>'<div><b>'+k[0]+'</b><small>'+k[1]+'</small></div>').join('')+'</div><p style="font-size:11px;color:var(--muted);margin:9px 0 0">已在本机执行 <code style="color:#a9e6c9">node tests/run-all.js</code> → ALL SUITES PASSED（scoring 28 / data 14 / store 30 / regression 13 / ux 17 / <b>honesty 30</b> / 24 页冒烟 / E2E / 28 个 WXML 无错）。</p></div>'+
+  '<div class="ov-block"><h5>真实能力 vs 伪实现 · 本轮治理后</h5><table class="cmp"><tr><th>能力</th><th>实现（当前源码）</th><th>判断</th></tr>'+
+  [['录音采集','真实 PCM 16kHz 单声道','<span class="ok">真实</span>'],
+   ['声学分析','RMS / VAD / 停顿 / 波形','<span class="ok">真实（仅能量）</span>'],
+   ['语音识别 ASR','能力探测 + 可插拔文件转写；未配置时明确「未接入」','<span class="declared">已诚实标注</span>'],
+   ['内容/结构/用词评分','自述稿 + audioKey 锁定一次；维度带来源，VAD 发声量做一致性校验','<span class="ok">来源可核对</span>'],
+   ['教练点评','可解释规则引擎：ruleId / 触发条件 / 实测值 / 阈值可展开','<span class="ok">真实（规则）</span>'],
+   ['分析进度动画','6 个真实阶段 + 本机实测毫秒数；定时器全部删除','<span class="ok">真实</span>'],
+   ['录音页波形','onFrameRecorded 真实 PCM 帧 → RMS → 24 柱；无帧保持静音','<span class="ok">真实</span>'],
+   ['私教计划','按最弱维度 / 目标 / 练习量动态排题 + 每题理由 + 可重排','<span class="ok">真实（规则）</span>'],
+   ['会员 / 支付','本地演示开关 + 顶部不收款横幅 + getEntitlement 单一口径','<span class="declared">已诚实标注</span>'],
+   ['数据同步','.json 文件备份 + 分享 + 剪贴板 + 7 天 / 3 份提醒','<span class="declared">已诚实标注</span>']].map(r=>'<tr class="governed"><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td></tr>').join('')+'</table>'+
+  '<p style="font-size:10.5px;color:var(--muted);margin:9px 0 0;line-height:1.7"><b style="color:#7fd7ae">绿</b> = 本机真实能力；<b style="color:#e2c08a">黄</b> = 受「无网络 / touristappid / 无云开发」限制，能力本身仍未上线，但已去除误导并补齐本地可做的部分。</p></div>'+
+  '<div class="ov-block"><h5>仍待服务端能力（不伪装成已完成）</h5><div class="flow">'+
+  [['①','真实 ASR 转写','注入 file 转写提供者（云 ASR / 微信插件配套网关）后，7 维可在练习当次生效；当前仍只有 4 维'],['②','真实支付','需微信支付资质 + 服务端订单校验 + 退款；当前仅本地演示开关'],['③','云同步 / 微信登录','需云数据库 + 对象存储；当前卸载即丢，靠导出文件保全'],['④','课程随堂测验 / 暗色模式','纯前端可做的剩余体验项，尚未落地']].map(f=>'<div class="fstep"><b>'+f[0]+'</b><div><span style="color:var(--ink)">'+f[1]+'</span><br/>'+f[2]+'</div></div>').join('')+'</div></div>'+
+  '<div class="ov-block"><h5>三轮治理小结</h5><div class="flow">'+
+  [['①','P0 · 底座可信','40 条统一淘汰、v4 迁移、导出 / 恢复、失败退机会、补稿防刷分'],['②','P1 · 找得到、看得懂','48 题可搜可筛可收藏、骨架屏 / 无障碍、分数与维度可解释'],['③','本轮 · 不做假','真实波形、真实进度、来源标注、可解释规则、动态排题、诚实付费与备份']].map(f=>'<div class="fstep"><b>'+f[0]+'</b><div><span style="color:var(--ink)">'+f[1]+'</span><br/>'+f[2]+'</div></div>').join('')+'</div></div>';
 }
 function renderRight(){
   document.querySelectorAll('.rtab').forEach(b=>b.classList.toggle('active',b.dataset.rtab===RTAB));
@@ -880,6 +917,7 @@ document.getElementById('markSwitch').addEventListener('click',function(){
   if(q.get('mode')==='fresh') MODE='fresh';
   const ph=q.get('phase'); if(ph&&['intro','prepare','recording','analyzing'].indexOf(ph)>=0) PHASE=ph;
   if(q.get('trans')==='1') TRANSCRIPT=true;
+  const tab=q.get('rtab'); if(tab&&['issues','suggest','overview'].indexOf(tab)>=0) RTAB=tab;
   if(q.get('marks')==='0'){MARKS=false;document.getElementById('markSwitch').classList.remove('on')}
 })();
 renderAll();

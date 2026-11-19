@@ -21,7 +21,7 @@
       <view wx:if="{{question.audio}}" class="demo-row">
         <view class="demo-btn" bindtap="toggleDemo" hover-class="tap-hover" aria-role="button">
           <view class="demo-icon {{demoPlaying ? 'pause' : ''}}"></view>
-          <text>{{demoPlaying ? '暂停示范' : '听教练示范'}}</text>
+          <text>{{demoPlaying ? '暂停示范' : '听合成示范'}}</text>
         </view>
         <view class="demo-note">{{demoError ? '示范音频不可用' : '合成语音 · 先听停顿与重音'}}</view>
       </view>
@@ -121,6 +121,22 @@
           <text>{{item.label}}</text>
         </view>
       </view>
+
+      <view wx:if="{{preparedPoints.length}}" class="prepare-check">
+        <view class="prepare-check-title">开口前勾一下要讲的要点</view>
+        <view class="prepare-check-sub">这是自评清单，不计入分数，会随这次报告留档</view>
+        <view class="prepare-check-list">
+          <view
+            wx:for="{{preparedPoints}}"
+            wx:key="id"
+            class="prepare-check-item {{item.checked ? 'checked' : ''}}"
+            data-index="{{index}}"
+            bindtap="togglePreparedPoint" hover-class="tap-hover" aria-role="button" aria-label="标记要点{{item.label}}">
+            <view class="prepare-check-box">{{item.checked ? '✓' : ''}}</view>
+            <text>{{item.label}}</text>
+          </view>
+        </view>
+      </view>
     </view>
 
     <view class="prepare-foot">
@@ -149,10 +165,11 @@
         <view
           wx:for="{{waveBars}}"
           wx:key="id"
-          class="wave-bar"
-          style="height: {{item.h}}%; animation-delay: {{item.delay}}s; animation-duration: {{item.dur}}s;"
+          class="wave-bar {{item.live ? 'on' : ''}}"
+          style="height: {{item.h}}%;"
         ></view>
       </view>
+      <view class="wave-note">{{waveNote}}</view>
 
       <view class="record-progress">
         <view class="record-progress-fill" style="width: {{recordPercent}}%;"></view>
@@ -183,28 +200,31 @@
     </view>
 
     <view class="analyzing-title serif">正在把这段声音<br />拆成可改的动作。</view>
-    <view class="analyzing-sub">本地确定性分析 · 不联网 · 不上传</view>
+    <view class="analyzing-sub">本地规则引擎 · 不联网 · 不上传</view>
 
     <view class="analyzing-bar">
       <view class="bar"><view class="bar-fill" style="width: {{analyzingProgress}}%;"></view></view>
     </view>
+    <view class="analyzing-percent">{{analyzingProgress}}% · 已完成 {{analyzingProgress >= 100 ? '全部' : '部分'}}计算步骤</view>
 
     <view class="stage-list">
       <view
         wx:for="{{analyzingStages}}"
-        wx:key="*this"
-        class="stage-row {{index < analyzingStage ? 'stage-done' : ''}} {{index === analyzingStage ? 'stage-current' : ''}}"
+        wx:key="id"
+        class="stage-row {{item.state === 'done' ? 'stage-done' : ''}} {{item.state === 'active' ? 'stage-current' : ''}}"
       >
         <view class="stage-dot">
-          <text wx:if="{{index < analyzingStage}}">✓</text>
+          <text wx:if="{{item.state === 'done'}}">✓</text>
           <text wx:else>{{index + 1}}</text>
         </view>
-        <view class="stage-text">{{item}}</view>
-        <view wx:if="{{index === analyzingStage}}" class="stage-spinner"></view>
+        <view class="stage-text">{{item.label}}</view>
+        <view wx:if="{{item.state === 'done'}}" class="stage-ms">{{item.msLabel}}</view>
+        <view wx:elif="{{item.state === 'active'}}" class="stage-spinner"></view>
       </view>
     </view>
 
-    <view class="analyzing-note">通常只需要几秒。你会拿到分数、原话证据和一个下次能改的动作。</view>
+    <view class="analyzing-note">{{analyzingNote}}</view>
+    <view class="analyzing-cancel" bindtap="goBack" hover-class="tap-hover" aria-role="button" aria-label="取消本次分析">取消分析</view>
   </view>
 </view>
 

@@ -2,6 +2,9 @@ const store = require('../../utils/store')
 const util = require('../../utils/util')
 const scoring = require('../../utils/scoring')
 const recorder = require('../../utils/recorder')
+const waveform = require('../../utils/live-waveform')
+const analysis = require('../../utils/analysis')
+const asr = require('../../utils/asr')
 const questionData = require('../../data/questions')
 const pronounceData = require('../../data/pronounce')
 
@@ -42,9 +45,15 @@ Page({
     recordTip: '',
     recordTipIndex: 0,
     analyzingStage: 0,
-    analyzingProgress: 6,
-    analyzingStages: ['提取声音特征', '核对表达节奏', '生成具体的教练反馈'],
-    waveBars: []
+    analyzingProgress: 0,
+    // 阶段来自 analysis.createRun()，每个步骤带真实耗时，不再用定时器伪装
+    analyzingStages: [],
+    analyzingNote: '每一步都对应真实的计算，右侧是本机实测耗时',
+    // 波形只由 onFrameRecorded 的真实 PCM 帧驱动
+    waveBars: [],
+    waveLive: false,
+    waveNote: '等待音频帧',
+    preparedPoints: []
   },
 
   onLoad(options) {
@@ -102,15 +111,14 @@ Page({
       // ignore
     }
 
-    const waveBars = []
-    for (let i = 0; i < 24; i++) {
-      waveBars.push({
-        id: i,
-        h: 16 + Math.round(60 * (0.5 + 0.5 * Math.sin(i * 0.9)) * (0.6 + 0.4 * Math.cos(i * 0.37))),
-        delay: util.round((i % 8) * 0.07, 2),
-        dur: util.round(0.55 + (i % 5) * 0.09, 2)
-      })
-    }
+    // 真实波形容器：初始全部为静音柱，只有拿到音频帧才会长高
+    this.wave = waveform.createLiveWaveform(24)
+    const waveBars = this.wave.getBars()
+    const preparedPoints = (question.keyPoints || []).map((p, i) => ({
+      id: i,
+      label: p.label,
+      checked: false
+    }))
 
     this.setData({
       ready: true,
@@ -129,6 +137,11 @@ Page({
       tips: question.tips || [],
       recordTip: (question.tips && question.tips[0]) || '',
       waveBars,
+      waveLive: false,
+      waveNote: recorder.supportsFrames()
+        ? '等待录音帧 · 波形来自真实音量'
+        : '本机未回吐音频帧 · 波形保持静音',
+      preparedPoints,
       materialLong: !!(question.material && question.material.length > 120)
     })
 
@@ -138,7 +151,8 @@ Page({
       onStart: () => this.handleRecordStart(),
       onStop: res => this.handleStop(res),
       onError: err => this.handleRecordError(err),
-      onInterruption: type => this.handleInterruption(type)
+      onInterruption: type => this.handleInterruption(type),
+      onFrame: res => this.handleFrame(res)
     })
   },
 
@@ -189,6 +203,41 @@ Page({
 
   toggleMaterial() {
     this.setData({ materialExpanded: !this.data.materialExpanded })
+  },
+
+  /** 开口前标记要点：这是自评清单，不参与打分，只随报告留档 */
+  togglePreparedPoint(e) {
+    const index = Number(e.currentTarget.dataset.index)
+    const list = (this.data.preparedPoints || []).slice()
+    if (!list[index]) return
+    list[index] = Object.assign({}, list[index], { checked: !list[index].checked })
+    this.setData({ preparedPoints: list })
+  },
+
+  /** 真实音频帧 → RMS → 波形。没有帧时一根柱子都不会凭空长出来 */
+  handleFrame(res) {
+    if (this.cancelled || this.data.phase !== 'recording' || !this.wave) return
+    const buffer = res.frameBuffer || res.data
+    if (!buffer || !buffer.byteLength) return
+    this.wave.pushFrame(buffer)
+    const now = Date.now()
+    if (now - (this.lastWavePaint || 0) < 100) return
+    this.lastWavePaint = now
+    this.setData({
+      waveBars: this.wave.getBars(),
+      waveLive: true,
+      waveNote: '真实音频帧 · ' + this.wave.getStats().frames + ' 帧 RMS 振幅'
+    })
+  },
+
+  /** 把真实阶段（含本机耗时）推到 analyzing 视图 */
+  renderAnalysis(snapshot) {
+    if (this.cancelled || !snapshot) return
+    this.setData({
+      analyzingStages: snapshot.steps,
+      analyzingProgress: snapshot.percent,
+      analyzingStage: snapshot.currentIndex < 0 ? snapshot.steps.length : snapshot.currentIndex
+    })
   },
 
   setupDemoAudio(question) {
@@ -288,12 +337,19 @@ Page({
       this.cancelled = false
       this.stopHandled = false
       this.recordStartedAt = 0
+      this.lastWavePaint = 0
+      if (this.wave) this.wave.reset()
       this.setData({
         phase: 'recording',
         recordSeconds: 0,
         recordActive: false,
         progressPercent: 0,
-        recordTip: (this.data.tips && this.data.tips[0]) || ''
+        recordTip: (this.data.tips && this.data.tips[0]) || '',
+        waveBars: this.wave ? this.wave.getBars() : [],
+        waveLive: false,
+        waveNote: recorder.supportsFrames()
+          ? '等待音频帧'
+          : '本机未回吐音频帧 · 波形保持静音'
       })
       wx.setKeepScreenOn({ keepScreenOn: true })
       this.vibrate()
@@ -515,13 +571,16 @@ Page({
     this.clearTimers()
     wx.setKeepScreenOn({ keepScreenOn: false })
     this.vibrate()
+    // 进度绑定真实计算阶段：读取文件 / 分帧 / VAD / 停顿 / 组装 / 落库
+    this.run = analysis.createRun(snapshot => this.renderAnalysis(snapshot))
     this.setData({
       phase: 'analyzing',
       recordActive: false,
       analyzingStage: 0,
-      analyzingProgress: 8
+      analyzingProgress: 0,
+      analyzingStages: this.run.snapshot().steps
     })
-    this.startAnalysisAnimation()
+    this.run.begin('read')
     try {
       recorder.stop()
       this.stopTimeout = setTimeout(() => {
@@ -532,16 +591,6 @@ Page({
     } catch (e) {
       this.failAnalysis('录音结束失败，请再试一次。')
     }
-  },
-
-  startAnalysisAnimation() {
-    if (this.analysisTimer) clearInterval(this.analysisTimer)
-    this.analysisTimer = setInterval(() => {
-      const stage = Math.min(2, this.data.analyzingStage + 1)
-      const progress = Math.min(92, this.data.analyzingProgress + 18)
-      this.setData({ analyzingStage: stage, analyzingProgress: progress })
-      if (progress >= 92) clearInterval(this.analysisTimer)
-    }, 480)
   },
 
   handleStop(res) {
@@ -605,13 +654,15 @@ Page({
 
   analyzeFile(filePath, duration, fileSize) {
     const fs = wx.getFileSystemManager()
+    const run = this.run
     fs.readFile({
       filePath,
       success: res => {
         if (this.cancelled) return
+        if (run && run.end) run.end('read')
         let audio = null
         try {
-          audio = scoring.analyzePcm(res.data, 16000)
+          audio = scoring.analyzePcm(res.data, 16000, run)
         } catch (e) {
           console.warn('[session] analyze pcm failed', e)
         }
@@ -623,6 +674,7 @@ Page({
       },
       fail: err => {
         console.warn('[session] readFile failed', err)
+        if (run && run.skip) run.skip('read')
         this.failAnalysis('读取录音文件失败，请再试一次。')
       }
     })
@@ -645,6 +697,30 @@ Page({
     // await 写文件期间用户可能已取消，这里再确认一次
     if (this.cancelled) return
 
+    // 只有配置了「文件转写」提供者时才会自动得到文字稿；
+    // 未配置时保持空稿，由报告页明确告诉用户去补写自述稿，绝不假装识别过。
+    const asrCapability = asr.getCapability()
+    let transcript = ''
+    let transcriptSource = 'none'
+    if (asrCapability.available && asrCapability.mode === 'file' && wavPath) {
+      try {
+        const recognized = await asr.recognizeAudio({
+          filePath: wavPath,
+          duration: audio.duration,
+          sampleRate: 16000
+        })
+        transcript = recognized.text
+        transcriptSource = recognized.source
+      } catch (e) {
+        console.warn('[session] asr unavailable, fallback to manual transcript', e && e.code)
+      }
+    }
+    if (this.cancelled) return
+
+    const preparedPoints = (this.data.preparedPoints || [])
+      .filter(p => p.checked)
+      .map(p => p.label)
+
     const quota = this.isDeliveryQuestion(question)
       ? { ok: true, source: 'delivery' }
       : store.consumeReview()
@@ -652,7 +728,11 @@ Page({
       id,
       question,
       audio,
-      transcript: '',
+      transcript,
+      transcriptSource,
+      asrCapability,
+      preparedPoints,
+      run: this.run,
       source: this.data.source,
       date: util.dateKey(),
       locked: !quota.ok
@@ -660,6 +740,7 @@ Page({
     report.quotaSource = quota.source
     report.audioPath = wavPath || tempFilePath
     report.hasAudioFile = !!wavPath
+    if (this.run) this.run.begin('save')
     store.saveReport(report)
     // 报告已落库，这次机会才算真正用掉
     this.reportSaved = true
@@ -716,11 +797,16 @@ Page({
       store.saveReport(report)
     }
 
+    if (this.run) {
+      this.run.end('save')
+      this.run.finish()
+    }
     this.clearTimers()
     this.leaving = true
+    // 只保留极短的视觉过渡，不再是「至少 1.6 秒假装在算」
     const elapsed = Date.now() - (this.analysisStart || Date.now())
-    const wait = Math.max(0, 1600 - elapsed)
-    this.setData({ analyzingStage: 2, analyzingProgress: 100 })
+    const wait = Math.max(0, 420 - elapsed)
+    this.setData({ analyzingProgress: 100 })
     this.navigateTimer = setTimeout(() => {
       wx.redirectTo({ url: '/pages/report/report?id=' + report.id })
     }, wait)

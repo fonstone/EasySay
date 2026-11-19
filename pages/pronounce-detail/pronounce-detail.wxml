@@ -9,7 +9,7 @@
     <view class="demo-row">
       <view class="demo-btn" bindtap="toggleDemo" hover-class="tap-hover" aria-role="button">
         <view class="demo-icon {{playing ? 'pause' : ''}}"></view>
-        <text>{{playing ? '暂停示范' : '听教练示范'}}</text>
+        <text>{{playing ? '暂停示范' : '听合成示范'}}</text>
       </view>
       <view class="demo-note">{{audioError ? '示范音频不可用' : '合成语音 · 听字音与节奏'}}</view>
     </view>

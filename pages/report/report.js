@@ -37,7 +37,15 @@ Page({
     submitting: false,
     expandedDim: '',
     scoreGuideOpen: false,
-    scoreGuide: guide.SCORE_GUIDE
+    scoreGuide: guide.SCORE_GUIDE,
+    sourceRows: [],
+    engineLabel: '本地可解释规则引擎',
+    transcriptSourceLabel: '未提供文字稿',
+    alignmentNote: '',
+    alignmentStatus: 'consistent',
+    preparedPoints: [],
+    coachRules: [],
+    rulesOpen: false
   },
 
   onLoad(options) {
@@ -61,6 +69,12 @@ Page({
       setTimeout(() => util.goBack(), 700)
       return
     }
+    this.applyReport(report)
+    this.setupAudio(report)
+  },
+
+  /** 报告视图的统一装配：首次加载与补稿重算后都走这里，避免两套数据不同步 */
+  applyReport(report) {
     const locked = !!report.locked && !store.isMember()
     const transcriptLocked = !!report.transcriptLocked
     const audioExpired = !!report.audioExpired || !report.audioPath
@@ -79,8 +93,8 @@ Page({
         tone: d.score >= 85 ? 'high' : d.score >= 70 ? 'mid' : 'low',
         muted: d.weight === 0,
         guide: g,
-        fromLabel: guide.fromLabel(d.key),
-        fromTone: g.from === 'text' ? 'text' : 'voice'
+        fromLabel: d.source ? guide.sourceLabel(d.source) : guide.fromLabel(d.key),
+        fromTone: d.source === 'text' ? 'text' : (g.from === 'text' ? 'text' : 'voice')
       }
     })
 
@@ -98,6 +112,11 @@ Page({
         ? { label: '语速', value: text.pace, unit: '字/分' }
         : { label: '声音起伏', value: ((report.audio && report.audio.energyCV) || 0).toFixed(2), unit: '' }
     ]
+
+    const provenance = report.provenance || {}
+    const asrInfo = provenance.asr || {}
+    const alignment = provenance.alignment || null
+    const coach = report.coach || {}
 
     this.setData({
       ready: true,
@@ -118,10 +137,20 @@ Page({
       questionFavorited: report.question ? store.isFavorite(report.question.id) : false,
       textCoverage: report.text && report.text.coverage !== null
         ? report.text.matchedPoints.length + '/' + (report.question.keyPoints ? report.question.keyPoints.length : 1)
-        : '—'
+        : '—',
+      transcriptSourceLabel: report.transcriptSourceLabel || '未提供文字稿',
+      engineLabel: (coach.engine && coach.engine.label) || '本地确定性规则（非 AI 生成）',
+      preparedPoints: report.preparedPoints || [],
+      coachRules: (coach.rules || []).map(r => Object.assign({}, r)),
+      alignmentNote: alignment && !alignment.trusted ? alignment.label : '',
+      alignmentStatus: alignment ? alignment.status : 'none',
+      sourceRows: [
+        { label: '声音数据', value: '真实录音 · PCM 16kHz 单声道' },
+        { label: '文字来源', value: report.transcriptSourceLabel || '未提供文字稿' },
+        { label: '语音识别', value: asrInfo.available ? (asrInfo.label || '已接入') : '未接入 · 内容维度需手动补写自述稿' },
+        { label: '点评引擎', value: (coach.engine && coach.engine.label) || '本地可解释规则引擎（非 AI 生成）' }
+      ]
     })
-
-    this.setupAudio(report)
   },
 
   setupAudio(report) {
@@ -234,6 +263,9 @@ Page({
       question,
       audio: report.audio,
       transcript: text,
+      transcriptSource: 'manual',
+      asrCapability: (report.provenance && report.provenance.asr) || null,
+      preparedPoints: report.preparedPoints || [],
       source: report.source,
       date: report.date,
       locked: false,
@@ -263,26 +295,10 @@ Page({
     }
 
     store.updateReport(rebuilt)
-
-    const dims = rebuilt.dimensions.map(d => ({
-      key: d.key,
-      name: d.name,
-      detail: d.detail,
-      score: d.score,
-      tone: d.score >= 85 ? 'high' : d.score >= 70 ? 'mid' : 'low',
-      muted: d.weight === 0
-    }))
-
+    this.applyReport(rebuilt)
     this.setData({
-      report: rebuilt,
-      dims,
       transcriptOpen: true,
       transcriptInput: text,
-      transcriptLocked: true,
-      quoteSaved: store.isQuoteSaved(rebuilt.quote),
-      textCoverage: rebuilt.text && rebuilt.text.coverage !== null
-        ? rebuilt.text.matchedPoints.length + '/' + (rebuilt.question.keyPoints ? rebuilt.question.keyPoints.length : 1)
-        : '—',
       submitting: false
     })
 
@@ -322,6 +338,10 @@ Page({
 
   toggleScoreGuide() {
     this.setData({ scoreGuideOpen: !this.data.scoreGuideOpen })
+  },
+
+  toggleRules() {
+    this.setData({ rulesOpen: !this.data.rulesOpen })
   },
 
   toggleQuestionFavorite() {

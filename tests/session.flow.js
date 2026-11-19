@@ -11,6 +11,7 @@ const storage = {}
 const calls = []
 let onStartCb = null
 let onStopCb = null
+let onFrameCb = null
 
 function makePcm(duration, sampleRate) {
   const sr = sampleRate || 16000
@@ -34,8 +35,13 @@ const recorderManager = {
   onError() {},
   onInterruptionBegin() {},
   onInterruptionEnd() {},
+  onFrameRecorded(fn) { onFrameCb = fn },
   start() {
     setTimeout(() => { if (onStartCb) onStartCb() }, 5)
+    // 回吐一帧真实 PCM，验证录音页波形确实由音频帧驱动
+    setTimeout(() => {
+      if (onFrameCb) onFrameCb({ frameBuffer: PCM.slice(0, 3200), isLastFrame: false })
+    }, 10)
   },
   stop() {
     setTimeout(() => {
@@ -142,9 +148,13 @@ async function run() {
   session.skipPrepare()
   await sleep(40)
   assert.strictEqual(session.data.recordActive, true)
+  assert.strictEqual(session.data.waveLive, true, '波形必须由真实音频帧点亮')
+  assert.ok(session.data.waveBars.some(b => b.live), '至少有一根柱子来自真实帧')
 
   // 手动结束录音
   session.doStop()
+  assert.strictEqual(session.data.analyzingStages.length, 6, '进度必须是 6 个真实阶段')
+  assert.strictEqual(session.data.analyzingStages[0].label, '读取录音数据')
   await sleep(2200)
 
   const history = store.getHistory(5)

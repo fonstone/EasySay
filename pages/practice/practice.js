@@ -67,9 +67,10 @@ Page({
       planGoal = require('../../data/coach').getGoal(plan.goalId)
       planDone = (plan.completed || []).length
       const nextIndex = (plan.completed || []).length
-      if (planGoal && planGoal.plan[nextIndex]) {
-        planNext = questionData.getQuestion(planGoal.plan[nextIndex])
-      }
+      // 动态计划以 days 为准；旧版固定课表由 normalizePlan 兼容
+      const normalized = require('../../utils/plan').normalizePlan(plan)
+      const day = normalized && normalized.days && normalized.days[nextIndex]
+      if (day) planNext = questionData.getQuestion(day.qid)
     }
 
     const stats = store.getStats()
